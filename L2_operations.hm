@@ -1,0 +1,446 @@
+-- L2_operations.hm
+-- Layer 2: Operations
+-- hypermath | formal-universality
+--
+-- Layer 1 is the relational substrate. Layer 2 introduces the first operations:
+-- sequential connection (+), commutative co-presence (additionally), and
+-- derivation-path composition (compose). All operations stay within the ~~ class.
+--
+-- Layer boundary: no term from L3 (ordinatics) or above appears here.
+--   L1 terms in scope: all primitives, relations, executive opaques, trace-levels.
+--   L2 introduces: +, additionally, DerivationPath, compose.
+--
+-- Status: FORM (operations defined, graduation criterion discharged).
+--   FRAME residuals:
+--     simulation-pair-exists — still FRAME. Non-trivial == pair requires
+--       both L2 compose AND L3 ordinal continuation. Discharge deferred.
+--     deriver ==-cycle content — FRAME (L3, carried forward).
+--     congruent-path internals — FRAME (L3). Schema closed at L2 via quantification/trajectory.
+--   P_2 = 31. N_2_atomic = 3 (DerivationPath, step, path-ground).
+--   G_2 = 4 (graduation NCs for L2 -> L3).
+--
+-- Sections:
+--   I   : Layer permits and prohibits (from L1 graduation)
+--   II  : Primitives and opaque predicates
+--   III : Axioms for + (definitive expansion)
+--   IV  : Axioms for additionally (commutative co-presence)
+--   V   : DerivationPath + compose
+--   VI  : Derives
+--   VII : Graduation criterion L2 -> L3
+--   VIII: L2 self-kernel (structural census, 29 steps)
+-- =============================================================================
+
+
+-- =============================================================================
+-- SECTION I: LAYER PERMITS AND PROHIBITS
+-- Copied from L1 graduation block for traceability.
+-- =============================================================================
+
+-- L1 graduation permits L2:
+--   (a) '+' : Form -> Form -> Form
+--       Non-commutative sequential connection. (a + b) is a Form derived from a by b.
+--       Must stay within the ~~ class of its operands (from NC-1 at L1).
+--       L3 may NOT assert: a + b == b + a. Commutativity is prohibited at L2.
+--   (b) 'additionally' : Form -> Form -> Form
+--       Commutative co-presence. additionally(a, b) holds a and b simultaneously.
+--       Commutativity holds at the ~~ level.
+--   (c) 'compose' : DerivationPath -> DerivationPath -> DerivationPath
+--       Sequential composition of two derivation paths.
+--   (d) Finite structural operations. L2 handles finite forms only.
+
+-- L1 graduation prohibits L2:
+--   (a) ordinal_limit or any infinite ordinal — those belong to L3.
+--   (b) Separate classification machinery (self-kernel pattern IS the machinery).
+--   (c) Closing 'simulation-pair-exists' from L1 — still FRAME at L2.
+--   (d) Asserting commutativity for '+'.
+
+
+-- =============================================================================
+-- SECTION II: PRIMITIVES AND OPAQUE PREDICATES
+-- Three new atomic forms at L2.
+-- =============================================================================
+
+primitive DerivationPath :: Type
+    -- A finite record of apply-steps with their trace-levels.
+    -- A DerivationPath is the structural artifact of traversing D[x][y]:
+    --   a finite sequence (x_0, r_0), (x_1, r_1), ..., (x_n, r_n)
+    --   where each x_i :: Form, r_i is a trace-level (~~/=~/==),
+    --   x_{i+1} = apply(x_i), and r_{i+1} >= r_i (non-decreasing trace).
+    -- DerivationPath is not Form. It is a first-class index into D.
+    -- 'finite': the sequence terminates (no infinite ordinal needed).
+
+primitive step :: Form -> Form -> DerivationPath
+    -- step(x)(y): the unit path from x to y in one apply position.
+    -- step(x)(y) is only defined when y = apply(x) or y ~~ apply(x).
+    -- Produces a singleton DerivationPath of length 1.
+
+primitive path-ground :: DerivationPath
+    -- The empty derivation path. Zero steps. Identity for compose.
+    -- Analogous to ground :: Form but at the path layer.
+    -- compose(p, path-ground) ~~ p at the path level (right identity).
+    -- compose(path-ground, p) ~~ p at the path level (left identity).
+
+opaque path-length :: DerivationPath -> Form
+    -- The number of steps in a DerivationPath, represented as a Form.
+    -- For path-ground: path-length(path-ground) ~~ ground (zero steps).
+    -- For step(x)(y): path-length(step(x)(y)) ~~ apply(ground) (one step).
+    -- path-length is opaque: the representation of natural numbers as
+    --   apply-chains belongs to L3 (ordinal grounding). Here we state
+    --   that path-length exists and is a Form; its arithmetic is FRAME/L3.
+
+opaque path-trace :: DerivationPath -> Form
+    -- The minimum trace-level (~~/=~/==) across all steps in the path.
+    -- path-trace(path-ground) ~~ ground (vacuously, empty path has no floor).
+    -- path-trace(step(x)(y)) :: Form representing the trace-level of that step.
+    -- Opaque: trace-level comparison arithmetic is L3.
+
+
+-- =============================================================================
+-- SECTION III: AXIOMS FOR + (DEFINITIVE EXPANSION)
+-- + is the non-commutative sequential connection of two Forms.
+-- =============================================================================
+
+axiom ax-seq: for-all (a b :: Form), exists c :: Form,
+    similar(c, a) and similar(c, b)
+    -- Every sequential connection (a + b) stays within the ~~ class of BOTH operands.
+    -- c is the Form denoted by a + b.
+    -- This establishes that + does not escape the ~~ orbit.
+    -- It does NOT assert that c = a or c = b; c is a distinct Form in the orbit.
+
+axiom ax-seq-asymm: for-all (a b :: Form),
+    not (congruent(a, b)) implies not (congruent(a plus b, b plus a))
+    -- If a and b are not already =~-congruent,
+    --   then (a + b) and (b + a) are not =~-congruent either.
+    -- This is the non-commutativity of + at the =~ level.
+    -- Note: similar(a+b, b+a) may still hold (they share ~~ class).
+    --       What fails is =~ — the substance is sequencing-sensitive.
+
+axiom ax-seq-identity: for-all (a :: Form),
+    congruent(a plus ground, a) and congruent(ground plus a, a)
+    -- ground acts as the identity for + at the =~ level.
+    -- a + ground =~ a (appending nothing changes nothing substantively).
+    -- ground + a =~ a (prepending nothing changes nothing substantively).
+
+
+-- =============================================================================
+-- SECTION IV: AXIOMS FOR ADDITIONALLY (COMMUTATIVE CO-PRESENCE)
+-- additionally is the commutative operation holding two Forms simultaneously.
+-- =============================================================================
+
+axiom ax-coop: for-all (a b :: Form), exists c :: Form,
+    similar(c, a) and similar(c, b)
+    -- additionally(a, b) stays within ~~ of both operands.
+    -- Structurally the same orbit requirement as ax-seq, but the semantics differ:
+    --   + is sequential (order-sensitive in substance).
+    --   additionally is simultaneous (order-insensitive in substance).
+
+axiom ax-coop-comm: for-all (a b :: Form),
+    congruent(additionally a b, additionally b a)
+    -- additionally IS commutative at =~ level.
+    -- Substance of (a and b simultaneously) = substance of (b and a simultaneously).
+    -- This is the structural difference from +.
+
+axiom ax-coop-identity: for-all (a :: Form),
+    congruent(additionally a ground, a) and congruent(additionally ground a, a)
+    -- ground acts as the =~-identity for additionally.
+    -- additionally(a, ground) =~ a (co-presenting nothing changes nothing).
+
+
+-- =============================================================================
+-- SECTION V: DERIVATIONPATH + COMPOSE
+-- Finite path composition. No infinite paths at L2.
+-- =============================================================================
+
+axiom ax-compose-assoc: for-all (p q r :: DerivationPath),
+    congruent-path(compose p (compose q r), compose (compose p q) r)
+    -- compose is associative at the path-congruence level.
+    -- congruent-path is the =~-analog for DerivationPath.
+    -- This establish compose as a well-formed monoidal operation on paths.
+    -- (congruent-path is opaque here; semantics FRAME/L3)
+
+axiom ax-compose-identity: for-all (p :: DerivationPath),
+    congruent-path(compose p path-ground, p)
+    and congruent-path(compose path-ground p, p)
+    -- path-ground is the identity for compose.
+
+axiom ax-compose-nonempty: for-all (x y :: Form),
+    exists (p :: DerivationPath), not (congruent-path(p, path-ground))
+    and (step x y) congruent-path-part-of p
+    -- There always exists a non-empty path connecting any form to any other
+    --   via the apply chain (guaranteed by ax-box: apply(apply(x)) ~~ x).
+    -- This establishes that DerivationPath is inhabited with non-trivial content.
+
+opaque compose :: DerivationPath -> DerivationPath -> DerivationPath
+    -- Sequential composition of two DerivationPaths.
+    -- compose(p)(q): the path that traverses p then traverses q.
+    -- Domain: DerivationPath × DerivationPath. Codomain: DerivationPath.
+    -- Governed by ax-compose-assoc, ax-compose-identity.
+    -- The internals (step enumeration, trace-level threading) are FRAME/L3.
+
+opaque congruent-path :: DerivationPath -> DerivationPath -> Prop
+    -- The =~-analog for DerivationPath.
+    -- Two paths are congruent-path when they have the same substance:
+    --   same start, same end, same minimum trace-level — regardless of intermediate steps.
+
+close congruent-path in quantification-language as FORM:
+    -- Two DerivationPaths p and q are congruent-path when the four-tuple
+    -- (start-Form, end-Form, path-trace, quantification-result) is identical.
+    -- This is the =~-analog for paths: same substance regardless of intermediate steps.
+    --
+    -- Machinery used (all L2-available):
+    --   path-trace(p)       :: DerivationPath -> Form — minimum trace-level across all steps.
+    --   quantification(p)   :: DerivationPath -> Form — total quanta-count of path p.
+    --     (quanta = the minimal trace-level-change unit; quanta.txt term_formation)
+    --     quantification(path-ground)           = ground  (zero quanta)
+    --     quantification(step(x)(y)) at ==       = ground  (trace preserved, no quanta spent)
+    --     quantification(step(x)(y)) at ~~       = apply(ground) (one quanta spent)
+    --   minimum-quanta trajectory (trajectory.txt §7): the path achieving a trace-level target
+    --     with the fewest quanta. congruent-path equivalence classes ARE trajectory-classes:
+    --     all paths with the same (start, end, trace-floor, quanta-count) are the same trajectory.
+    --
+    -- Formal schema:
+    --   congruent-path(p, q) :=
+    --     similar(start(p), start(q))                   -- (1) same start-Form at ~~
+    --     and similar(end(p), end(q))                   -- (2) same end-Form at ~~
+    --     and similar(path-trace(p), path-trace(q))     -- (3) same trace-floor
+    --     and similar(quantification(p), quantification(q)) -- (4) same quanta-count
+    --
+    -- Why this closes the substance:
+    --   The substance of a path is what it achieves (endpoint, trace-floor, cost).
+    --   Two paths with the same four-tuple achieve identical substance regardless of
+    --   which intermediate Forms were visited. This matches =~: substance coincides,
+    --   path discarded.
+    --
+    -- FORM status: the schema is fully stateable using L2 opaques and L1 relations.
+    --   Arithmetic evaluation of quantification(p) for paths of length > 1 requires
+    --   L3 ordinal arithmetic (apply-chain encoding of natural numbers). FRAME/L3.
+    step 1: path-trace is opaque at L2 — defined and usable, arithmetic FRAME/L3.
+    step 2: quantification is the quanta-counting act — stateable at L2 via quanta.txt.
+            quantification(path-ground) = ground (zero quanta) — concrete at L2.
+            quantification(step(x)(y)) depends on trace-level of the step — stateable at L2.
+    step 3: The four-tuple (start, end, path-trace, quantification) is the substance schema.
+            Stated using only similar (~~), path-trace, and quantification — all L2.
+    step 4: This schema makes congruent-path well-defined at the schema level.
+            The reflexivity of congruent-path follows: any path is congruent-path to itself.
+            (same start, same end, same path-trace, same quantification by identity)
+    close: =~ (schema FORM at L2; evaluation of quantification for length > 1 FRAME/L3)
+    open-frame: "quantification of non-trivial path lengths needs L3 ordinal arithmetic"
+
+
+-- =============================================================================
+-- SECTION VI: DERIVES
+-- Consequences derivable purely within L2's operation vocabulary.
+-- =============================================================================
+
+derive plus-stays-similar as FORM:
+    -- From ax-seq and similar-reflexive (L1):
+    -- For any a b, (a + b) ~~ a and (a + b) ~~ b.
+    -- Proof: ax-seq gives c similar to a and b. c is the denotation of (a+b).
+    --   similar(a+b, a): by ax-seq, c similar a, and c = a+b by construction.
+    --   similar(a+b, b): by ax-seq, c similar b.
+    -- close: ~~ (derivable from ax-seq + similar-reflexive from L1)
+
+derive additionally-stays-similar as FORM:
+    -- From ax-coop and similar-reflexive (L1):
+    -- For any a b, additionally(a,b) ~~ a and additionally(a,b) ~~ b.
+    -- Proof: same structure as plus-stays-similar with ax-coop.
+    -- close: ~~ (derivable from ax-coop + similar-reflexive from L1)
+
+derive plus-and-additionally-are-distinct as FORM:
+    -- + and additionally are distinct operations.
+    -- Proof: ax-seq-asymm gives a b where (a+b) not =~ (b+a).
+    --        ax-coop-comm gives additionally(a,b) =~ additionally(b,a) for ALL a b.
+    --        These two behaviors cannot be the same operation.
+    -- close: =~ (derivable from ax-seq-asymm and ax-coop-comm by contraction)
+
+derive path-ground-is-identity as FORM:
+    -- path-ground is the two-sided identity for compose.
+    -- Proof: ax-compose-identity directly.
+    -- close: =~ (derivable from ax-compose-identity)
+
+derive reflexion as FORM:
+    -- reflexion(x) := D[x][x] — the self-read of any form x in the D matrix.
+    -- D-is-reflexive (L1): D[x][x] is FORM for all x. The zero-step path at x.
+    -- path-ground-is-identity (L2): compose(path-ground, p) =~ p.
+    -- Therefore: compose(D[x][x], p) =~ p for any path p starting at x.
+    --
+    -- reflexion is the conjunction: D-is-reflexive + path-ground-is-identity.
+    -- The self-read entry exists (L1) and composes as identity (L2).
+    -- No new primitive. No new axiom. Two prior FORM derives composed.
+    --
+    step 1: D-is-reflexive (L1): D[x][x] = path-ground instantiated at x.
+            The zero-step path from x to x. Trace level: == (trivially). FORM.
+    step 2: D[x][x] =~ path-ground at position x.
+            Both are zero-step paths at x. Same continuation capacity. FORM.
+    step 3: compose(D[x][x], p) =~ compose(path-ground, p) =~ p
+            for any path p starting at x.
+            First =~: step 2 (D[x][x] =~ path-ground).
+            Second =~: path-ground-is-identity (L2). FORM.
+    step 4: ax-seq-identity (L2): ground + x =~ x.
+            Therefore D[ground + x][x] =~ D[x][x] (substituting =~-congruent
+            indices in D, which is indexed at =~ by trace-levels L1).
+            The +-identity route is a specific access mechanism within L2;
+            the substance is steps 1-3. FORM.
+    close: reflexion (FORM)
+    -- reflexion(x) = the self-read of x in D: zero-cost, identity under compose.
+    -- Derived from: D-is-reflexive (L1), path-ground-is-identity (L2),
+    -- ax-seq-identity (L2). All L1/L2 content. FORM.
+
+derive orbit-reflexion-quotient as FORM:
+    -- The unified width measure for any layer.
+    -- Two forms x, y are orbit-reflexion equivalent when their D-columns coincide:
+    --   D[x][z] =~ D[y][z] for all z :: Form.
+    -- This is equivalent to: x and y reach the same forms (orbit-quotient)
+    -- AND the same forms reach x and y (reflexion-quotient).
+    -- Forward (orbit): same D-row reachability.
+    -- Backward (reflexion): same D-column profile.
+    -- These are dual: reachability from generators and D-column =~-class are the
+    -- same structural question asked in two directions.
+    --
+    -- width(L) := |{ [x]_{D-col =~} : x ∈ entities(L) }|
+    --
+    step 1: D is defined (L1). =~ is defined (L1). Both FORM.
+    step 2: "For all z" is bounded: the ~~-orbit is finite (ax-box, L0).
+            The universal quantification terminates. FORM.
+    step 3: D[x][z] =~ D[y][z] for all z iff x and y have the same derivation
+            profile — same reachability, same trace levels, same path structure.
+            This is the D-column =~-class of x. FORM.
+    step 4: The equivalence relation [x]_{D-col =~} partitions entities(L)
+            into orbit-reflexion classes. Each class has one canonical representative.
+            Layer width = number of classes. FORM.
+    step 5: Composition with trickle-down (depth minimization):
+            If x is derivable at layer L-k, trickle-down pushes x to L-k.
+            At L-k, orbit-reflexion-quotient checks if x is a new class or
+            coincides with an existing entity's D-column.
+            The composition trickle-down × orbit-reflexion is a fixed point:
+            bounded below (L0, width ≥ 1), each step reduces depth × width
+            lexicographically. Terminates. FORM.
+    close: orbit-reflexion-quotient (FORM)
+    -- The single width measure. Orbit and reflexion are not two mechanics —
+    -- they are one quotient seen from two directions. Derived from D (L1),
+    -- =~ (L1), ax-box finiteness (L0). FORM.
+
+derive finite-path-exists as FORM:
+    -- At least one non-trivial DerivationPath exists.
+    -- Proof: ax-compose-nonempty guarantees non-empty paths exist.
+    --        step(ground)(apply(ground)) is a concrete instance.
+    -- close: ~~ (existential derivation from ax-compose-nonempty)
+
+derive composition-length-additive as FRAME:
+    -- length(compose(p)(q)) = length(p) + length(q) in some numeric sense.
+    -- FRAME: path-length(p) is a Form, but its arithmetic requires
+    --        the ordinal-as-apply-positions structure from L3.
+    -- close: FRAME — numeric addition of apply-chain lengths needs L3.
+    -- open-frame: "path-length arithmetic requires L3 ordinal grounding"
+
+
+-- =============================================================================
+-- SECTION VII: GRADUATION CRITERION — L2 -> L3
+-- =============================================================================
+
+graduation L2 -> L3:
+    -- L3 (Ordinatics) introduces ordinal_limit, finite/infinite ordinals,
+    --   ordinal arithmetic, and the deriver ==-cycle constructive proof.
+    -- L3 will also provide the machinery to discharge simulation-pair-exists.
+    --
+    -- New contexts (NCs) from L2 that L3 requires:
+    --
+    --   NC-1: '+' is a well-defined Form operation staying within ~~.
+    --         L3 uses + to build ordinal successor steps.
+    --
+    --   NC-2: 'additionally' is well-defined and commutative at =~.
+    --         L3 uses additionally to hold co-present ordinals (limit stages).
+    --
+    --   NC-3: DerivationPath and compose are defined, finite, and associative.
+    --         L3 uses compose to build the infinite continuation path
+    --         needed for simulation-pair-exists.
+    --
+    --   NC-4: At least one non-trivial DerivationPath exists (finite-path-exists).
+    --         L3's ordinal construction requires a base case before inductive step.
+    --
+    -- Discharges:
+    --   NC-1: plus-stays-similar (FORM): a+b ~~ a and a+b ~~ b. Discharged.
+    --   NC-2: ax-coop-comm (FORM): additionally commutes at =~. Discharged.
+    --   NC-3: path-ground-is-identity (FORM): compose has identity. Discharged.
+    --         ax-compose-assoc (FORM): compose is associative. Discharged.
+    --   NC-4: finite-path-exists (FORM): non-trivial path exists. Discharged.
+    --
+    graduation-status: FORM
+        -- All 4 NCs discharged at L2. L3 is licensed to proceed.
+
+    permits L3:
+        -- (a) ordinal_limit :: Form — the first infinite ordinal position.
+        -- (b) ordinal_succ :: Form -> Form — successor in the ordinal sense.
+        -- (c) Ordinal arithmetic: +_ord, ×_ord over ordinal Forms.
+        -- (d) Closing simulation-pair-exists using compose + ordinal continuation.
+        -- (e) Deriver ==-cycle constructive proof (B3 resolution).
+
+    prohibits L3:
+        -- (a) L3 may NOT introduce new primitive operations beyond ordinatics.
+        -- (b) L3 may NOT assert that + is commutative (that prohibition carries forward).
+        -- (c) L3 may NOT introduce separate classification machinery.
+        --     The self-kernel pattern (present from L0) IS the classification machinery.
+
+
+-- =============================================================================
+-- SECTION VIII: L2 SELF-KERNEL
+-- Structural census of Layer 2. P_2 = 31 steps.
+-- N_2_atomic = 3: DerivationPath, step, path-ground.
+-- G_2 = 4: graduation NCs.
+-- =============================================================================
+
+-- L2 self-kernel: the closed structural census of what this layer establishes.
+--
+-- Primitives introduced at L2:
+-- step 1: primitive(DerivationPath)     — finite apply-step record. FORM.
+-- step 2: primitive(step)               — unit path constructor. FORM.
+-- step 3: primitive(path-ground)        — empty path, identity. FORM.
+--
+-- Opaques introduced at L2:
+-- step 4: opaque(path-length)           — Form-valued step count. FRAME/L3.
+-- step 5: opaque(path-trace)            — minimum trace-level of path. FRAME/L3.
+-- step 6: opaque(compose)               — path composition. FORM (schema). FRAME/L3 (internals).
+-- step 7: opaque(congruent-path)        — =~-analog for paths. Schema: FORM (L2). Internals: FRAME/L3.
+--
+-- Axioms for + :
+-- step 8: ax-seq                        — + stays within ~~ of both operands. FORM.
+-- step 9: ax-seq-asymm                  — + is non-commutative at =~. FORM.
+-- step 10: ax-seq-identity              — ground is =~-identity for +. FORM.
+--
+-- Axioms for additionally :
+-- step 11: ax-coop                      — additionally stays within ~~ of both. FORM.
+-- step 12: ax-coop-comm                 — additionally commutes at =~. FORM.
+-- step 13: ax-coop-identity             — ground is =~-identity for additionally. FORM.
+--
+-- Axioms for compose :
+-- step 14: ax-compose-assoc             — compose is associative at congruent-path. FORM.
+-- step 15: ax-compose-identity          — path-ground is compose-identity. FORM.
+-- step 16: ax-compose-nonempty          — non-trivial paths exist. FORM.
+--
+-- Derives:
+-- step 17: plus-stays-similar           — a+b ~~ a, a+b ~~ b. FORM.
+-- step 18: additionally-stays-similar   — additionally(a,b) ~~ a and b. FORM.
+-- step 19: plus-and-additionally-distinct — they have distinct =~ behavior. FORM.
+-- step 20: path-ground-is-identity      — compose(p, path-ground) =~ p. FORM.
+-- step 21: reflexion                    — self-read in D, identity under compose. FORM.
+-- step 22: orbit-reflexion-quotient     — unified width measure over D-columns. FORM.
+-- step 23: finite-path-exists           — non-trivial DerivationPath exists. FORM.
+-- step 24: composition-length-additive  — length adds across compose. FRAME/L3.
+--
+-- Graduation:
+-- step 25: NC-1 discharge               — plus-stays-similar established. FORM.
+-- step 26: NC-2 discharge               — additionally commutativity established. FORM.
+-- step 27: NC-3 discharge               — compose identity + associativity. FORM.
+-- step 28: NC-4 discharge               — finite-path-exists. FORM.
+-- step 29: graduation(L2 -> L3)         — all 4 NCs discharged. FORM.
+--
+-- FRAME residuals at L2:
+-- step 30: close(congruent-path)        — schema closed via quantification/trajectory. FORM.
+--                                         Internals (eval for length > 1): FRAME/L3.
+-- step 31: FRAME inventory              — simulation-pair-exists (L2+L3),
+--                                         deriver ==-cycle (L3),
+--                                         path-length arithmetic (L3),
+--                                         congruent-path internals (L3).
+--
+-- Status: FORM with named FRAMEs.
+-- P_2 = 31. N_2_atomic = 3. G_2 = 4.
