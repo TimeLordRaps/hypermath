@@ -1,0 +1,8 @@
+name = "Hypermath"
+version = "0.1.0"
+description = "A closed formal universe built from one primitive operation (□)."
+
+defaultTargets = ["Hypermath"]
+
+[[lean_lib]]
+name = "Hypermath"
