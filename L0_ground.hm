@@ -22,7 +22,7 @@
 --         IV derives (5), V relation declarations, VI closing opaque predicates,
 --         VII graduation criterion (4 NCs discharged),
 --         VIII executive framework (7 opaques, 7 axioms, 3 derives),
---         IX self-kernel (structural census, 42 steps, FORM with named FRAMEs).
+--         IX self-kernel (structural census, 41 steps, FORM with named FRAMEs).
 --         Triangle: syntax → substance → semantics → syntax (closing cycle).
 --         Maps to relations: syntax/~~, substance/=~, semantics/==.
 --         congruent (=~): same substance regardless of path. Path discarded.
@@ -404,18 +404,7 @@ graduation L0 -> L1:
 -- The relation hierarchy (~~, =~, ==) maps to (syntax, substance, semantics):
 --   ~~ = shared syntactic continuation; =~ = same substance-matter; == = full semantic path.
 --
--- Note on `Keyword :: HMKeyword`:
--- HMKeyword is a new type declared here — the type of hypermath grammar keywords.
--- It is distinct from Form (structural entities) and Prop (structural assertions).
 -- =============================================================================
-
-primitive HMKeyword :: Type
-    -- The type of hypermath executive keywords.
-    -- HMKeyword is the type inhabited by the words that make derivations valid:
-    --   axiom, derive, close, graduation, opaque, relation, primitive.
-    -- Without HMKeyword, these words have no formal status within the system.
-    -- With HMKeyword: they are derivable objects of L0, not imported metalanguage.
-    -- HMKeyword forms do not derive from apply. They are named structural roles.
 
 
 -- ── Opaque declarations ────────────────────────────────────────────────────
@@ -425,7 +414,6 @@ opaque syntax :: Form -> Prop
     -- Pre-semantic. Syntax does not know what the form MEANS — only how it is SHAPED.
     -- A form has syntax when its shape can be checked against the rules of the system
     -- without knowing whether the form has been semantically closed.
-    -- All HMKeyword instances are syntactically valid by structure.
     -- Semantics close this: syntax(x) grounds 'x is a structurally valid form'.
 
 opaque substance :: Form -> Prop
@@ -651,41 +639,38 @@ derive L0-self-kernel as FORM:
     step 24: syntax(graduation-status = FORM)            — FORM. L1 licensed.
 
     -- ── SECTION VIII: EXECUTIVE FRAMEWORK ───────────────────────────────
-    -- Primitive HMKeyword declared.
-    step 25: definition(HMKeyword, HMKeyword) — HMKeyword :: Type. FORM.
-
     -- Seven executive opaques declared.
     -- Semantic closes deferred to L1 (they require relation-language unavailable at L0).
-    step 26: syntax(syntax)       — declared. semantic close: L1 pending. FRAME/L1.
-    step 27: syntax(substance)    — declared. semantic close: L1 pending. FRAME/L1.
-    step 28: syntax(semantics)    — declared. semantic close: L1 pending. FRAME/L1.
-    step 29: syntax(derives)      — declared. semantic close: L1 pending. FRAME/L1.
-    step 30: syntax(discharge)    — declared. semantic close: L1 pending. FRAME/L1.
-    step 31: syntax(definition)   — declared. semantic close: L1 pending. FRAME/L1.
-    step 32: syntax(form-closure) — declared. semantic close: L1 pending. FRAME/L1.
+    step 25: syntax(syntax)       — declared. semantic close: L1 pending. FRAME/L1.
+    step 26: syntax(substance)    — declared. semantic close: L1 pending. FRAME/L1.
+    step 27: syntax(semantics)    — declared. semantic close: L1 pending. FRAME/L1.
+    step 28: syntax(derives)      — declared. semantic close: L1 pending. FRAME/L1.
+    step 29: syntax(discharge)    — declared. semantic close: L1 pending. FRAME/L1.
+    step 30: syntax(definition)   — declared. semantic close: L1 pending. FRAME/L1.
+    step 31: syntax(form-closure) — declared. semantic close: L1 pending. FRAME/L1.
 
-    -- Eight Section VIII axioms.
-    step 33: syntax(ax-syntax-requires-substance)  — stated. FORM.
-    step 34: syntax(ax-substance-requires-semantics) — stated. FORM.
-    step 35: syntax(ax-semantics-requires-syntax)  — stated. FORM.
-    step 36: syntax(ax-form-closes-loop)           — stated. FORM.
-    step 37: syntax(ax-ground-syntax)              — stated. FORM.
-    step 38: syntax(ax-ground-substance)           — stated. FORM.
-    step 39: syntax(ax-ground-semantics)           — stated. FORM.
+    -- Seven Section VIII axioms.
+    step 32: syntax(ax-syntax-requires-substance)  — stated. FORM.
+    step 33: syntax(ax-substance-requires-semantics) — stated. FORM.
+    step 34: syntax(ax-semantics-requires-syntax)  — stated. FORM.
+    step 35: syntax(ax-form-closes-loop)           — stated. FORM.
+    step 36: syntax(ax-ground-syntax)              — stated. FORM.
+    step 37: syntax(ax-ground-substance)           — stated. FORM.
+    step 38: syntax(ax-ground-semantics)           — stated. FORM.
 
     -- Three Section VIII derives.
-    step 40: discharge(ground-is-form-closed,    FORM)  — FORM.
-    step 41: discharge(derives-is-directional,   FRAME) — FRAME/L1: direction needs relation-language.
-    step 42: discharge(definition-of-ground,     FORM)  — FORM. name('ground') is a file-format
+    step 39: discharge(ground-is-form-closed,    FORM)  — FORM.
+    step 40: discharge(derives-is-directional,   FRAME) — FRAME/L1: direction needs relation-language.
+    step 41: discharge(definition-of-ground,     FORM)  — FORM. name('ground') is a file-format
     --        convention (human interface), not a formal dependency. D indexes by Form position,
     --        not by string. The universe does not use names internally.
 
     -- ── CENSUS CLOSE ─────────────────────────────────────────────────────
     -- Every entity declared in this file is accounted for above.
-    -- FORM items: steps 1-16, 17-24, 25, 33-40, 42 (core).
+    -- FORM items: steps 1-24, 32-39, 41 (core).
     -- FRAME items (acknowledged forward-dependencies):
-    --   FRAME/L1: derives-is-directional (step 41),
-    --             Section VIII executive opaques semantic closes (steps 26-32).
+    --   FRAME/L1: derives-is-directional (step 40),
+    --             Section VIII executive opaques semantic closes (steps 25-31).
     -- No entity is unaccounted for. No FRAME is hidden.
     -- Structural verification: COMPLETE.
     -- Semantic validation: L1 (deferred, dependency named).

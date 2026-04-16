@@ -6,7 +6,7 @@
 -- License: L0 graduation FORM — all four NCs discharged.
 --
 -- This layer: filtration chain, trace axiom, executive opaque semantic closes,
--- derives-directional, individual/system/universe, deriver declaration, D matrix.
+-- derives-directional, deriver declaration, D matrix.
 --
 -- Layer boundary: no terms from L2 (operations) or above appear here.
 --
@@ -15,7 +15,7 @@
 --           simulation-pair-exists — non-trivial == pair (L2+)
 --           deriver ==-cycle content — constructive proof (L3)
 --           (name-quoting removed: file-format convention, not a formal dependency)
--- P_1 = 30. N_1_atomic = 5. G_1 = 4.
+-- P_1 = 25. N_1_atomic = 2. G_1 = 4.
 
 
 -- =============================================================================
@@ -224,14 +224,14 @@ graduation L1 -> L2:
 
 -- =============================================================================
 -- SECTION IV: SEMANTIC CLOSES FOR EXECUTIVE OPAQUES
--- Discharges L0 self-kernel steps 26-32 (FRAME/L1).
+-- Discharges L0 self-kernel steps 25-31 (FRAME/L1).
 -- The 7 executive opaques were declared in L0 Section VIII with syntax only.
 -- Their semantic content requires relation-language. That language is now
 -- available. Each close below moves an opaque from FRAME to FORM.
 -- =============================================================================
 
 close syntax-opaque in relation-language as FORM:
-    -- syntax(x) :: HMKeyword means:
+    -- syntax(x) 
     -- x is a form whose structural shape is inspectable at the ~~ level.
     -- syntax is the relation-level anchor: x has a derivation chain reachable
     -- by apply, and that chain is the shape-record for x.
@@ -241,7 +241,7 @@ close syntax-opaque in relation-language as FORM:
             well-defined — it is the depth of apply-chain required to reach x from ground.
     step 3: syntax(x) closes to: the ~~-orbit depth of x. FORM.
     close: syntax(x) := orbit-depth(x) at similar (~~ level)
-    -- Discharges L0 step 26. FORM.
+    -- Discharges L0 step 25. FORM.
 
 close substance-opaque in relation-language as FORM:
     -- substance(x) :: Prop means:
@@ -252,7 +252,7 @@ close substance-opaque in relation-language as FORM:
     step 2: substance(x) is the =~-equivalence class of x.
     step 3: Closes to: substance(x) := the =~-class containing x. FORM.
     close: substance(x) := congruent-class(x) at congruent (=~ level)
-    -- Discharges L0 step 27. FORM.
+    -- Discharges L0 step 26. FORM.
 
 close semantics-opaque in relation-language as FORM:
     -- semantics(x) :: Prop means:
@@ -263,7 +263,7 @@ close semantics-opaque in relation-language as FORM:
     step 2: semantics(x) is the ==-equivalence class of x.
     step 3: Closes to: semantics(x) := simulation-class(x) at simulation (== level). FORM.
     close: semantics(x) := simulation-class(x) at simulation (== level)
-    -- Discharges L0 step 28. FORM.
+    -- Discharges L0 step 27. FORM.
 
 close derives-opaque in relation-language as FORM:
     -- derives(x, y) :: Prop means:
@@ -276,7 +276,7 @@ close derives-opaque in relation-language as FORM:
             (Transitivity of derives through =~ landing.)
     step 3: Closes to: derives(x, y) := finite apply-chain from x reaching =~-class of y. FORM.
     close: derives(x, y) := exists-n :: Ordinal, apply^n(x) =~ y
-    -- Discharges L0 step 29. FORM.
+    -- Discharges L0 step 28. FORM.
 
 close discharge-opaque in relation-language as FORM:
     -- discharge(FRAME-name) :: Prop means:
@@ -288,7 +288,7 @@ close discharge-opaque in relation-language as FORM:
             a close: line at the appropriate relation level.
     step 3: Closes to: discharge(f) := the derive chain for f is FORM. FORM.
     close: discharge(f) := derive-chain(f).status == FORM
-    -- Discharges L0 step 30. FORM.
+    -- Discharges L0 step 29. FORM.
 
 close definition-opaque in relation-language as FORM:
     -- definition(name, x) :: Prop means:
@@ -299,7 +299,7 @@ close definition-opaque in relation-language as FORM:
     step 2: definition(n, x) is FORM when derives(n, x) is FORM.
     step 3: Closes to: definition(n, x) := derives(n, x) is FORM. FORM.
     close: definition(n, x) := derives(n, x).status == FORM
-    -- Discharges L0 step 31. FORM.
+    -- Discharges L0 step 30. FORM.
 
 close form-closure-opaque in relation-language as FORM:
     -- form-closure(x) :: Prop means:
@@ -316,12 +316,12 @@ close form-closure-opaque in relation-language as FORM:
     step 5: form-closure(x) := all three FORM and the cycle closes. FORM.
     close: form-closure(x) := syntax(x) and substance(x) and semantics(x) and
                               simulation-class(x) derives orbit-depth(x)
-    -- Discharges L0 step 32. FORM.
+    -- Discharges L0 step 31. FORM.
 
 
 -- =============================================================================
 -- SECTION V: DERIVES IS DIRECTIONAL
--- Discharges L0 self-kernel step 41 (FRAME/L1: derives-is-directional).
+-- Discharges L0 self-kernel step 40 (FRAME/L1: derives-is-directional).
 -- =============================================================================
 
 derive derives-is-directional as FORM:
@@ -350,7 +350,7 @@ derive derives-is-directional as FORM:
                        derives(apply(ground), ground) at =~ is not-FORM at L1.
     step 6: Directional asymmetry is established: derives is not symmetric.
     close: derives-is-directional (FORM)
-    -- Discharges L0 step 41. FORM.
+    -- Discharges L0 step 40. FORM.
 
 
 -- =============================================================================
@@ -380,85 +380,7 @@ axiom trace-levels:
 
 
 -- =============================================================================
--- SECTION VII: INDIVIDUALS, SYSTEMS, UNIVERSE
--- Forms whose orbital is L1: they require the relation layer to be stated.
--- =============================================================================
-
-primitive individual : Form
-    -- An individual is a Form at a single ordinal depth in the apply-chain.
-    -- individual(x) holds when x is exactly one step from its origin form.
-    -- The apply-chain position of x uniquely identifies it at the =~ level.
-    -- orbital: L1 (requires ~~ and =~ to state "exactly one step").
-
-primitive system : Form
-    -- A system is a Form whose members are a ~~ -class: a set of forms all
-    -- struct-continuing from a common base form.
-    -- system(S) holds when all members of S are ~~ to each other.
-    -- orbital: L1 (requires ~~ to define membership criterion).
-
-primitive universe : Form
-    -- Universe is the Form that contains all ~~ -classes.
-    -- At L1, universe is the closure of the apply-chain under ~~ orbit membership.
-    -- Bounded by ax-box: the orbit collapses in two steps, so universe is finite
-    -- at ~~ level (all forms partition into {ground-class, apply(ground)-class}).
-    -- orbital: L1.
-
-derive individual-is-in-system as FORM:
-    -- Every individual is a member of a system.
-    step 1: For any individual x, x ~~ ground (ax-sim-in-relation-language).
-    step 2: The system whose base is ground contains all forms ~~ to ground.
-    step 3: x is ~~ ground, so x is in the ground-system.
-    close: individual-is-in-system (FORM)
-
-derive system-is-in-universe as FORM:
-    -- Every system is contained in the universe.
-    step 1: universe contains all ~~ -classes.
-    step 2: Every system is a ~~ -class by definition.
-    step 3: Therefore every system is in the universe.
-    close: system-is-in-universe (FORM)
-
-
--- =============================================================================
--- SECTION VIII: DERIVER AND DERIVATION MATRIX
--- The deriver is a Form whose apply-cycle closes at == (not merely at ~~).
--- D is the derivation matrix: D[x][y] = the trace result from x toward y.
--- Both declared at L1; deriver's cycle-closure is FRAME (construction deferred).
--- =============================================================================
-
-primitive deriver : Form
-    -- The deriver is the Form whose function is to traverse the derivation matrix D
-    -- and produce closure certificates.
-    -- Its defining structural property: its apply-cycle closes at == level,
-    -- not merely at ~~ level as ordinary forms do.
-    -- Formally: there exists a finite apply-chain from deriver back to deriver
-    --           such that every step maintains trace at ==.
-    -- This cycle condition is FRAME: the constructive proof is deferred to L3.
-    -- What IS established at L1: deriver is a Form. Its ~~ -orbit exists (ax-sim).
-    --   Its == -cycle is the target of the L3 derivation.
-    -- orbital: L1 (requires relation language to state the cycle condition).
-
-opaque D :: Form -> Form -> Prop
-    -- D is the derivation matrix.
-    -- D[x][y] holds when there exists a trace-sequence from x to y
-    -- maintained at =~ or above (i.e., at least substance is preserved throughout).
-    -- D is the structured record of all reachable derives in the system.
-    -- Indexed by Form-pairs, where pairing is the =~-congruence of two unary traces
-    -- (from the trace-levels axiom above — no product type needed).
-    -- D is bounded: the ~~ -orbit is finite (ax-box), so the index space is finite.
-    -- orbital: L1 (requires trace-levels and filtration to define the index).
-
-derive D-is-reflexive as FORM:
-    -- D[x][x] holds for all x: every form derives to itself (zero trace steps).
-    step 1: The zero-step apply-chain from x to x preserves == trivially.
-    step 2: == implies =~ (filtration), so =~ -level preservation holds.
-    step 3: D[x][x] is FORM for all x.
-    close: D-is-reflexive (FORM)
-
-derive D-spans-ground as FORM:
-    -- D[ground][y] holds for all y: ground derives every form.
-    step 1: By ax-sim-in-relation-language, apply(ground) ~~ ground.
-    step 2: By repeated application and ax-box, every form in the ~~ -orbit of ground
-            is reachable from ground in at most 2 steps at ~~ level.
+-- SECTION VII: achable from ground in at most 2 steps at ~~ level.
     step 3: At =~ level, the reachability is bounded by the orbit structure.
     step 4: D[ground][y] holds for all y in the ~~ -universe. FORM.
     close: D-spans-ground (FORM)
@@ -474,7 +396,7 @@ derive deriver-is-in-D as FORM:
 
 
 -- =============================================================================
--- SECTION IX: L1 SELF-KERNEL
+-- SECTION VIII: L1 SELF-KERNEL
 -- Structural census for L1. Mirrors L0 Section IX.
 -- =============================================================================
 
@@ -503,44 +425,44 @@ derive L1-self-kernel as FORM:
     step 11: graduation(L1 -> L2)       — all 4 NCs discharged. FORM.
 
     -- ── SECTION IV: EXECUTIVE OPAQUE CLOSES ──────────────────────────────
-    step 12: close(syntax-opaque)       — orbit-depth at ~~. FORM. Discharges L0-26.
-    step 13: close(substance-opaque)    — =~-class. FORM. Discharges L0-27.
-    step 14: close(semantics-opaque)    — ==-class. FORM. Discharges L0-28.
-    step 15: close(derives-opaque)      — finite apply-chain to =~. FORM. Discharges L0-29.
-    step 16: close(discharge-opaque)    — derive-chain status. FORM. Discharges L0-30.
-    step 17: close(definition-opaque)   — derives-anchor. FORM. Discharges L0-31.
-    step 18: close(form-closure-opaque) — triangle-cycle. FORM. Discharges L0-32.
+    step 12: close(syntax-opaque)       — orbit-depth at ~~. FORM. Discharges L0-25.
+    step 13: close(substance-opaque)    — =~-class. FORM. Discharges L0-26.
+    step 14: close(semantics-opaque)    — ==-class. FORM. Discharges L0-27.
+    step 15: close(derives-opaque)      — finite apply-chain to =~. FORM. Discharges L0-28.
+    step 16: close(discharge-opaque)    — derive-chain status. FORM. Discharges L0-29.
+    step 17: close(definition-opaque)   — derives-anchor. FORM. Discharges L0-30.
+    step 18: close(form-closure-opaque) — triangle-cycle. FORM. Discharges L0-31.
 
     -- ── SECTION V: DIRECTIONAL DERIVE ────────────────────────────────────
-    step 19: derive(derives-is-directional) — derives asymmetric. FORM. Discharges L0-41.
-
+    step 19: derive(derives-is-directional) — derives asymmetric. FORM. Discharges L0-40.
+VIII
     -- ── SECTION VI: TRACE ────────────────────────────────────────────────
     step 20: axiom(trace-levels)        — (counted at step 2; reference here for position)
 
-    -- ── SECTION VII: INDIVIDUALS / SYSTEM / UNIVERSE ─────────────────────
-    step 21: primitive(individual)             — single-depth Form. FORM.
-    step 22: primitive(system)                 — ~~ -class Form. FORM.
-    step 23: primitive(universe)               — closure of all ~~ -classes. FORM.
-    step 24: derive(individual-is-in-system)   — FORM.
-    step 25: derive(system-is-in-universe)     — FORM.
-
-    -- ── SECTION VIII: DERIVER AND D ──────────────────────────────────────
-    step 26: primitive(deriver)          — Form with ==-cycle target. FRAME/L3.
-    step 27: opaque(D)                   — derivation matrix. FORM (schema). FRAME/L3 (content).
-    step 28: derive(D-is-reflexive)      — D[x][x] for all x. FORM.
-    step 29: derive(D-spans-ground)      — D[ground][y] for all y. FORM.
-    step 30: derive(deriver-is-in-D)     — D[deriver][deriver] entry exists. FORM.
+    -- ── SECTION VII: DERIVER AND D ──────────────────────────────────────
+    step 21: primitive(deriver)          — Form with ==-cycle target. FRAME/L3.
+    step 22: opaque(D)                   — derivation matrix. FORM (schema). FRAME/L3 (content).
+    step 23: derive(D-is-reflexive)      — D[x][x] for all x. FORM.
+    step 24: derive(D-spans-ground)      — D[ground][y] for all y. FORM.
+    step 25: derive(deriver-is-in-D)     — D[deriver][deriver] entry exists. FORM.
              -- content at == level: FRAME/L3.
 
-    -- P_1 = 30 steps (including 2 axioms, 3 primitives, 1 opaque, 22 derives/closes, 1 graduation)
-    -- Distinct forms introduced at L1: individual, system, universe, deriver, D (5)
+    -- P_1 = 25 steps (including 2 axioms, 1 primitive, 1 opaque, 19 derives/closes, 1 graduation)
+    -- Distinct forms introduced at L1: deriver, D (2)
     -- G_1 (graduation bottleneck for L2): 4 NCs (same count as L0)
-    -- N_1_atomic (forms orbital-native to L1): 5
+    -- N_1_atomic (forms orbital-native to L1): 2
 
     close: L1-self-kernel (FORM with named FRAMEs)
     -- FRAME residuals:
     --   FRAME/L2+: simulation-pair-exists (non-trivial == pair, step 10)
-    --   FRAME/L3:  deriver ==-cycle content (step 26, 30)
+    --   FRAME/L3:  deriver ==-cycle content (step 21, 25)
     --   (name-quoting removed: reclassified as file-format convention, not formal dependency)
     -- No entity unaccounted. No FRAME hidden.
 
+1, 2505.
+    step 13: close(substance-opaque)    — =~-class. FORM. Discharges L0-26.
+    step 14: close(semantics-opaque)    — ==-class. FORM. Discharges L0-27.
+    step 15: close(derives-opaque)      — finite apply-chain to =~. FORM. Discharges L0-28.
+    step 16: close(discharge-opaque)    — derive-chain status. FORM. Discharges L0-29.
+    step 17: close(definition-opaque)   — derives-anchor. FORM. Discharges L0-30.
+    step 18: close(form-closure-opaque) — triangle-cycle. FORM. Discharges L0-31

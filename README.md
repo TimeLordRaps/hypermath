@@ -58,13 +58,40 @@ No vertex is ground. Ground is what the triangle stands on. Ground inhabits all 
 | Layer | File | Status | Content |
 |-------|------|--------|---------|
 | L0 | `L0_ground.hm` | FORM | Ground, relations, executive framework, self-kernel |
-| L1 | `L1_relations.hm` | FORM | Filtration, deriver, individual/system/universe, executive opaque closes |
+| L1 | `L1_relations.hm` | FORM | Filtration, deriver, D matrix, executive opaque closes |
 | L2 | `L2_operations.hm` | FORM | +, additionally, DerivationPath, compose, reflexion, orbit-reflexion-quotient |
 | L3 | `L3_ordinatics.hm` | FORM (terminal) | Ordinal structure, simulation-pair-exists, deriver ==-cycle, self-derivation |
 
 **Layer definitions:** L0 is pure unary operations. L1 is binary relations. L2 is binary operations (composition). L0 ↔ L1 form a co-necessary pair — the ax-box orbit at layer level. Together they are the closed base from which L2+ composes.
 
 Each layer file contains a **graduation criterion** — a formal statement of what must be true before the next layer is licensed to proceed. If any necessity constraint is FRAME at graduation, the next layer does not start.
+
+### Dependency flow
+
+Each layer produces FRAME obligations that later layers discharge. The chain terminates at self-derivation.
+
+```mermaid
+flowchart TD
+    G["□"]
+    G --> L0
+
+    L0["L0 · Ground — 41 steps<br/>Form · Prop · ground · apply<br/>4 axioms · 3 relations · triangle<br/>7 executive opaques"]
+
+    L0 -->|"8 FRAMEs"| L1
+
+    L1["L1 · Relations — 25 steps<br/>filtration · trace axiom<br/>closes all 8 L0 FRAMEs<br/>deriver · D matrix"]
+
+    L1 -->|"simulation-pair-exists"| L2
+    L1 -.->|"deriver ==-cycle"| L3
+
+    L2["L2 · Operations — 31 steps<br/>+ · additionally · compose<br/>DerivationPath · reflexion · ORQ"]
+
+    L2 --> L3
+
+    L3["L3 · Ordinatics — 18 steps<br/>ordinal structure · deriver ==-cycle closed<br/>self-derivation ■"]
+```
+
+Solid arrows: FRAME discharge to the next layer. Dashed arrow: L1→L3 skip — the deriver's ==-cycle cannot close until L3 ordinals are available. The `■` marks terminal closure.
 
 ### L0 is complete
 
@@ -77,7 +104,7 @@ L0 (Layer 0 / Ground) contains:
 - 3 relation declarations: `~~`, `=~`, `==`
 - 7 executive opaques: `syntax`, `substance`, `semantics`, `derives`, `discharge`, `definition`, `form-closure`
 - 7 triangle axioms
-- A **self-kernel**: a 42-step structural census that lists every declared entity in the file with its explicit closure status
+- A **self-kernel**: a 41-step structural census that lists every declared entity in the file with its explicit closure status
 
 The self-kernel means L0 can be parsed and verified mechanically without an external proof checker. Every FRAME residual (forward dependency on L1 or L2) is named explicitly. Nothing is hidden.
 
