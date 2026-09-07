@@ -1,0 +1,2 @@
+# Reference digests bind original bytes, including historical line endings.
+references/seed-ai/** -text

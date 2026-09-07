@@ -23,6 +23,12 @@ relation signature produces a `Prop`. `Prop` and `Form` share the type universe
   with proof irrelevance. Hypermath's `Prop` is defined by discharge-acts, not
   by sort.
 
+The present Lean translation nevertheless maps these assertions to Lean's
+built-in `Prop`. This is a translation choice, not a proved identification of
+the two semantics. It does not represent the source's closure states and
+formation paths merely by checking a proposition's type. An adequacy theorem
+for that translation remains open.
+
 ## What it clarifies
 
 Clarifies why opaque predicates return `Prop`, not `Bool`: they make structural

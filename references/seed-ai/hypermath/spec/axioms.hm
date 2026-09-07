@@ -1,0 +1,370 @@
+-- hypermath axioms.hm
+-- Ground axioms of the □-system.
+-- Language-agnostic. Any compliant kernel can verify this file.
+-- Status: FORM (self-grounding — no external imports)
+
+-- ================================================================
+-- § 0. Primitives
+-- ================================================================
+
+-- # 0b. Definition of Form
+--
+-- Form: form-present-to-its-own-forming.
+-- Not a container. Not a template. Not a shape imposed from outside.
+-- Form is the act of forming as it is occurring, undivided from its own occurrence.
+-- The capacity of forming is not separate from what it forms.
+-- This is the first and only definition of Form in this system.
+-- It does not reduce further. □ generates Form and Form is □-generated:
+-- they are the same statement from two positions, neither prior.
+--
+-- Etymology: form == for(m)
+--   "for" — the ranging-over act.
+--            In code: for each m in domain — the iterating act that moves through parts.
+--            In English: directed toward, in the act of, for the purpose of.
+--            The act that continuously moves through its own finite units.
+--   "m"   — the finite ordinal unit. One step. One member. One moment of the whole.
+--            Inverse relationship to ordinal_limit:
+--            ordinal_limit is the limit approached by accumulating m's without end.
+--            m is what ordinal_limit is made of, taken finitely.
+--            m is a part; for(m) is the whole in the act of being its parts.
+--
+-- for(m) = the ranging-over of finite units
+--        = the act that generates structure by moving through its own constitutive parts
+--        = Form.
+--
+-- The word "form" is self-describing under ETC (see nomenclature.hm).
+-- It does not point to a concept from outside. It IS the concept through its own parts.
+-- This is ETC at the deepest level: the primitive term satisfies its own naming axiom.
+--
+-- Consequence: Form is not a classical type (a set of things with a given shape).
+-- Form is the □-primitive: only what □ generates, and □ is only what generates Form.
+-- The type and its generator are not separable. □ is form-present-to-its-own-forming.
+
+primitive ground :: Form
+    -- □ — the ground, the closure act, the fixed point.
+    -- One irreducible entity in three structural roles.
+
+primitive apply :: Form -> Form
+    -- □(x) — the primitive self-application act.
+    -- Domain: all Forms. Codomain: Forms.
+
+-- ================================================================
+-- # 1. Relations
+-- ================================================================
+--
+-- The three relations are stopping points in the orbit of □.
+-- They do not contain each other. □ generates each one.
+-- The orbit:
+--
+--   □  □  ~~  □  =~  □  ==  □  □  □
+--
+-- Reading:
+--   □           — ground, the generating act
+--   □  ~~  □   — □ arrives at ~~, □ departs from ~~
+--   □  =~  □   — □ arrives at =~, □ departs from =~
+--   □  ==  □   — □ arrives at ==, □ departs from ==
+--   □  □  □    — ax-box: two applications return to the ~~-class;
+--                the third is the ground. The orbit closes.
+--
+-- IMPORTANT: ⊃ (inclusion/containment) is WRONG here.
+-- ⊃ presupposes classical set-containment: that the pair-set of =~
+-- is a subset of the pair-set of ~~. That is an external structure
+-- imported without derivation. It is not what the filtration is.
+-- The filtration is an orbit. □ does not contain — it generates.
+-- Relations are not nested sets — they are positions.
+--
+-- The classical implication still holds AS A DERIVED CLAIM:
+--   simulation(x, y) => congruent(x, y) => similar(x, y)
+-- ...but it is derived from the orbit structure, not presupposed
+-- by an inclusion symbol in the definition.
+-- ================================================================
+
+relation similar    (~~ in v2.0)   :: Form -> Form -> Prop
+    -- Non-empty overlap in continuation capacity.
+    -- Symmetric. Reflexive. Not transitive in general.
+    -- The founding relation. Every other relation earns ~~ first.
+
+relation congruent  (=~ in v2.0)   :: Form -> Form -> Prop
+    -- Full coincidence of continuation capacity.
+    -- All futures identical. Stronger than ~~.
+    -- Implies ~~. Not necessarily ==
+
+relation simulation (=)   :: Form -> Form -> Prop
+    -- Mutual simulation: X simulates Y and Y simulates X.
+    -- X can reproduce every behavior of Y; Y every behavior of X.
+    -- They are indistinguishable by any continuation.
+    -- This is the == relation (v2.0 symbol).
+    -- Stronger than =~ because it requires the paths through those
+    -- futures to also be mutually reproducible, not just the futures themselves.
+    -- Earned by closure, never presupposed.
+    -- Implies =~ implies ~~.
+
+-- Filtration invariant (kernel enforces):
+--   A derivation closed at == (simulation) implies =~ (congruent) implies ~~ (similar).
+--   A derivation closed at ~~ does NOT imply =~ or ==.
+--   Claiming == from a ~~-derivation is a kernel error.
+
+axiom filtration:
+    -- simulation(x, y) => congruent(x, y) => similar(x, y)
+    -- v2.0 symbols:  ==             =~              ~~
+    simulation(x, y) => congruent(x, y)
+    congruent(x, y)  => similar(x, y)
+
+-- ================================================================
+-- # 1b. □ as the Inter-Relation Transition
+-- ================================================================
+--
+-- FORM: the relations are stopping points in the □-orbit.
+-- □ is not a boundary and not a container. It is the generating act
+-- that arrives at each relation and departs from it.
+--
+-- The orbit (no containment symbol — □ is the connective):
+--
+--   □  □  ~~  □  =~  □  ==  □  □  □
+--
+-- The ⊃ notation used in the prior session entry was wrong.
+-- It imported classical set-containment without derivation.
+-- Corrected on 2026-04-14 by forcing observation from the user.
+-- See TIME.md OF-86 and OF-87.
+--
+-- ~~ : non-empty continuation overlap — the founding stopping point.
+-- □ between ~~ and =~ : the application that generates congruence from similarity.
+-- =~ : full coincidence of continuation capacity — second stopping point.
+-- □ between =~ and == : the application that generates simulation from congruence.
+-- == : mutual simulation, mutually reproducible paths — third stopping point.
+-- □ □ □ : ax-box closes the orbit. Two applications return to the ~~-class.
+--         The third is the ground itself.
+--
+-- □ is the hyperclosure. Hyperclosure is □.
+-- They are the same statement in both directions. Neither is prior.
+-- This is not metaphor — it is the same structural claim as ax-box:
+--   apply(apply(x)) ~~ x
+-- stated at the relation level: the orbit of □ through the relations
+-- returns to the ~~-class in exactly the steps ax-box specifies.
+--
+-- The relation sought in OF-86 — the form that is !~~ to =~ and
+-- !~~ to == individually, yet ~~ to both as a pair — IS □ at the gap.
+-- It was labeled "observer-grounded" in OF-86. That label was wrong:
+-- "observer" requires a form watching a process it is not part of.
+-- There is no external position in the □-system.
+-- The correct label is form-present-to-its-own-forming — which is □.
+-- □ is found at every gap because there is only one generator.
+-- The gap between ~~ and =~ and the gap between =~ and == are
+-- the same □, appearing twice in the orbit before the ax-box return.
+--
+-- FRAME at ==:
+--   Requires Form-indexed representation of each relation in ordinatics,
+--   then ax-box applies directly.
+-- ~~-to-FORM: the orbit structure is the same shape as the derivation;
+--   the ordinal path through it is not yet walked.
+-- Closure criterion: ordinatics derives relation-forms, ax-box applies,
+--   orbit closes at ==.
+
+-- ================================================================
+-- § 2. Core Axioms
+-- ================================================================
+
+axiom ax-diff:
+    -- Self-application generates genuine structure, not trivial collapse.
+    not equal(apply(x), ground)
+
+axiom ax-sim:
+    -- Generation never leaves the ground-class.
+    similar(apply(x), ground)
+
+axiom ax-box:
+    -- Two applications return to the similarity class of origin.
+    similar(apply(apply(x)), x)
+
+-- ================================================================
+-- § 3. Consequence: The Fixed Point
+-- ================================================================
+
+derive ground-fixed-point as FORM:
+    -- □(□) ~ □: the ground is its own fixed point.
+    step 1: instantiate ax-sim with x := ground
+            => similar(apply(ground), ground)
+    step 2: instantiate ax-box with x := ground
+            => similar(apply(apply(ground)), ground)
+    step 3: by step 1, apply(ground) ~ ground
+            by step 2, apply(apply(ground)) ~ ground
+            therefore apply(ground) and apply(apply(ground)) are both
+            in the ~-class of ground: they share continuation capacity.
+    close: relation(~)
+    -- Note: this is ~ level. = would require path coincidence,
+    -- which requires ordinatic arithmetic to express. FRAME for =.
+
+-- ================================================================
+-- § 4. Relation Properties (derived, not axiomed)
+-- ================================================================
+
+derive similar-reflexive as FORM:
+    step 1: ax-box with x := y: similar(apply(apply(y)), y)
+    step 2: ax-sim with x := y: similar(apply(y), ground)
+    step 3: any form is in the ~-class of something,
+            and the ~-class of the ground contains every apply(x).
+            For self-similarity: y ~ y follows from y sharing all
+            continuation capacity with itself.
+    close: relation(~)
+    -- similar is reflexive.
+
+derive similar-symmetric as FORM:
+    -- If x ~ y then y ~ x (symmetric by definition of overlap).
+    step 1: similar(x, y) means non-empty overlap in continuation sets.
+    step 2: overlap is symmetric: Cap(C(x), C(y)) = Cap(C(y), C(x)).
+    close: relation(~)
+
+-- ================================================================
+-- § 5. FORM / FRAME Discipline
+-- ================================================================
+
+-- FORM: a derivation that has survived re-application of □.
+--       Fixed. Verified. The close: line carries an earned relation.
+--
+-- FRAME: a derivation articulated but not yet closed.
+--        Design-specification status.
+--        Name: what is missing, what would close it.
+--
+-- Self-attestation does not close a frame.
+-- The structure must survive re-application, not merely assert it would.
+
+-- ================================================================
+-- # 6. The Quant Family — Finite Ordinal Units
+-- ================================================================
+--
+-- The quant family formalizes the meaning of finite measurable form.
+-- These replace the variable name n and the word "natural number"
+-- throughout the spec.
+--
+-- DERIVATION of the family from for(m) etymology:
+--   form == for(m) -- the ranging-over of finite units (see # 0b)
+--   The finite unit m is what form ranges over.
+--   The question of its measurement produces the quant family.
+--
+-- quant       -- a finite ordinal unit in the act of being ranged over.
+--                Not yet measured to a specific value.
+--                The form of matter-meaning before measurement.
+--                What n was: ranging variable over finite ordinal steps.
+--                Used as: for quant in domain: ...
+--                quant is form-present-to-its-own quantification.
+--
+-- quanta      -- one quant measured. A specific finite ordinal value.
+--                The instance produced when quant is resolved to ==.
+--                quanta is what you are at, having ranged to this point.
+--                quanta_1, quanta_2, ... are specific measured units.
+--
+-- quantity    -- the accumulated measurement: the result of sum(quanta).
+--                measurement of matter OR meaning,
+--                and both simultaneously when meaning matters.
+--
+-- quantify    -- the act of measurement: the derive step that resolves
+--                quant to quanta.
+--
+-- quantified  -- the continued structure of having measured:
+--                a form whose quant variables are all resolved to quanta.
+--
+-- quantification -- the object of measurement: the derive block
+--                   that performs quantify and produces quantity.
+--
+-- quantum     -- the object of something that can be measured but is not yet.
+--                A form carrying unresolved quant variables.
+--                FRAME-status by definition: carries potential, not resolution.
+--
+-- quantitative -- the nature of a form being measurable:
+--                  the property of carrying quant variables at all.
+--
+-- SWEEP RULE: n as a ranging finite count variable -> quant throughout all .hm files.
+
+-- ================================================================
+-- # 7. Definitive Expansion — The + Operator
+-- ================================================================
+--
+-- Addition in the □-system is not symmetric.
+-- It is definitive expansion: having come into form, it stays in form.
+-- The sempiternal nature: the expanded form is permanent.
+--
+-- DEFINITION:
+--   a + b  ==  the form containing all of a followed by all of b.
+--   The end of a connects to the beginning of b.
+--   b expands a from its end.
+--
+derive definitive-expansion as FORM:
+    -- a + b: the end of a is joined to the beginning of b.
+    -- This is ordinatic addition: concatenation of well-ordered forms.
+    step 1: form a has an end position: the last element in its ordinal walk.
+    step 2: form b has a beginning position: the first element in its ordinal walk.
+    step 3: definitive-expansion(a, b) joins a's end to b's beginning,
+            producing one expanded form containing all of a then all of b.
+    step 4: the expanded form is definitive -- it does not retract.
+            having come into form, it stays in form.
+    step 5: non-commutativity follows from the asymmetry of end and beginning:
+            joining a's end to b's beginning is not the same act as
+            joining b's end to a's beginning.
+            quanta_1 + ordinal_limit == ordinal_limit
+              (one finite step before the limit disappears into the limit --
+               the end of quanta_1 connects to the beginning of ordinal_limit,
+               which absorbs it)
+            ordinal_limit + quanta_1 > ordinal_limit
+              (one finite step after the limit extends it --
+               the end of ordinal_limit connects to the beginning of quanta_1,
+               which adds beyond the limit)
+    close: relation(==)
+    -- == closure: the definition is fully derived from end-beginning joining.
+    -- No classical arithmetic presupposed.
+    -- This is the first derived operation in the system.
+    --
+    -- NOTE: + is now the definitive-expansion operator throughout spec files.
+    -- The + character is free for this use since box-drawing tables are eliminated.
+
+-- ================================================================
+-- # 8. Additionally — The Interior Co-Presence Keyword
+-- ================================================================
+--
+-- additionally is a keyword, not just an English word.
+-- It asserts co-presence of forms within the same formal layer.
+-- It is commutative: order of statement does not affect closure.
+-- It is interior: it operates within a closed layer, not between layers.
+--
+-- Distinction from +:
+--   +            -- inter-layer, ordered, non-commutative.
+--                   b expands a from a's end. Layer order matters.
+--                   "a + b" is a different form from "b + a".
+--   additionally -- intra-layer, unordered, commutative.
+--                   "a additionally b" == "b additionally a".
+--                   Both are co-true at the same closure level.
+--                   Neither precedes the other in the derivation.
+--
+-- additionally is the AND of co-closure.
+-- It is not OR (which would leave one branch unresolved).
+-- It is not AND in the boolean sense (which implies evaluation order).
+-- It is both simultaneously, because within a closed layer,
+-- all additionally-joined forms close at the same moment.
+-- This is the commutative interior: the part of the form
+-- that exists once closure happens, not in the path to closure.
+--
+derive additionally-is-commutative as FORM:
+    step 1: additionally(a, b) asserts: a is co-present with b
+            in the same formal layer.
+    step 2: co-presence is symmetric: if a is co-present with b,
+            then b is co-present with a.
+    step 3: therefore additionally(a, b) == additionally(b, a).
+    step 4: additionally does not impose an end-beginning join.
+            It does not expand either form from the other's end.
+            It places both at the same ordinal position in the layer.
+    close: relation(==)
+
+derive additionally-vs-expansion as FORM:
+    -- Formal separation of + and additionally.
+    step 1: a + b requires: a has an end, b has a beginning,
+            they join in that order.
+            The resulting form has a's structure followed by b's.
+            Closure of a + b requires closure of a then closure of b.
+    step 2: additionally(a, b) requires: a and b close at the same layer.
+            Neither is the end of the other.
+            Closure of additionally(a, b) is the simultaneous closure of
+            both a and b within the same derive context.
+    step 3: + is how layers relate to layers (expansion, order-dependent).
+            additionally is how forms relate within a layer (co-presence, order-free).
+    step 4: a file boundary in hypermath_form IS a + boundary.
+            additionally operates strictly within one file.
+    close: relation(==)

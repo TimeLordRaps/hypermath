@@ -17,8 +17,11 @@ simulation :: Form -> Form -> Prop
 
 ## What it is not
 
-- Not identity. Two distinct forms can stand in `` `==` `` without being the
-  same `Form`. `struct-distinct(x, y)` and `x == y` can hold simultaneously.
+- Not the ambient logic's equality. Different forms may stand in `` `==` ``
+  if the specified path semantics permits it. However, `struct-distinct(x, y)`
+  and `x == y` cannot both hold under L0's close: structural distinction is
+  explicitly the negation of simulation. Ambient inequality and
+  `struct-distinct` must not be interchanged.
 - Not [`=~`](congruent.md). `` `=~` `` requires same landing; `` `==` `` requires
   paths to match too. `` `==` `` is strictly stronger than `` `=~` ``.
 - Not computational simulation in the computer-science sense. There is no model
@@ -37,10 +40,11 @@ Clarifies [`struct-distinct`](struct-distinct.md) semantically: two forms are
 
 ## Concrete example
 
-The 41-step L0 self-kernel (Section IX) establishes the structural census as a
+The 41-step L0 self-kernel (Section IX) records the structural census as a
 candidate, but the `` `==` `` self-closure of the deriver is listed as `FRAME`
-(forward-dependency on L1+). The deriver's `` `==` ``-cycle is formally closed
-at L3 (`deriver-cycle-is-closed`).
+(forward-dependency on L1+). L3 labels `deriver-cycle-is-closed` as closed, but
+its Lean translation still has a proof obligation. The stronger return does
+not follow from a similarity-level return without an additional argument.
 
 ## Visualization
 
