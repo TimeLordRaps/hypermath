@@ -1,0 +1,5 @@
+lean4/.lake/
+lean4/lake-manifest.json
+__pycache__/
+*.py[cod]
+build/

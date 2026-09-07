@@ -60,15 +60,6 @@ theorem axDiffInRelationLanguage :
 theorem groundFixedPoint : f2f ground ~~ ground :=
   (axDiffInRelationLanguage ground).1
 
-/-- The □-orbit: {ground, f2f(ground), f2f(f2f(ground))} is a single ~~ class. FORM. -/
-theorem orbitStructure :
-    (f2f ground ~~ ground) ∧
-    (f2f (f2f ground) ~~ ground) ∧
-    (f2f (f2f ground) ~~ f2f ground) :=
-  ⟨groundFixedPoint,
-   axSimInRelationLanguage (f2f ground),
-   similarSymmetric _ _ (axSimInRelationLanguage (f2f ground))⟩
-
 /-- A non-trivial ≡ pair exists. FRAME/L3.
     Witness constructed in L3Ordinatics.lean (simulationPairExists). -/
 theorem simulationPairExists_L1 : ∃ x y : Form, (x ~~ y) ∧ (x ≡ y) := by
@@ -108,7 +99,7 @@ theorem nc4_L1 : ∃ x y : Form, (x ~~ y) ∧ x ≠ y := by
 axiom closeSyntaxOpaque :
     ∀ x : Form,
       HMSyntax x ↔
-      ∃ n : ℕ, f2f^[n] ground ~~ x
+      ∃ n : Nat, Nat.repeat f2f n ground ~~ x
 
 /-- substance closes to =~-equivalence class of x. FORM. Discharges L0 step 26. -/
 axiom closeSubstanceOpaque :
@@ -120,7 +111,7 @@ axiom closeSemanticsOpaque :
 
 /-- derives(x, y) closes to: ∃ finite n, f2f^n(x) =~ y. FORM. Discharges L0 step 28. -/
 axiom closeDerivesOpaque :
-    ∀ x y : Form, Derives x y ↔ ∃ n : ℕ, f2f^[n] x =~ y
+    ∀ x y : Form, Derives x y ↔ ∃ n : Nat, Nat.repeat f2f n x =~ y
 
 /-- discharge(c, e) closes to: Derives e c is FORM. FORM. Discharges L0 step 29. -/
 axiom closeDischargeOpaque :
@@ -172,6 +163,17 @@ axiom traceLevels :
       ((f2f x =~ x) → (f2f x ~~ x)) ∧          -- (b) =~ implies ~~
       ((f2f x ≡ x) → (f2f x =~ x))             -- (a) ≡ implies =~
 
+/-- The displayed pairwise orbit relations follow from the declared trace axiom.
+    Placed after traceLevels because ax-sim plus symmetry alone does not give
+    the third pair. This proves these pairs, not transitivity of Similar. -/
+theorem orbitStructure :
+    (f2f ground ~~ ground) ∧
+    (f2f (f2f ground) ~~ ground) ∧
+    (f2f (f2f ground) ~~ f2f ground) :=
+  ⟨groundFixedPoint,
+   axSimInRelationLanguage (f2f ground),
+   (traceLevels (f2f ground)).1⟩
+
 -- ============================================================================
 -- §VII  Deriver and Derivation Matrix
 -- N_1_atomic = 2: deriver, D.
@@ -180,12 +182,12 @@ axiom traceLevels :
 /-- The deriver: a Form whose purpose is to traverse D and produce closure
     certificates. Its ==-cycle (≡-cycle) is FRAME/L3;
     discharged in L3Ordinatics.lean. -/
-opaque deriver : Form
+axiom deriver : Form
 
 /-- The derivation matrix.
     D[x][y] = there exists a trace-path from x to y at =~+.
     Schema is FORM at L1. Cycle-closure content at ≡ level is FRAME/L3. -/
-opaque D : Form → Form → Prop
+axiom D : Form → Form → Prop
 
 /-- D[x][x] for every x: every Form has a zero-step self-read in D. FORM. -/
 theorem dIsReflexive : ∀ x : Form, D x x := by

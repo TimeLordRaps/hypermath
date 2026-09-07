@@ -36,32 +36,38 @@ namespace Hypermath
 
 /-- A finite record of f2f-steps with associated trace levels.
     Analogous to a typed derivation sequence. -/
-opaque DerivationPath : Type
+axiom DerivationPath : Type
 
 /-- Unit path: a single f2f-step from Form x to Form y. -/
-opaque pathStep : Form → Form → DerivationPath
+axiom pathStep : Form → Form → DerivationPath
 
 /-- The empty derivation path. Identity element for compose. -/
-opaque pathGround : DerivationPath
+axiom pathGround : DerivationPath
+
+/-- Endpoint projections used explicitly in L3_ordinatics.hm:97–99.
+    These are uninterpreted source parameters, not an implementation of paths.
+    No endpoint law or path finiteness theorem is assumed by declaring them. -/
+axiom pathStart : DerivationPath → Form
+axiom pathEnd : DerivationPath → Form
 
 /-- Path length: the number of steps, represented as a Form.
     For pathGround: ~~ ground (zero steps).
     For pathStep(x)(y): ~~ f2f(ground) (one step).
     Arithmetic (full ordinal grounding) is FRAME/L3. -/
-opaque pathLength : DerivationPath → Form
+axiom pathLength : DerivationPath → Form
 
 /-- Path trace: the minimum trace level (~~/=~/≡) across all steps.
     Minimum trace arithmetic is FRAME/L3. -/
-opaque pathTrace : DerivationPath → Form
+axiom pathTrace : DerivationPath → Form
 
 /-- Sequential composition of two DerivationPaths.
     compose(p)(q) traverses p then q.
     Governed by axComposeAssoc, axComposeIdentity. -/
-opaque compose : DerivationPath → DerivationPath → DerivationPath
+axiom compose : DerivationPath → DerivationPath → DerivationPath
 
 /-- The =~-analog for DerivationPath: same substance regardless of intermediate steps.
     congruentPath(p, q) iff same (start, end, pathTrace, quantification). -/
-opaque congruentPath : DerivationPath → DerivationPath → Prop
+axiom congruentPath : DerivationPath → DerivationPath → Prop
 
 -- ============================================================================
 -- §III  Axioms for + (non-commutative sequential connection)
@@ -140,8 +146,10 @@ theorem plusAndAdditionallyAreDistinct :
       (∃ c d : Form, (c ~~ a) ∧ (c ~~ b) ∧ (d ~~ b) ∧ (d ~~ a) ∧ ¬ (c =~ d)) ∧
       (∃ ca cab : Form, (ca ~~ a) ∧ (ca ~~ b) ∧ (cab ~~ b) ∧ (cab ~~ a) ∧ (ca =~ cab)) := by
   refine ⟨f2f ground, ground, ?_, ?_⟩
-  · exact axSeqAsymm _ _ (fun h => (axDiffInRelationLanguage ground).2
-        (filtrationSimCong _ _ (sorry)))
+  · exact axSeqAsymm _ _ (by
+      -- OPEN: ax-diff yields not Simulation, which does not entail not
+      -- Congruent. The filtration implication cannot be used backwards.
+      sorry)
   · exact axCoopComm _ _
   -- FORM: ax-seq-asymm gives a b where (a+b) ≢~ (b+a);
   --       ax-coop-comm gives the same pair with commutative substance.

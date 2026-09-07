@@ -38,27 +38,27 @@ namespace Hypermath
 /-- The first Form unreachable by any finite f2f-chain from ground.
     The Form naming the end of the finite apply-chain sequence.
     ordinalLimit is not f2f^n(ground) for any finite n (ax-limit-not-finite). -/
-opaque ordinalLimit : Form
+axiom ordinalLimit : Form
 
 /-- ordinalSucc(x): the Form one step beyond x in the ordinal ordering.
     For finite ordinals: ordinalSucc(f2f^n(ground)) ~ f2f^{n+1}(ground).
     For ordinalLimit: ordinalSucc(ordinalLimit) is a Form beyond ordinalLimit.
     Structural: ordinalSucc(x) ~~ f2f(x) at ~~. ordinalSucc(x) =~ x + f2f(ground) at =~. -/
-opaque ordinalSucc : Form → Form
+axiom ordinalSucc : Form → Form
 
 -- ============================================================================
 -- §III  Axioms for Ordinal Structure
 -- ============================================================================
 
 /-- **ax-limit-not-finite**: ordinalLimit is not reachable by any finite f2f-chain. -/
-axiom axLimitNotFinite : ∀ n : ℕ, ¬ (f2f^[n] ground ≡ ordinalLimit)
+axiom axLimitNotFinite : ∀ n : Nat, ¬ (Nat.repeat f2f n ground ≡ ordinalLimit)
 
 /-- **ax-limit-derives**: the limit-path from ground exists; its end =~ ordinalLimit.
     The infinite composition of finite continuation paths reaches ordinalLimit. -/
 axiom axLimitDerives :
     ∃ limitPath : DerivationPath,
-      (pathGround ~~ pathGround) ∧  -- start =~ ground (structural anchor)
-      (pathLength limitPath =~ ordinalLimit)
+      (pathStart limitPath ~~ ground) ∧
+      (pathEnd limitPath =~ ordinalLimit)
 
 /-- **ax-succ-extends**: ordinalSucc strictly extends every Form. -/
 axiom axSuccExtends :
@@ -69,7 +69,7 @@ axiom axSuccExtends :
     For all finite n: Derives(f2f^n(ground), y) for any upper bound y → Derives(ordinalLimit, y). -/
 axiom axLimitIsLimit :
     ∀ y : Form,
-      (∀ n : ℕ, Derives (f2f^[n] ground) y) →
+      (∀ n : Nat, Derives (Nat.repeat f2f n ground) y) →
       Derives ordinalLimit y
 
 -- ============================================================================
@@ -80,12 +80,12 @@ axiom axLimitIsLimit :
     The finite ordinals. Defined by least-fixed-point:
     (a) finiteApplyFromGround(ground); (b) closed under f2f;
     (c) ordinalLimit is NOT in this set. -/
-opaque finiteApplyFromGround : Form → Prop
+axiom finiteApplyFromGround : Form → Prop
 
 /-- ordinalApply(p)(x): apply p to x in the ordinal sense.
     ordinalApply(ground)(x) =~ x; ordinalApply(f2f(ground))(x) =~ f2f(x);
     ordinalApply(ordinalLimit)(x) = limit ordinal Form constructed from x. -/
-opaque ordinalApply : Form → Form → Form
+axiom ordinalApply : Form → Form → Form
 
 /-- ordinalApply(ground)(x) =~ x: zero steps = =~-identity. FORM. -/
 theorem ordinalZeroIdentity : ∀ x : Form, ordinalApply ground x =~ x := by
