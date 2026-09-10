@@ -16,3 +16,4 @@ import Hypermath.Observation
 import Hypermath.FiniteAction
 import Hypermath.GroundSyntax
 import Hypermath.GroundDerivation
+import Hypermath.RecordEncoding

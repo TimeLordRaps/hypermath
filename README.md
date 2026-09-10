@@ -70,8 +70,15 @@ adds typed rule trees, the three existing predicate closes, conjunction, and
 checked projections. Every typed derivation has an accepted record, and typed
 reconstruction preserves the entire accepted rule tree. Soundness uses the
 existing source premises; the 26 additional reports introduce no admission or
-native axiom. These structured records still require native encoding and
-internally derived acceptance before realizing the ranked meta-surface.
+native axiom.
+
+The [record encoding](docs/research/RECORD_ENCODING.md) maps composed records and
+formulas to single free ground terms, with proved recovery, preservation of all
+record observations, and agreement with the composed checker. Its packed
+numerical interface avoids expanding the enormous unary term. The 45 additional
+dependency reports expose all host assumptions, including classical choice in
+the size-bound proof. Semantic interpretation and internally derived acceptance
+remain necessary before this realizes the ranked meta-surface.
 
 ## Ground and relations
 

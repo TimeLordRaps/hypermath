@@ -185,11 +185,15 @@ typed finite derivations and structured records for primitive rules, predicate
 closes, conjunction, and projections. Its record-only checker is sound under
 the explicit source premises, accepts every derivation of that calculus, and
 preserves the complete rule tree through typed reconstruction. This is a
-constructive representation result at the host level; the structured records,
-predicates, and checker still need native encoding and ranked acceptance.
+constructive representation result at the host level. The
+[record encoding](RECORD_ENCODING.md) now supplies free ground-term codes for
+records and formulas, exact recovery, and checking of packed numerical inputs.
+Preservation through semantic interpretation, internal representation of the
+checker, and ranked acceptance are still open. The unary expansion is
+exponential in the prefix length; no compression result is claimed.
 
-1. Encode the typed composed records, predicates, and checking operations as
-   native expressions, with preserved observations after interpretation.
+1. Prove a faithful semantic interpretation of the typed composed-record codes,
+   and internally represent the predicates and checking operations.
    Derive ranked acceptance through explicit source rules.
 2. Resolve the current relation, composition, and finite/transfinite path
    conflicts documented in the audit.
