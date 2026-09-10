@@ -81,7 +81,25 @@ OBSERVATION_TARGETS = ('Hypermath.Observation.endpoints_eq_of_step',
  'Hypermath.ObservationChecks.universal_decoder_rejected',
  'Hypermath.ObservationChecks.whole_trace_retains_lengths',
  'Hypermath.ObservationChecks.reused_length',
- 'Hypermath.ObservationChecks.reused_preserves_length')
+ 'Hypermath.ObservationChecks.reused_preserves_length',
+ 'Hypermath.Observation.decoder_implies_compatible',
+ 'Hypermath.Observation.chosenDecoder_correct',
+ 'Hypermath.Observation.compatible_iff_decoder',
+ 'Hypermath.Observation.decoder_unique_on_image',
+ 'Hypermath.Observation.reuse_respects_encoding',
+ 'Hypermath.Observation.reuse_preserves_observations',
+ 'Hypermath.Observation.equality_queries_iff_injective',
+ 'Hypermath.ObservationChecks.first_bit_exact',
+ 'Hypermath.ObservationChecks.flip_respects_encoding',
+ 'Hypermath.ObservationChecks.first_bit_reuse_exact',
+ 'Hypermath.ObservationChecks.swap_exposes_lost_bit')
+OBSERVATION_DEPENDENCIES = {
+    name: (["Classical.choice"] if name in {
+        "Hypermath.Observation.chosenDecoder_correct",
+        "Hypermath.Observation.compatible_iff_decoder",
+    } else [])
+    for name in OBSERVATION_TARGETS
+}
 CLAIMS = ("self_derivation", "source_adequacy", "recursive_arithmetic_completeness")
 FULL_MODEL_TARGETS = tuple("HypermathFullAxiomModel." + name for name in (
     "full_axioms_hold", "finite_numerals_injective", "boundary_probe",
@@ -93,6 +111,7 @@ ACTION_COUNTERMODEL_TARGETS = tuple("HypermathFiniteActionCountermodel." + name 
     "ordinal_zero_identity_claim_fails", "ordinal_successor_action_claim_fails",
     "path_length_arithmetic_claim_fails", "self_derivation_target_holds",
     "self_derivation_without_arithmetic_bridge",
+    "numeral_equality_observation_fails", "no_numeral_equality_decoder",
 ))
 ACTION_COUNTERMODEL_DEPENDENCIES = {
     name: (
@@ -110,6 +129,8 @@ PROBE_TARGETS = {"countermodel": COUNTERMODEL_TARGETS, "finite_trace": TRACE_CHE
 def probe_dependencies_valid(name: str, records: dict[str, list[str]]) -> bool:
     if name == "finite_action":
         return records == ACTION_COUNTERMODEL_DEPENDENCIES
+    if name == "observation":
+        return records == OBSERVATION_DEPENDENCIES
     allowed = LEAN_BUILTINS if name in {"countermodel", "full_model"} else frozenset()
     return all(dep in allowed for deps in records.values() for dep in deps)
 

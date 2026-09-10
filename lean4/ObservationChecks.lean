@@ -54,6 +54,40 @@ theorem reused_length : reused.expand.length = 4 := rfl
 theorem reused_preserves_length : reused.expand.length = reused.length :=
   TraceExpr.length_expand reused
 
+/-- Dropping the second bit is sufficient for first-bit queries at this stage. -/
+theorem first_bit_exact :
+    Observation.Compatible (Prod.fst : Bool × Bool → Bool)
+      (fun pair (_ : Unit) => pair.1) := by
+  intro first second equal query
+  exact equal
+
+def flipFirst (_ : Unit) (pair : Bool × Bool) : Bool × Bool := (!pair.1, pair.2)
+
+theorem flip_respects_encoding :
+    Observation.RespectsEncoding (Prod.fst : Bool × Bool → Bool) flipFirst := by
+  intro index first second equal
+  exact congrArg Bool.not equal
+
+/-- A non-injective encoding is adequate for all finite contexts from the
+declared operation family. Literal recovery of both bits is unnecessary. -/
+theorem first_bit_reuse_exact (context : List Unit) {first second : Bool × Bool}
+    (equal : first.1 = second.1) :
+    (Observation.reuse flipFirst context first).1 =
+      (Observation.reuse flipFirst context second).1 :=
+  Observation.reuse_preserves_observations first_bit_exact flip_respects_encoding
+    context equal ()
+
+def swap (_ : Unit) (pair : Bool × Bool) : Bool × Bool := (pair.2, pair.1)
+
+/-- Base-stage adequacy does not survive a context that exposes discarded data.
+This is why reuse compatibility must be checked, not assumed. -/
+theorem swap_exposes_lost_bit :
+    ¬ Observation.Compatible (Prod.fst : Bool × Bool → Bool)
+      (fun pair (_ : Unit) => (Observation.reuse swap [()] pair).1) := by
+  intro compatible
+  have impossible := compatible (first := (false, false)) (second := (false, true)) rfl ()
+  exact Bool.noConfusion impossible
+
 end Hypermath.ObservationChecks
 
 #print axioms Hypermath.Observation.endpoints_eq_of_step
@@ -69,3 +103,14 @@ end Hypermath.ObservationChecks
 #print axioms Hypermath.ObservationChecks.whole_trace_retains_lengths
 #print axioms Hypermath.ObservationChecks.reused_length
 #print axioms Hypermath.ObservationChecks.reused_preserves_length
+#print axioms Hypermath.Observation.decoder_implies_compatible
+#print axioms Hypermath.Observation.chosenDecoder_correct
+#print axioms Hypermath.Observation.compatible_iff_decoder
+#print axioms Hypermath.Observation.decoder_unique_on_image
+#print axioms Hypermath.Observation.reuse_respects_encoding
+#print axioms Hypermath.Observation.reuse_preserves_observations
+#print axioms Hypermath.Observation.equality_queries_iff_injective
+#print axioms Hypermath.ObservationChecks.first_bit_exact
+#print axioms Hypermath.ObservationChecks.flip_respects_encoding
+#print axioms Hypermath.ObservationChecks.first_bit_reuse_exact
+#print axioms Hypermath.ObservationChecks.swap_exposes_lost_bit

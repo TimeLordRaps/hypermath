@@ -180,7 +180,7 @@ Neither the declarations nor the model supplies that missing correspondence.
 The current translation has **16 admissions and 67 declared assumptions**
 (29 source parameters and 38 logical clauses). The latest three removed
 admissions were withdrawn after these counterexamples; they were not proved.
-The audit binds 34 proved production milestone declarations, including ten
+The audit binds 35 proved production milestone declarations, including eleven
 finite-orbit/action results. The classical existence results disclose their Lean
 foundation dependencies; no new native axiom was added.
 
@@ -193,10 +193,24 @@ with those same endpoints. The concrete check uses an empty path and a two-step
 closed path, with lengths zero and two; retaining the paths retains both values.
 Reusing the closed path twice preserves its computed length four.
 
-All 13 observation construction/check reports have no axiom dependencies. This
+The original 13 observation construction/check reports have no axiom dependencies. This
 is an explicit obstruction to forgetting path information, not an impossibility
 claim about fractal representations that retain it. It motivates the intended
 retention of formation history in a reusable atom.
+
+The observation module now also proves decoder factorization and uniqueness,
+preservation under every finite sequence of encoding-compatible reuse
+operations, and the necessity of injectivity when all equality queries are
+observed. Its 24 reports contain 22 axiom-free results and two explicit uses of
+classical choice for decoder existence. These are host-level results with stated
+premises, not a constructed native rule checker.
+
+Specializing to the existing native numerals gives
+`finiteNumeralEqualityExact_iff_injective`. In the six-form model, equality of
+`E(1)` and `E(3)` prevents a record-only decoder from correctly answering both
+"is the original count 1?" queries. This obstruction holds even though finite
+addition and multiplication respect equality of represented values. The native
+arithmetic interpretation therefore needs more than those operation laws.
 
 An observation that treats congruent forms as the same numeral cannot also
 count each congruence-preserving edge as a change of numeral. Path observations

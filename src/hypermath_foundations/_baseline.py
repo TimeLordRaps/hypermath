@@ -158,7 +158,7 @@ AXIOM_DECLARATIONS = {'Hypermath.Congruent': 'axiom Hypermath.Congruent : Hyperm
 
 TARGET_STATEMENT = 'theorem Hypermath.selfDerivation : And (Hypermath.structContinues Hypermath.ground Hypermath.ground) (And (∀ (x : Hypermath.Form), Hypermath.D x x) (And (∀ (p : Hypermath.DerivationPath), And (Hypermath.congruentPath (Hypermath.compose p Hypermath.pathGround) p) (Hypermath.congruentPath (Hypermath.compose Hypermath.pathGround p) p)) (Hypermath.Simulation (Hypermath.f2f (Hypermath.f2f Hypermath.deriver)) Hypermath.deriver)))'
 
-AUDIT_SOURCE_SHA256 = 'e12594c2cdd73599b12ea07385ead4a4c4b114a887f01229a23b29de68837c3d'
+AUDIT_SOURCE_SHA256 = '3363bd416af4ba6588d505b34cfd935d5d253cb1cc60c36dfc15d765fe1a0130'
 COUNTERMODEL_SOURCE_SHA256 = 'b822d53b244418db1c3a505332b6090d9da72bc6e0fe3ce620bd9e5c5413adc7'
 LEAN_BUILTINS = frozenset({"propext", "Classical.choice", "Quot.sound"})
 
@@ -382,9 +382,9 @@ PROVED_DEPENDENCIES = {'Hypermath.selfReadLength': ('Hypermath.Congruent', 'Hype
                                       'Hypermath.ordinalLimit',
                                       'Hypermath.traceLevels')}
 
-OBSERVATION_SOURCE_SHA256 = '47bc700f98d3da378ddca6600d86e9c699c4b93e86d3629a2ab3acef7b05cc71'
+OBSERVATION_SOURCE_SHA256 = '528fc4fe96beeca0e4b06783652348f66c5bc273f47446230cf684821a78413b'
 
-OBSERVATION_CHECKS_SOURCE_SHA256 = 'eb358969af52b4445c81cb390a0047523e893ec2fc3577021d82d4908e824d60'
+OBSERVATION_CHECKS_SOURCE_SHA256 = '0cb28bb33dd2711c764732d41536f331d150b27b7854f7b96580608a09d2ffcd'
 
 FULL_MODEL_SOURCE_SHA256 = 'd5bffd8e7b9fd8714b6759e90e0ec135001a55c1c86e7de076d1bf3d6dbb969d'
 
@@ -470,6 +470,10 @@ PROVED_DECLARATIONS.update({
         'theorem Hypermath.finiteActionCompatible_iff_exists_exact : Iff '
         'Hypermath.FiniteActionCompatible (Exists fun action => '
         'Hypermath.ExactFiniteAction action)',
+    'Hypermath.finiteNumeralEqualityExact_iff_injective':
+        'theorem Hypermath.finiteNumeralEqualityExact_iff_injective : Iff '
+        '(Hypermath.Observation.Compatible Hypermath.finiteApplyPosition '
+        'Hypermath.Observation.equalityQuery) Hypermath.FiniteOrbitInjective',
 })
 
 PROVED_DEPENDENCIES.update({
@@ -495,8 +499,10 @@ PROVED_DEPENDENCIES.update({
     'Hypermath.finiteActionCompatible_iff_exists_exact':
         ('Classical.choice', 'Hypermath.Form', 'Hypermath.f2f', 'Hypermath.ground',
          'Quot.sound', 'propext'),
+    'Hypermath.finiteNumeralEqualityExact_iff_injective':
+        ('Hypermath.Form', 'Hypermath.f2f', 'Hypermath.ground'),
 })
 
-FINITE_ACTION_SOURCE_SHA256 = '3684ecc224d91be388d77d1ebfba60a025d3cf1f54fca526f258952c025fd1d3'
+FINITE_ACTION_SOURCE_SHA256 = 'e5f5a0ef525088b1bf87f0669c7e0fecb6ab9a4e5fcda432a13825f8d96e609c'
 
-ACTION_COUNTERMODEL_SOURCE_SHA256 = '55e2892d7910c2ee864ec1aa536888597166ec946c3a8b3fbed10e2cbf0724b9'
+ACTION_COUNTERMODEL_SOURCE_SHA256 = 'c050dbe4635fd9a8c2fbcafa50bdb27ee9fc3d13f9d4f6e5ab44fa9b4f4305d9'
