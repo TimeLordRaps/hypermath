@@ -193,14 +193,17 @@ RECORD_ENCODING_DEPENDENCIES = {
 }
 RECORD_ENCODING_TARGETS = tuple(RECORD_ENCODING_DEPENDENCIES)
 FULL_MODEL_DEPENDENCIES = {
+    **{"HypermathFullAxiomModel." + name: [] for name in (
+        "same_conclusion_opposite_acceptance", "no_conclusion_only_record_checker",
+    )},
     **{"HypermathFullAxiomModel." + name: ["propext"] for name in (
         "finite_numerals_injective", "recordValue_is_interpretation",
-        "formulaValue_is_interpretation",
+        "formulaValue_is_interpretation", "record_native_ready",
     )},
     **{"HypermathFullAxiomModel." + name: ["Classical.choice", "Quot.sound", "propext"]
        for name in (
            "full_axioms_hold", "boundary_probe", "full_clauses_with_faithful_records",
-           "no_preserving_record_to_formula",
+           "no_preserving_record_to_formula", "full_clauses_with_rejected_closed_record",
        )},
     **{"HypermathFullAxiomModel." + name: ["Quot.sound", "propext"] for name in (
         "readRecordValue_recordValue", "readFormulaValue_formulaValue",
@@ -208,6 +211,7 @@ FULL_MODEL_DEPENDENCIES = {
         "recordValue_injective", "checkValues_values", "checkValues_sound",
         "other_chain_not_a_record", "other_chain_not_a_formula", "record_formula_values_disjoint",
         "interpreted_separation_checked", "interpreted_wrong_claim_rejected", "other_chain_rejected",
+        "rejected_record_has_native_closure", "native_closure_is_not_record_acceptance",
     )},
 }
 FULL_MODEL_TARGETS = tuple(FULL_MODEL_DEPENDENCIES)

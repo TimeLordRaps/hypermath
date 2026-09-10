@@ -82,6 +82,13 @@ faithful semantic interpretation and exact checker correspondence. This is a
 compatibility witness; source adequacy and internally derived acceptance
 remain necessary before this realizes the ranked meta-surface.
 
+The [native acceptance boundary](docs/research/NATIVE_ACCEPTANCE.md) checks why
+executive closure cannot substitute for that missing acceptance construction.
+A malformed projection has the same true conclusion as a valid primitive
+record, and both encoded forms satisfy the model's executive and ground-anchoring
+conditions. The checker distinguishes their formation trees. An internal
+acceptance proof must bind those trees and their premises to the claimed result.
+
 ## Ground and relations
 
 `Form` names the source's forming structure, `ground` its distinguished base,

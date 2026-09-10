@@ -498,7 +498,9 @@ def test_record_encoding_requires_exact_proof_dependencies(checkout, monkeypatch
     assert not evaluate_gate(report)
 
 
-@pytest.mark.parametrize("alteration", ["missing", "hidden_choice", "extra_choice", "admission"])
+@pytest.mark.parametrize("alteration", [
+    "missing", "missing_closure_boundary", "hidden_choice", "extra_choice", "admission",
+])
 def test_faithful_model_requires_exact_dependencies(checkout, monkeypatch, alteration):
     root, _, run = checkout
 
@@ -508,6 +510,10 @@ def test_faithful_model_requires_exact_dependencies(checkout, monkeypatch, alter
             if alteration == "missing":
                 output = "\n".join(line for line in output.splitlines()
                                    if "FullAxiomModel.interpreted_record_recovered'" not in line)
+            elif alteration == "missing_closure_boundary":
+                output = "\n".join(line for line in output.splitlines()
+                                   if "FullAxiomModel.native_closure_is_not_record_acceptance'"
+                                   not in line)
             elif alteration == "hidden_choice":
                 output = output.replace("Classical.choice, ", "")
             elif alteration == "extra_choice":
