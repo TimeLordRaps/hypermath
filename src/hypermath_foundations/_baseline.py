@@ -158,7 +158,7 @@ AXIOM_DECLARATIONS = {'Hypermath.Congruent': 'axiom Hypermath.Congruent : Hyperm
 
 TARGET_STATEMENT = 'theorem Hypermath.selfDerivation : And (Hypermath.structContinues Hypermath.ground Hypermath.ground) (And (∀ (x : Hypermath.Form), Hypermath.D x x) (And (∀ (p : Hypermath.DerivationPath), And (Hypermath.congruentPath (Hypermath.compose p Hypermath.pathGround) p) (Hypermath.congruentPath (Hypermath.compose Hypermath.pathGround p) p)) (Hypermath.Simulation (Hypermath.f2f (Hypermath.f2f Hypermath.deriver)) Hypermath.deriver)))'
 
-AUDIT_SOURCE_SHA256 = '9147815a4e8363b9e8b2130e7a3501ea3fa1a38d3a7ee07236d2226a433dfd04'
+AUDIT_SOURCE_SHA256 = 'e12594c2cdd73599b12ea07385ead4a4c4b114a887f01229a23b29de68837c3d'
 COUNTERMODEL_SOURCE_SHA256 = 'b822d53b244418db1c3a505332b6090d9da72bc6e0fe3ce620bd9e5c5413adc7'
 LEAN_BUILTINS = frozenset({"propext", "Classical.choice", "Quot.sound"})
 
@@ -416,6 +416,18 @@ DEFINITION_DECLARATIONS.update({
     'Hypermath.hostFiniteAction':
         'def Hypermath.hostFiniteAction : Hypermath.Form → Hypermath.Form → '
         'Hypermath.Form := Hypermath.FiniteAction.chosenAction Hypermath.f2f Hypermath.ground',
+    'Hypermath.FiniteOrbit':
+        'def Hypermath.FiniteOrbit : Type := Subtype fun x => '
+        'Hypermath.finiteApplyFromGround x',
+    'Hypermath.finiteOrbitEncode':
+        'def Hypermath.finiteOrbitEncode : Nat → Hypermath.FiniteOrbit := '
+        'fun n => ⟨Hypermath.finiteApplyPosition n, ⋯⟩',
+    'Hypermath.finiteOrbitDecode':
+        'def Hypermath.finiteOrbitDecode : Hypermath.FiniteOrbit → Nat := '
+        'fun x => Classical.choose ⋯',
+    'Hypermath.FiniteOrbitInjective':
+        'def Hypermath.FiniteOrbitInjective : Prop := ∀ {m n : Nat}, Eq '
+        '(Hypermath.finiteApplyPosition m) (Hypermath.finiteApplyPosition n) → Eq m n',
 })
 
 PROVED_DECLARATIONS.update({
@@ -428,6 +440,25 @@ PROVED_DECLARATIONS.update({
         'theorem Hypermath.finiteNumeralEq_add : ∀ {m n p q : Nat}, '
         'Hypermath.FiniteNumeralEq m n → Hypermath.FiniteNumeralEq p q → '
         'Hypermath.FiniteNumeralEq (HAdd.hAdd m p) (HAdd.hAdd n q)',
+    'Hypermath.finiteNumeralEq_mul':
+        'theorem Hypermath.finiteNumeralEq_mul : ∀ {m n p q : Nat}, '
+        'Hypermath.FiniteNumeralEq m n → Hypermath.FiniteNumeralEq p q → '
+        'Hypermath.FiniteNumeralEq (HMul.hMul m p) (HMul.hMul n q)',
+    'Hypermath.finiteOrbitEncode_surjective':
+        'theorem Hypermath.finiteOrbitEncode_surjective : ∀ (x : '
+        'Hypermath.FiniteOrbit), Exists fun n => Eq (Hypermath.finiteOrbitEncode n) x',
+    'Hypermath.finiteOrbitDecode_spec':
+        'theorem Hypermath.finiteOrbitDecode_spec : ∀ (x : Hypermath.FiniteOrbit), '
+        'Eq (Hypermath.finiteApplyPosition (Hypermath.finiteOrbitDecode x)) x.val',
+    'Hypermath.finiteOrbitEquivalence_laws':
+        'theorem Hypermath.finiteOrbitEquivalence_laws : '
+        'Hypermath.FiniteOrbitInjective → And (∀ (n : Nat), Eq '
+        '(Hypermath.finiteOrbitDecode (Hypermath.finiteOrbitEncode n)) n) '
+        '(∀ (x : Hypermath.FiniteOrbit), Eq (Hypermath.finiteOrbitEncode '
+        '(Hypermath.finiteOrbitDecode x)) x)',
+    'Hypermath.finiteOrbitInjective_implies_actionCompatible':
+        'theorem Hypermath.finiteOrbitInjective_implies_actionCompatible : '
+        'Hypermath.FiniteOrbitInjective → Hypermath.FiniteActionCompatible',
     'Hypermath.exactFiniteAction_implies_compatible':
         'theorem Hypermath.exactFiniteAction_implies_compatible : ∀ {action : '
         'Hypermath.Form → Hypermath.Form → Hypermath.Form}, '
@@ -446,6 +477,16 @@ PROVED_DEPENDENCIES.update({
         ('Hypermath.Form', 'Hypermath.f2f', 'Hypermath.ground'),
     'Hypermath.finiteNumeralEq_add':
         ('Hypermath.Form', 'Hypermath.f2f', 'Hypermath.ground'),
+    'Hypermath.finiteNumeralEq_mul':
+        ('Hypermath.Form', 'Hypermath.f2f', 'Hypermath.ground'),
+    'Hypermath.finiteOrbitEncode_surjective':
+        ('Hypermath.Form', 'Hypermath.f2f', 'Hypermath.ground'),
+    'Hypermath.finiteOrbitDecode_spec':
+        ('Classical.choice', 'Hypermath.Form', 'Hypermath.f2f', 'Hypermath.ground'),
+    'Hypermath.finiteOrbitEquivalence_laws':
+        ('Classical.choice', 'Hypermath.Form', 'Hypermath.f2f', 'Hypermath.ground'),
+    'Hypermath.finiteOrbitInjective_implies_actionCompatible':
+        ('Hypermath.Form', 'Hypermath.f2f', 'Hypermath.ground'),
     'Hypermath.exactFiniteAction_implies_compatible':
         ('Hypermath.Form', 'Hypermath.f2f', 'Hypermath.ground'),
     'Hypermath.hostFiniteAction_exact':
@@ -456,6 +497,6 @@ PROVED_DEPENDENCIES.update({
          'Quot.sound', 'propext'),
 })
 
-FINITE_ACTION_SOURCE_SHA256 = 'e58280684f5cc48a8a198e941bdfa02a5377edd54f2e56575b614d6141d74a85'
+FINITE_ACTION_SOURCE_SHA256 = '3684ecc224d91be388d77d1ebfba60a025d3cf1f54fca526f258952c025fd1d3'
 
-ACTION_COUNTERMODEL_SOURCE_SHA256 = 'e69828ed877b31781f1c492f530939eaa016049ca032769bacc643f4382916e0'
+ACTION_COUNTERMODEL_SOURCE_SHA256 = '55e2892d7910c2ee864ec1aa536888597166ec946c3a8b3fbed10e2cbf0724b9'

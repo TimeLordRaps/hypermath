@@ -114,10 +114,12 @@ and Form-valued length observations. Its refutation of universal ground-spanning
 and endpoint-decoding obstruction constrain the next native representation;
 the full arithmetic objective remains open.
 
-Finite addition respects equal ground-orbit numeral representations without
-an injectivity assumption. The stronger task of making those representations
-act on every Form requires representative independence. The exact-action
-criterion is now characterized in Lean, with classical choice used for the
+Finite addition and multiplication respect equal ground-orbit numeral
+representations without an injectivity assumption. Every witnessed finite-orbit
+Form has a natural-number representative, and an explicit numeral-injectivity
+premise yields a two-sided correspondence and representative independence on
+every starting Form. The exact-action criterion is now characterized in Lean,
+with classical choice used for the
 conditional existence direction. A six-form interpretation satisfies all 38
 declared logical clauses, with Congruent an equivalence relation, but refutes
 both exact and congruence-valued uniform finite actions. This concerns the
@@ -127,6 +129,12 @@ The proposed `ordinalZeroIdentity`, `ordinalSuccApplies`, and
 `pathLengthArithmetic` statements are retained as `Claim` definitions after
 the model refuted their entailment. Their withdrawal from the admitted theorem
 list does not prove them or settle the intended ordinal interpretation.
+The same model now proves a sharper separation: all 38 declared logical clauses
+and the exact current `selfDerivation` target hold together while the global
+finite-action criterion and all three ordinal computation claims fail. Thus the
+current self-derivation proposition is not itself an arithmetic interpretation
+theorem. A positive result needs the typed reification, transfinite-path, and
+semantic preservation premises listed below.
 Fractal reuse must retain or justify the observations needed for its actual
 domain of application; neither this obstruction nor the finite-orbit result
 establishes a completeness verdict.

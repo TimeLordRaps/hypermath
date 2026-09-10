@@ -90,9 +90,12 @@ prose glosses; its vacuous upper-bound implication and opaque path endpoints
 make the remaining specification gaps visible. `ObservationChecks.lean` checks
 that endpoint-only observations can lose path length while retained traces keep it.
 
-`Hypermath/FiniteAction.lean` proves that finite addition respects equality of
-ground-orbit numeral representations without an injectivity assumption. Its
-stronger exact-action criterion concerns every starting Form: equal numeral
+`Hypermath/FiniteAction.lean` proves that finite addition and multiplication
+respect equality of ground-orbit numeral representations without an injectivity
+assumption. It also gives a surjective encoding of the witnessed finite orbit;
+an explicit numeral-injectivity premise yields checked two-sided encode/decode
+laws and implies the global compatibility condition. Its stronger exact-action
+criterion concerns every starting Form: equal numeral
 Forms must induce equal iterates on all of them. The existence direction uses
 classical choice, is noncomputable, and remains conditional on that criterion.
 Agreement through a relation requires the corresponding compatibility; the
@@ -104,10 +107,13 @@ explicit equivalence relation. The first and third numeral Forms coincide,
 yet their actions on the other cycle differ even modulo Congruent. Thus neither
 an exact nor a congruence-valued action can agree with every finite iteration
 on every Form in this model. The same model refutes the three retained
-computation claims. It does not encode the stronger unformalized native intent
-that all Forms arise from ground, and does not refute finite-orbit addition.
+computation claims. It also satisfies the exact current `selfDerivation`
+proposition, proving that this target does not entail those arithmetic bridges.
+It does not encode the stronger unformalized native intent
+that all Forms arise from ground, and does not refute finite-orbit addition or
+multiplication.
 
-The audit binds 29 proved production milestone declarations and their reviewed
+The audit binds 34 proved production milestone declarations and their reviewed
 dependencies. Its seven required processes are `lean_build`,
 `dependency_output`, `countermodel`, `finite_trace`, `observation`, `full_model`,
 and `finite_action`; the last runs the six-form model and its failure witnesses.

@@ -73,6 +73,22 @@ theorem numeralEq_add {step : α → α} {base : α} {m n p q : Nat}
     ((congrArg (Nat.repeat step p) left).trans
       ((action_eq_on_finite_orbit right n).trans (iteration_add step n q base).symm))
 
+/-- The numeral-equivalence kernel also respects multiplication by a fixed
+natural count. Multiplication here is repeated host-level addition. -/
+theorem numeralEq_mul_right {step : α → α} {base : α} {m n : Nat}
+    (equal : NumeralEq step base m n) (k : Nat) :
+    NumeralEq step base (m * k) (n * k) := by
+  induction k with
+  | zero => rfl
+  | succ k ih => simpa [Nat.mul_succ] using numeralEq_add ih equal
+
+/-- The numeral-equivalence kernel respects multiplication in both arguments. -/
+theorem numeralEq_mul {step : α → α} {base : α} {m n p q : Nat}
+    (left : NumeralEq step base m n) (right : NumeralEq step base p q) :
+    NumeralEq step base (m * p) (n * q) :=
+  numeralEq_trans (numeralEq_mul_right left p)
+    (by simpa [Nat.mul_comm] using numeralEq_mul_right right n)
+
 /-- Representative independence for an exact action on every starting value. -/
 def FiniteActionCompatible (step : α → α) (base : α) : Prop :=
   ∀ m n, NumeralEq step base m n → ∀ x, Nat.repeat step m x = Nat.repeat step n x
@@ -160,9 +176,89 @@ theorem finiteNumeralEq_add {m n p q : Nat}
     FiniteNumeralEq (m + p) (n + q) :=
   FiniteAction.numeralEq_add left right
 
+/-- Finite numeral multiplication descends without assuming numeral
+injectivity or an action on Forms outside the finite ground orbit. -/
+theorem finiteNumeralEq_mul {m n p q : Nat}
+    (left : FiniteNumeralEq m n) (right : FiniteNumeralEq p q) :
+    FiniteNumeralEq (m * p) (n * q) :=
+  FiniteAction.numeralEq_mul left right
+
+/-- The existing finite ground orbit, retaining its finite-generation witness. -/
+def FiniteOrbit := {x : Form // finiteApplyFromGround x}
+
+/-- Encode a natural count as its witnessed native finite-orbit position. -/
+noncomputable def finiteOrbitEncode (n : Nat) : FiniteOrbit :=
+  ⟨finiteApplyPosition n, finiteApplyPositionMember n⟩
+
+/-- Every witnessed finite-orbit Form has at least one host count. -/
+theorem finiteOrbitEncode_surjective :
+    ∀ x : FiniteOrbit, ∃ n : Nat, finiteOrbitEncode n = x := by
+  intro x
+  obtain ⟨n, hn⟩ := x.property
+  refine ⟨n, Subtype.ext ?_⟩
+  exact hn
+
+/-- A classically selected count from the witness carried by a finite-orbit Form. -/
+noncomputable def finiteOrbitDecode (x : FiniteOrbit) : Nat :=
+  Classical.choose x.property
+
+theorem finiteOrbitDecode_spec (x : FiniteOrbit) :
+    finiteApplyPosition (finiteOrbitDecode x) = x.val :=
+  Classical.choose_spec x.property
+
+/-- The one additional proposition needed to identify this orbit with Nat. -/
+def FiniteOrbitInjective : Prop :=
+  ∀ {m n : Nat}, finiteApplyPosition m = finiteApplyPosition n → m = n
+
+/-- A two-sided correspondence between host natural numbers and witnessed
+finite-orbit Forms. This local structure avoids importing a larger library. -/
+structure FiniteOrbitEquivalence where
+  toOrbit : Nat → FiniteOrbit
+  toNat : FiniteOrbit → Nat
+  toNat_toOrbit : ∀ n : Nat, toNat (toOrbit n) = n
+  toOrbit_toNat : ∀ x : FiniteOrbit, toOrbit (toNat x) = x
+
+/-- Under the explicit injectivity obligation, the finite ground orbit has a
+set-level two-sided correspondence with the natural numbers. The current source
+axioms do not discharge the hypothesis or establish arithmetic preservation. -/
+noncomputable def finiteOrbitEquivalence
+    (injective : FiniteOrbitInjective) : FiniteOrbitEquivalence where
+  toOrbit := finiteOrbitEncode
+  toNat := finiteOrbitDecode
+  toNat_toOrbit := by
+    intro n
+    apply injective
+    exact finiteOrbitDecode_spec (finiteOrbitEncode n)
+  toOrbit_toNat := by
+    intro x
+    apply Subtype.ext
+    exact finiteOrbitDecode_spec x
+
+@[simp] theorem finiteOrbitEquivalence_apply
+    (injective : FiniteOrbitInjective) (n : Nat) :
+    (finiteOrbitEquivalence injective).toOrbit n = finiteOrbitEncode n := rfl
+
+/-- The conditional correspondence exposes both inverse laws as one reviewed
+set-level boundary. -/
+theorem finiteOrbitEquivalence_laws (injective : FiniteOrbitInjective) :
+    (∀ n : Nat, finiteOrbitDecode (finiteOrbitEncode n) = n) ∧
+    (∀ x : FiniteOrbit, finiteOrbitEncode (finiteOrbitDecode x) = x) := by
+  constructor
+  · exact (finiteOrbitEquivalence injective).toNat_toOrbit
+  · exact (finiteOrbitEquivalence injective).toOrbit_toNat
+
 /-- The native-parameter compatibility obligation; it is not assumed or derived here. -/
 def FiniteActionCompatible : Prop :=
   ∀ m n, FiniteNumeralEq m n → ∀ x, Nat.repeat f2f m x = Nat.repeat f2f n x
+
+/-- Injective finite numeral representation is sufficient for representative
+independence on every starting Form. The current axioms do not prove the premise. -/
+theorem finiteOrbitInjective_implies_actionCompatible
+    (injective : FiniteOrbitInjective) : FiniteActionCompatible := by
+  intro m n equal x
+  have indices : m = n := injective equal
+  cases indices
+  rfl
 
 /-- Exact host action agreement on the existing `finiteApplyPosition` representation. -/
 def ExactFiniteAction (action : Form → Form → Form) : Prop :=

@@ -37,18 +37,26 @@ also refutes the proposed universal ground-spanning claim under the existing
 limit axiom. A separate interpretation satisfies all 38 declared logical
 clauses while exposing their weaker treatment of limits and path endpoints.
 
-Finite numeral addition respects equality of ground-orbit representations
-without assuming that distinct counts produce distinct Forms. Extending those
-numerals to an exact action on every Form requires a separate compatibility
-condition. A six-form countermodel satisfies all 38 clauses, with congruence
+Finite numeral addition and multiplication respect equality of ground-orbit
+representations without assuming that distinct counts produce distinct Forms.
+Every finite-orbit Form has a natural-number representative; if the numeral
+encoding is injective, the checked encode/decode laws give a two-sided
+correspondence with the natural numbers and equal numeral Forms induce equal
+iterations from every starting Form. The conditional exact host action uses
+classical choice; agreement with native `ordinalApply` remains separate. A
+six-form countermodel satisfies all 38 clauses, with congruence
 an equivalence relation, but prevents both exact and congruence-valued actions
 of that kind. It also shows that the proposed zero, successor, and opaque
 path-length laws do not follow from those clauses. Their statements remain
 named propositions instead of admitted theorems. The translation now has
-67 declared assumptions and 16 admissions; the audit binds 29 proved milestone
+67 declared assumptions and 16 admissions; the audit binds 34 proved milestone
 declarations. Removing those three admissions records non-entailment, not
-three completed proofs. The model does not encode the stronger, unformalized
-native intent that all Forms arise from the ground.
+three completed proofs. The model additionally satisfies the exact current
+self-derivation target while those arithmetic bridges fail. This proves that
+the current target is insufficient for an arithmetic interpretation; it does
+not refute a stronger target with typed reification and transfinite semantics.
+The model does not encode the stronger, unformalized native intent that all
+Forms arise from the ground.
 
 ## Ground and relations
 
