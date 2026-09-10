@@ -14,6 +14,8 @@ from ._baseline import (
     DEFINITION_DECLARATIONS,
     FINITE_ACTION_SOURCE_SHA256,
     FULL_MODEL_SOURCE_SHA256,
+    GROUND_DERIVATION_CHECKS_SOURCE_SHA256,
+    GROUND_DERIVATION_SOURCE_SHA256,
     GROUND_SYNTAX_CHECKS_SOURCE_SHA256,
     GROUND_SYNTAX_SOURCE_SHA256,
     LEAN_BUILTINS,
@@ -128,6 +130,34 @@ GROUND_SYNTAX_DEPENDENCIES = {
     "Hypermath.GroundSyntaxChecks.distinct_records_retained": ["propext"],
 }
 GROUND_SYNTAX_TARGETS = tuple(GROUND_SYNTAX_DEPENDENCIES)
+GROUND_DERIVATION_DEPENDENCIES = {
+    **{"Hypermath.GroundDerivation." + name: [] for name in (
+        "derivation_sound", "separation",
+    )},
+    **{"Hypermath.GroundDerivation." + name: ["propext"] for name in (
+        "check_iff", "Record.derive", "check_sound", "conclusion_quote", "valid_quote",
+        "check_quote", "quote_derive", "observe_derive", "reconstruct",
+        "reconstruct_retains_record", "represented_iff_derivable", "check_join_iff",
+    )},
+    "Hypermath.GroundDerivation.native_check_sound": sorted([
+        "Hypermath.Form", "Hypermath.ground", "Hypermath.f2f",
+        "Hypermath.structDistinct", "Hypermath.structContinues", "Hypermath.structOrbits",
+        "Hypermath.Similar", "Hypermath.Simulation",
+        "Hypermath.axDiff", "Hypermath.axSim", "Hypermath.axBox", "Hypermath.axGroundSelf",
+        "Hypermath.closeStructContinues", "Hypermath.closeStructDistinct",
+        "Hypermath.closeStructOrbits", "propext",
+    ]),
+    **{"Hypermath.GroundDerivationChecks." + name: ["propext"] for name in (
+        "separation_checked", "invalid_record_not_reconstructed",
+    )},
+    **{"Hypermath.GroundDerivationChecks." + name: [] for name in (
+        "composed_example_checked", "wrong_claim_rejected", "wrong_predicate_premise_rejected",
+        "wrong_argument_rejected", "nonconjunction_projection_rejected",
+        "projection_cannot_hide_failed_premise", "wrong_projection_annotation_rejected",
+        "repeated_record_can_be_joined", "good_projection_checked",
+    )},
+}
+GROUND_DERIVATION_TARGETS = tuple(GROUND_DERIVATION_DEPENDENCIES)
 FULL_MODEL_TARGETS = tuple("HypermathFullAxiomModel." + name for name in (
     "full_axioms_hold", "finite_numerals_injective", "boundary_probe",
 ))
@@ -153,7 +183,8 @@ ACTION_COUNTERMODEL_DEPENDENCIES = {
 PROBE_TARGETS = {"countermodel": COUNTERMODEL_TARGETS, "finite_trace": TRACE_CHECK_TARGETS,
                  "observation": OBSERVATION_TARGETS, "full_model": FULL_MODEL_TARGETS,
                  "finite_action": ACTION_COUNTERMODEL_TARGETS,
-                 "ground_syntax": GROUND_SYNTAX_TARGETS}
+                 "ground_syntax": GROUND_SYNTAX_TARGETS,
+                 "ground_derivation": GROUND_DERIVATION_TARGETS}
 
 
 def probe_dependencies_valid(name: str, records: dict[str, list[str]]) -> bool:
@@ -163,6 +194,8 @@ def probe_dependencies_valid(name: str, records: dict[str, list[str]]) -> bool:
         return records == OBSERVATION_DEPENDENCIES
     if name == "ground_syntax":
         return records == GROUND_SYNTAX_DEPENDENCIES
+    if name == "ground_derivation":
+        return records == GROUND_DERIVATION_DEPENDENCIES
     allowed = LEAN_BUILTINS if name in {"countermodel", "full_model"} else frozenset()
     return all(dep in allowed for deps in records.values() for dep in deps)
 
@@ -276,4 +309,8 @@ def policy_errors(output: str, inputs: dict, assumptions: list[dict]) -> list[st
         reasons.append("ground syntax and checker differ from the reviewed source fragment")
     if inputs.get("lean4/GroundSyntaxChecks.lean") != GROUND_SYNTAX_CHECKS_SOURCE_SHA256:
         reasons.append("ground syntax checks differ from the reviewed probes")
+    if inputs.get("lean4/Hypermath/GroundDerivation.lean") != GROUND_DERIVATION_SOURCE_SHA256:
+        reasons.append("composed ground calculus differs from the reviewed construction")
+    if inputs.get("lean4/GroundDerivationChecks.lean") != GROUND_DERIVATION_CHECKS_SOURCE_SHA256:
+        reasons.append("composed ground checks differ from the reviewed probes")
     return reasons

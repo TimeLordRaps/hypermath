@@ -65,6 +65,14 @@ existing rules, and repeated argument reinstantiation. Semantic interpretation
 can identify distinct records, so this syntax is not silently identified with
 native `Form` values. The required audit checks 23 additional reports.
 
+The [composed ground calculus](docs/research/COMPOSED_GROUND_DERIVATIONS.md)
+adds typed rule trees, the three existing predicate closes, conjunction, and
+checked projections. Every typed derivation has an accepted record, and typed
+reconstruction preserves the entire accepted rule tree. Soundness uses the
+existing source premises; the 26 additional reports introduce no admission or
+native axiom. These structured records still require native encoding and
+internally derived acceptance before realizing the ranked meta-surface.
+
 ## Ground and relations
 
 `Form` names the source's forming structure, `ground` its distinguished base,

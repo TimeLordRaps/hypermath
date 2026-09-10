@@ -24,6 +24,7 @@ from hypermath_foundations._reports import (
     ACTION_COUNTERMODEL_DEPENDENCIES,
     COUNTERMODEL_TARGETS,
     DEPENDENCY_TARGETS,
+    GROUND_DERIVATION_DEPENDENCIES,
     GROUND_SYNTAX_DEPENDENCIES,
     OBSERVATION_DEPENDENCIES,
     PROBE_TARGETS,
@@ -86,6 +87,10 @@ def checkout(tmp_path, monkeypatch):
             project / "lean4/Hypermath/GroundSyntax.lean").read_text(encoding="utf-8"),
         "lean4/GroundSyntaxChecks.lean": (
             project / "lean4/GroundSyntaxChecks.lean").read_text(encoding="utf-8"),
+        "lean4/Hypermath/GroundDerivation.lean": (
+            project / "lean4/Hypermath/GroundDerivation.lean").read_text(encoding="utf-8"),
+        "lean4/GroundDerivationChecks.lean": (
+            project / "lean4/GroundDerivationChecks.lean").read_text(encoding="utf-8"),
         "lean4/FullAxiomModel.lean": (project / "lean4/FullAxiomModel.lean").read_text(encoding="utf-8"),
         "lean4/Hypermath/FiniteAction.lean": (
             project / "lean4/Hypermath/FiniteAction.lean").read_text(encoding="utf-8"),
@@ -117,11 +122,13 @@ def checkout(tmp_path, monkeypatch):
             return 0, "\n".join(f"'{name}' does not depend on any axioms" for name in TRACE_CHECK_TARGETS)
         if command[-1] == "FiniteActionCountermodel.lean":
             return 0, action_countermodel_output()
-        if command[-1] == "GroundSyntaxChecks.lean":
+        if command[-1] in {"GroundSyntaxChecks.lean", "GroundDerivationChecks.lean"}:
+            expected = (GROUND_SYNTAX_DEPENDENCIES if command[-1] == "GroundSyntaxChecks.lean"
+                        else GROUND_DERIVATION_DEPENDENCIES)
             return 0, "\n".join(
                 f"'{name}' depends on axioms: [{', '.join(dependencies)}]"
                 if dependencies else f"'{name}' does not depend on any axioms"
-                for name, dependencies in GROUND_SYNTAX_DEPENDENCIES.items()
+                for name, dependencies in expected.items()
             )
         for filename, key in (("ObservationChecks.lean", "observation"), ("FullAxiomModel.lean", "full_model")):
             if command[-1] == filename:
@@ -409,7 +416,9 @@ def test_reification_dependency_policy_is_exact(checkout, monkeypatch, name, rep
                                   "lean4/Hypermath/Observation.lean", "lean4/ObservationChecks.lean",
                                   "lean4/FullAxiomModel.lean", "lean4/Hypermath/FiniteAction.lean",
                                   "lean4/FiniteActionCountermodel.lean",
-                                  "lean4/Hypermath/GroundSyntax.lean", "lean4/GroundSyntaxChecks.lean"])
+                                  "lean4/Hypermath/GroundSyntax.lean", "lean4/GroundSyntaxChecks.lean",
+                                  "lean4/Hypermath/GroundDerivation.lean",
+                                  "lean4/GroundDerivationChecks.lean"])
 def test_replaced_reporter_or_trace_cannot_authorize_its_own_output(checkout, path):
     root, _, _ = checkout
     (root / path).write_text('#eval IO.println "forged report"', encoding="utf-8")
@@ -419,15 +428,21 @@ def test_replaced_reporter_or_trace_cannot_authorize_its_own_output(checkout, pa
 
 
 @pytest.mark.parametrize("alteration", ["missing", "hidden_source_rule", "admission", "failure"])
-def test_ground_syntax_requires_exact_proof_dependencies(checkout, monkeypatch, alteration):
+@pytest.mark.parametrize("fragment,reporter,namespace", [
+    ("ground_syntax", "GroundSyntaxChecks.lean", "GroundSyntax"),
+    ("ground_derivation", "GroundDerivationChecks.lean", "GroundDerivation"),
+])
+def test_ground_fragment_requires_exact_proof_dependencies(
+    checkout, monkeypatch, alteration, fragment, reporter, namespace,
+):
     root, _, run = checkout
 
     def altered(command, *args):
         code, output = run(command, *args)
-        if command[-1] == "GroundSyntaxChecks.lean":
+        if command[-1] == reporter:
             if alteration == "missing":
                 output = "\n".join(line for line in output.splitlines()
-                                   if "GroundSyntax.native_check_sound'" not in line)
+                                   if f"{namespace}.native_check_sound'" not in line)
             elif alteration == "hidden_source_rule":
                 output = output.replace("Hypermath.axDiff, ", "")
             elif alteration == "admission":
@@ -439,7 +454,7 @@ def test_ground_syntax_requires_exact_proof_dependencies(checkout, monkeypatch, 
 
     monkeypatch.setattr(audit_module, "_run_process", altered)
     report = run_audit(root)
-    assert report["checks"]["ground_syntax"]["status"] == "FAIL"
+    assert report["checks"][fragment]["status"] == "FAIL"
     assert not report["execution"]["completed"]
     assert not evaluate_gate(report)
 

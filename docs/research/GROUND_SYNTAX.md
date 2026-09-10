@@ -99,6 +99,9 @@ failed execution, or omitted replay cannot count as a successful audit.
 The broader translation retains 67 declared assumptions and 16 admission sites.
 Its existing 35 production milestones remain a separate audit group. The new
 fragment leaves self-derivation, source adequacy, and arithmetic completeness
-unresolved. The next extension needs a source-derived calculus for composed
-derivations and represented acceptance, with soundness and interpretation
-proofs that keep syntax distinct from lossy semantic values.
+unresolved. The [composed ground calculus](COMPOSED_GROUND_DERIVATIONS.md) now
+checks finite rule trees built from these primitives, the three predicate
+closes, conjunction, and projections. It preserves accepted records through
+typed reconstruction. Encoding those structured records as native terms,
+preserving them through semantic interpretation, and internally deriving ranked
+acceptance remain open.

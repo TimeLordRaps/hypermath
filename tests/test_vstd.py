@@ -45,6 +45,7 @@ def report():
                           "output": "", "reasons": ["fixture"]}
                    for name in ("lean_build", "dependency_output", "countermodel", "finite_trace",
                                 "observation", "full_model", "finite_action", "ground_syntax",
+                                "ground_derivation",
                                 "proof_admissibility")},
         "target": {"name": "Hypermath.selfDerivation", "kind": "theorem", "dependencies": ["sorryAx"]},
         "admissions": {"source": [{"path": "L0_ground.hm", "line": 1, "token": "sorry"}],
@@ -435,7 +436,7 @@ def test_matching_unresolved_replay_remains_writable(report, monkeypatch, tmp_pa
 
 @pytest.mark.parametrize("side", ["supplied", "replayed"])
 @pytest.mark.parametrize("failure", ["countermodel", "finite_trace", "observation", "full_model",
-                                     "finite_action", "ground_syntax", "inventory",
+                                     "finite_action", "ground_syntax", "ground_derivation", "inventory",
                                      "inconsistent_completion"])
 def test_incomplete_lean_audit_never_matches_replay(report, monkeypatch, tmp_path, side, failure):
     replay = copy.deepcopy(report)
@@ -445,6 +446,7 @@ def test_incomplete_lean_audit_never_matches_replay(report, monkeypatch, tmp_pat
     else:
         name = failure if failure in {
             "finite_trace", "observation", "full_model", "finite_action", "ground_syntax",
+            "ground_derivation",
         } else "countermodel"
         candidate["checks"][name].update(status="FAIL", attempted=True, exit_code=1)
         candidate["execution"]["completed"] = failure == "inconsistent_completion"
