@@ -94,6 +94,13 @@ acceptance formulas bound to the exact record and conclusion. Its proof must
 cover the rejected projection above. Concluding that `c` is derivable from a
 different valid record does not certify `bad`.
 
+The [record machine](RECORD_MACHINE.md) now supplies an explicit host execution
+model for these operations. Every retained inference becomes an instruction;
+the machine's outcome agrees with the recursive checker on all records, and
+submitted traces are checked transition by transition against the exact record
+and claim. This resolves the choice of a concrete finite computation to
+represent. It does not yet supply its native simulation or ranked acceptance.
+
 For the ranked self-closing target, that execution must itself yield a
 derivation of the acceptance claim at the next rank. Repeating the same rule
 must represent that acceptance derivation while preserving the needed

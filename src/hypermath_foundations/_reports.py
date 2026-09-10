@@ -26,6 +26,8 @@ from ._baseline import (
     PROVED_DEPENDENCIES,
     RECORD_ENCODING_CHECKS_SOURCE_SHA256,
     RECORD_ENCODING_SOURCE_SHA256,
+    RECORD_MACHINE_CHECKS_SOURCE_SHA256,
+    RECORD_MACHINE_SOURCE_SHA256,
     TARGET_STATEMENT,
     TRACE_CHECKS_SOURCE_SHA256,
     TRACE_SOURCE_SHA256,
@@ -192,6 +194,33 @@ RECORD_ENCODING_DEPENDENCIES = {
     )},
 }
 RECORD_ENCODING_TARGETS = tuple(RECORD_ENCODING_DEPENDENCIES)
+RECORD_MACHINE_DEPENDENCIES = {
+    **{"Hypermath.RecordMachine." + name: [] for name in (
+        "step_failed", "execute_failed", "execute_append", "endpoint_trace",
+    )},
+    **{"Hypermath.RecordMachine." + name: ["propext"] for name in (
+        "execute_program", "check_agrees", "check_sound", "check_quote",
+        "replay_iff", "replay_trace", "replay_unique", "checkTrace_trace",
+        "checkTrace_iff", "checkTrace_sound", "checkTrace_quote", "program_length",
+        "trace_length", "compiled_trace_length",
+    )},
+    **{"Hypermath.RecordMachine." + name: ["Quot.sound", "propext"] for name in (
+        "checkNumbers_agrees", "checkNumbers_codes", "checkNumbers_sound",
+    )},
+    **{"Hypermath.RecordMachineChecks." + name: [] for name in (
+        "example_accepted", "invalid_projection_rejected", "same_conclusion_different_execution",
+        "projection_cannot_hide_failed_premise", "stack_underflow_rejected",
+        "wrong_predicate_rejected", "wrong_argument_rejected",
+        "later_primitive_cannot_restore_failure", "correct_trace_accepted",
+        "omitted_step_rejected", "extra_step_rejected", "forged_state_rejected",
+        "wrong_trace_claim_rejected", "trace_for_other_record_rejected",
+        "accurate_failure_trace_not_acceptance", "five_instructions_for_separation",
+    )},
+    **{"Hypermath.RecordMachineChecks." + name: ["Quot.sound", "propext"] for name in (
+        "packed_example_accepted", "packed_wrong_sort_rejected", "empty_packed_input_rejected",
+    )},
+}
+RECORD_MACHINE_TARGETS = tuple(RECORD_MACHINE_DEPENDENCIES)
 FULL_MODEL_DEPENDENCIES = {
     **{"HypermathFullAxiomModel." + name: [] for name in (
         "same_conclusion_opposite_acceptance", "no_conclusion_only_record_checker",
@@ -239,7 +268,8 @@ PROBE_TARGETS = {"countermodel": COUNTERMODEL_TARGETS, "finite_trace": TRACE_CHE
                  "finite_action": ACTION_COUNTERMODEL_TARGETS,
                  "ground_syntax": GROUND_SYNTAX_TARGETS,
                  "ground_derivation": GROUND_DERIVATION_TARGETS,
-                 "record_encoding": RECORD_ENCODING_TARGETS}
+                 "record_encoding": RECORD_ENCODING_TARGETS,
+                 "record_machine": RECORD_MACHINE_TARGETS}
 
 
 def probe_dependencies_valid(name: str, records: dict[str, list[str]]) -> bool:
@@ -255,6 +285,8 @@ def probe_dependencies_valid(name: str, records: dict[str, list[str]]) -> bool:
         return records == GROUND_DERIVATION_DEPENDENCIES
     if name == "record_encoding":
         return records == RECORD_ENCODING_DEPENDENCIES
+    if name == "record_machine":
+        return records == RECORD_MACHINE_DEPENDENCIES
     allowed = LEAN_BUILTINS if name == "countermodel" else frozenset()
     return all(dep in allowed for deps in records.values() for dep in deps)
 
@@ -378,4 +410,8 @@ def policy_errors(output: str, inputs: dict, assumptions: list[dict]) -> list[st
         reasons.append("record encoding differs from the reviewed construction")
     if inputs.get("lean4/RecordEncodingChecks.lean") != RECORD_ENCODING_CHECKS_SOURCE_SHA256:
         reasons.append("record encoding checks differ from the reviewed probes")
+    if inputs.get("lean4/Hypermath/RecordMachine.lean") != RECORD_MACHINE_SOURCE_SHA256:
+        reasons.append("record execution machine differs from the reviewed construction")
+    if inputs.get("lean4/RecordMachineChecks.lean") != RECORD_MACHINE_CHECKS_SOURCE_SHA256:
+        reasons.append("record machine checks differ from the reviewed probes")
     return reasons
