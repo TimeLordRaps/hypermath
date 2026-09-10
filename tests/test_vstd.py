@@ -17,6 +17,7 @@ import verifier
 import hypermath_foundations
 from hypermath_foundations.vstd import (
     _AuditMechanism,
+    _portable,
     evaluate_audit_report,
     write_verification_receipt,
 )
@@ -38,7 +39,9 @@ def report():
         "execution": {"mode": "lean", "completed": True},
         "inputs": {"before": inventory, "after": dict(inventory), "stable": True,
                    "sha256": hashlib.sha256(b"fixture inventory").hexdigest()},
-        "checks": {name: {"status": "UNKNOWN", "attempted": False, "exit_code": None,
+        "checks": {name: {"status": "UNKNOWN" if name == "proof_admissibility" else "PASS",
+                          "attempted": name != "proof_admissibility",
+                          "exit_code": None if name == "proof_admissibility" else 0,
                           "output": "", "reasons": ["fixture"]}
                    for name in ("lean_build", "dependency_output", "countermodel", "proof_admissibility")},
         "target": {"name": "Hypermath.selfDerivation", "kind": "theorem", "dependencies": ["sorryAx"]},
@@ -199,3 +202,110 @@ def test_machine_paths_rejected_before_publication(report):
     report["checks"]["lean_build"]["output"] = "Z" + ":/workstation/private/source.lean"
     with pytest.raises(ValueError, match="machine-specific"):
         evaluate_audit_report(report)
+
+
+def test_json_escaped_relative_windows_trace_preserves_evidence_bytes(report, tmp_path):
+    report["checks"]["lean_build"]["output"] = (
+        "trace: .> LEAN_PATH=.\\.lake\\build\\lib PATH "
+        "<home>\\.elan\\toolchains\\leanprover--lean4---v4.14.0\\bin\\lean.exe "
+        ".\\Hypermath\\L0Ground.lean\n"
+    )
+    receipt_path = write_verification_receipt(report, tmp_path / "bundle")
+    assert verifier.validate_run_receipt(receipt_path) == 0
+    receipt = json.loads(receipt_path.read_bytes())
+    evidence_bytes = (receipt_path.parent / "audit.json").read_bytes()
+    assert json.loads(evidence_bytes) == report
+    input_ref = next(item for item in receipt["inputs"] if item["path"] == "audit.json")
+    assert hashlib.sha256(evidence_bytes).hexdigest() == input_ref["sha256"]
+
+
+@pytest.mark.parametrize("path", [
+    "\\\\" + "host" + "\\share\\source.lean",
+    "\\\\" + "host",
+    "\\\\" + "?\\UNC\\host\\share\\source.lean",
+    "file:" + "///source.lean",
+    "/" + "tmp/private/source.lean",
+    "Z" + ":\\source.lean",
+])
+def test_real_machine_paths_remain_rejected_inside_json_values(report, path):
+    report["checks"]["lean_build"]["output"] = "compiler: " + path
+    with pytest.raises(ValueError, match="machine-specific"):
+        evaluate_audit_report(report)
+
+
+def test_escaped_relative_separators_in_plain_text_are_not_unc_paths():
+    _portable("trace: build" + "\\\\" + "lib" + "\\\\" + "Core.lean")
+
+
+def test_redacted_linux_trace_preserves_evidence_bytes(report, tmp_path):
+    report["checks"]["lean_build"]["output"] = (
+        "trace: LD_LIBRARY_PATH=<python>/lib "
+        "<runtime>/toolchains/leanprover--lean4---v4.14.0/bin/lean "
+        "./Hypermath/L0Ground.lean -o ./.lake/build/lib/Hypermath/L0Ground.olean\n"
+    )
+    receipt_path = write_verification_receipt(report, tmp_path / "bundle")
+    assert verifier.validate_run_receipt(receipt_path) == 0
+    assert json.loads((receipt_path.parent / "audit.json").read_bytes()) == report
+
+
+@pytest.mark.parametrize("path", ["/" + "bin/lean", "/" + "home/user/source.lean"])
+def test_absolute_linux_paths_remain_rejected(report, path):
+    report["checks"]["lean_build"]["output"] = "compiler=" + path
+    with pytest.raises(ValueError, match="machine-specific"):
+        evaluate_audit_report(report)
+
+
+@pytest.mark.parametrize("failure", ["coordinate", "unavailable", "downgraded_claim"])
+def test_failed_required_replay_preserves_receipt_but_raises(report, monkeypatch, tmp_path, failure):
+    replay = copy.deepcopy(report)
+    if failure == "coordinate":
+        replay["subject"]["revision"] = "2" * 40
+    elif failure == "downgraded_claim":
+        report["claims"]["self_derivation"]["status"] = "PASS"
+
+    def run_replay(*_args, **_kwargs):
+        if failure == "unavailable":
+            raise TimeoutError("bounded replay did not complete")
+        return replay
+
+    monkeypatch.setattr(hypermath_foundations, "run_audit", run_replay)
+    output = tmp_path / "bundle"
+    with pytest.raises(RuntimeError, match="required native replay"):
+        write_verification_receipt(report, output, foundation_root=tmp_path)
+    assert verifier.validate_run_receipt(output / "receipt.json") == 0
+    native = json.loads((output / "verification.json").read_bytes())
+    assert outcomes(native)["self_derivation"] == "UNKNOWN"
+    expected_match = {"coordinate": "FAIL", "unavailable": "UNKNOWN", "downgraded_claim": "PASS"}
+    assert outcomes(native)["audit_replay_matches"] == expected_match[failure]
+
+
+def test_matching_unresolved_replay_remains_writable(report, monkeypatch, tmp_path):
+    monkeypatch.setattr(hypermath_foundations, "run_audit", lambda *_args, **_kwargs: copy.deepcopy(report))
+    output = tmp_path / "bundle"
+    receipt_path = write_verification_receipt(report, output, foundation_root=tmp_path)
+    assert verifier.validate_run_receipt(receipt_path) == 0
+    native = json.loads((output / "verification.json").read_bytes())
+    assert outcomes(native)["self_derivation"] == "UNKNOWN"
+    assert outcomes(native)["audit_replay_matches"] == "PASS"
+
+
+@pytest.mark.parametrize("side", ["supplied", "replayed"])
+@pytest.mark.parametrize("failure", ["countermodel", "inventory", "inconsistent_completion"])
+def test_incomplete_lean_audit_never_matches_replay(report, monkeypatch, tmp_path, side, failure):
+    replay = copy.deepcopy(report)
+    candidate = report if side == "supplied" else replay
+    if failure == "inventory":
+        candidate["execution"] = {"mode": "inventory", "completed": True}
+    else:
+        candidate["checks"]["countermodel"].update(status="FAIL", attempted=True, exit_code=1)
+        candidate["execution"]["completed"] = failure == "inconsistent_completion"
+    assert candidate["target"]["kind"] == "theorem"
+    assert candidate["claims"]["self_derivation"]["status"] == "UNKNOWN"
+    monkeypatch.setattr(hypermath_foundations, "run_audit", lambda *_args, **_kwargs: replay)
+    output = tmp_path / "bundle"
+    with pytest.raises(RuntimeError, match="required native replay"):
+        write_verification_receipt(report, output, foundation_root=tmp_path)
+    assert verifier.validate_run_receipt(output / "receipt.json") == 0
+    native = json.loads((output / "verification.json").read_bytes())
+    assert outcomes(native)["audit_replay_matches"] == "FAIL"
+    assert outcomes(native)["self_derivation"] == "UNKNOWN"

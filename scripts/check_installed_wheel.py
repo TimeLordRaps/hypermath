@@ -42,7 +42,8 @@ def main() -> None:
         probe = (
             "import importlib, pathlib, sys; "
             f"module=importlib.import_module({args.package!r}); "
-            "assert pathlib.Path(module.__file__).resolve().is_relative_to(pathlib.Path(sys.prefix)); "
+            "assert pathlib.Path(module.__file__).resolve().is_relative_to("
+            "pathlib.Path(sys.prefix).resolve()), 'import did not come from the isolated environment'; "
         )
         if args.package == "hypermath_foundations":
             probe += "assert module.evaluate_gate({}) is False; "
