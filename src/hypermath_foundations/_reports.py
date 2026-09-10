@@ -192,9 +192,25 @@ RECORD_ENCODING_DEPENDENCIES = {
     )},
 }
 RECORD_ENCODING_TARGETS = tuple(RECORD_ENCODING_DEPENDENCIES)
-FULL_MODEL_TARGETS = tuple("HypermathFullAxiomModel." + name for name in (
-    "full_axioms_hold", "finite_numerals_injective", "boundary_probe",
-))
+FULL_MODEL_DEPENDENCIES = {
+    **{"HypermathFullAxiomModel." + name: ["propext"] for name in (
+        "finite_numerals_injective", "recordValue_is_interpretation",
+        "formulaValue_is_interpretation",
+    )},
+    **{"HypermathFullAxiomModel." + name: ["Classical.choice", "Quot.sound", "propext"]
+       for name in (
+           "full_axioms_hold", "boundary_probe", "full_clauses_with_faithful_records",
+           "no_preserving_record_to_formula",
+       )},
+    **{"HypermathFullAxiomModel." + name: ["Quot.sound", "propext"] for name in (
+        "readRecordValue_recordValue", "readFormulaValue_formulaValue",
+        "interpreted_record_recovered", "interpreted_observation_preserved",
+        "recordValue_injective", "checkValues_values", "checkValues_sound",
+        "other_chain_not_a_record", "other_chain_not_a_formula", "record_formula_values_disjoint",
+        "interpreted_separation_checked", "interpreted_wrong_claim_rejected", "other_chain_rejected",
+    )},
+}
+FULL_MODEL_TARGETS = tuple(FULL_MODEL_DEPENDENCIES)
 ACTION_COUNTERMODEL_TARGETS = tuple("HypermathFiniteActionCountermodel." + name for name in (
     "full_axioms_hold", "numeral_collision", "action_disagreement",
     "finite_action_incompatible", "no_exact_finite_action", "congruence_is_equivalence",
@@ -223,6 +239,8 @@ PROBE_TARGETS = {"countermodel": COUNTERMODEL_TARGETS, "finite_trace": TRACE_CHE
 
 
 def probe_dependencies_valid(name: str, records: dict[str, list[str]]) -> bool:
+    if name == "full_model":
+        return records == FULL_MODEL_DEPENDENCIES
     if name == "finite_action":
         return records == ACTION_COUNTERMODEL_DEPENDENCIES
     if name == "observation":
@@ -233,7 +251,7 @@ def probe_dependencies_valid(name: str, records: dict[str, list[str]]) -> bool:
         return records == GROUND_DERIVATION_DEPENDENCIES
     if name == "record_encoding":
         return records == RECORD_ENCODING_DEPENDENCIES
-    allowed = LEAN_BUILTINS if name in {"countermodel", "full_model"} else frozenset()
+    allowed = LEAN_BUILTINS if name == "countermodel" else frozenset()
     return all(dep in allowed for deps in records.values() for dep in deps)
 
 

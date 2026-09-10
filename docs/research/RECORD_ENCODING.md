@@ -30,10 +30,42 @@ derive a native checker, or establish arithmetic completeness.
 `recordCode_injective` and `recordTerm_injective` establish separation in these
 host representations. `observe_recordCode` and `observe_recordTerm` preserve
 every function of the retained record, including its complete formation tree.
-The analogous conclusion for native interpretation is conditional:
+The generic conclusion for native interpretation is conditional:
 `semantic_record_recovery` requires a recovery map satisfying the displayed
 faithfulness premise. The source clauses do not supply that premise; existing
 finite-model collisions remain relevant.
+
+## A faithful interpretation under all current clauses
+
+`lean4/FullAxiomModel.lean` instantiates the encoding in the existing two-chain
+model, whose forms are pairs `(n, branch)` with `n` a natural number and `branch`
+a Boolean. Ground is `(0, false)`, and application increments `n` on the same
+branch. All 38 logical clauses still hold, with no changes to their meanings
+or the model operations.
+
+The interpreted record value is `(recordCode(r), false)`, and the formula
+value uses `formulaCode` on that same branch. Two interpretation theorems
+identify these packed pairs with the actual interpretation of their free
+ground terms. `interpreted_record_recovered` supplies exact recovery, and
+`interpreted_observation_preserved` preserves every function of the record
+after this interpretation. Values on the second branch are rejected.
+
+`checkValues_values` proves that checking the interpreted values agrees with
+the original composed checker. `checkValues_sound` proves that accepted
+decoded conclusions hold in this model. `full_clauses_with_faithful_records`
+combines the clause model, full record recovery, and checker correspondence.
+This is a concrete compatibility witness. It does not imply that all models
+of the clauses have faithful records; the six-form countermodel remains.
+
+The existing congruence-preserving path relation has no positive edge in this
+model. Distinct record and formula envelopes yield distinct values, so
+`no_preserving_record_to_formula` rules out implementing their direct
+record-to-conclusion transition as one of those paths here. This isolates a
+remaining operational obligation even when record recovery succeeds. It does
+not refute other native checking or ranked acceptance constructions.
+
+The decoder and checker on these model values are still host functions. No
+new source operation, computation law, or acceptance rule was added.
 
 ## Acceptance and finite reuse
 
@@ -84,6 +116,14 @@ the gate; native replay requires this process. Negative probes include wrong
 sorts, unknown tags, wrong arity, malformed primitive records, incomplete tree
 prefixes, trailing bits, incorrect claims, and a projection hiding a bad premise.
 
+The separate full-model process now checks 20 exact dependency reports:
+three using propositional extensionality, 13 also using quotient soundness,
+and four additionally using classical choice. The four include the existing
+full-clause and boundary proofs and the two results that combine them with
+record interpretation. The policy rejects omitted or extra dependencies as
+well as admissions; it no longer permits any built-in assumption indiscriminately
+within this group.
+
 The broader translation still has 67 declared assumptions and 16 admission
-sites. Native self-representation, internal acceptance, arithmetic
+sites. Source-adequate native self-representation, internal acceptance, arithmetic
 interpretation, transfinite coverage, and novelty remain open.

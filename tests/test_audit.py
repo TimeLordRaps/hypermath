@@ -24,10 +24,10 @@ from hypermath_foundations._reports import (
     ACTION_COUNTERMODEL_DEPENDENCIES,
     COUNTERMODEL_TARGETS,
     DEPENDENCY_TARGETS,
+    FULL_MODEL_DEPENDENCIES,
     GROUND_DERIVATION_DEPENDENCIES,
     GROUND_SYNTAX_DEPENDENCIES,
     OBSERVATION_DEPENDENCIES,
-    PROBE_TARGETS,
     RECORD_ENCODING_DEPENDENCIES,
     REPOSITORY,
     TARGET,
@@ -139,13 +139,14 @@ def checkout(tmp_path, monkeypatch):
                 if dependencies else f"'{name}' does not depend on any axioms"
                 for name, dependencies in expected.items()
             )
-        for filename, key in (("ObservationChecks.lean", "observation"), ("FullAxiomModel.lean", "full_model")):
+        for filename, expected in (("ObservationChecks.lean", OBSERVATION_DEPENDENCIES),
+                                   ("FullAxiomModel.lean", FULL_MODEL_DEPENDENCIES)):
             if command[-1] == filename:
                 return 0, "\n".join(
-                    f"'{name}' depends on axioms: [{', '.join(OBSERVATION_DEPENDENCIES[name])}]"
-                    if key == "observation" and OBSERVATION_DEPENDENCIES[name]
+                    f"'{name}' depends on axioms: [{', '.join(dependencies)}]"
+                    if dependencies
                     else f"'{name}' does not depend on any axioms"
-                    for name in PROBE_TARGETS[key]
+                    for name, dependencies in expected.items()
                 )
         return 0, "Build completed successfully.\n"
 
@@ -493,6 +494,31 @@ def test_record_encoding_requires_exact_proof_dependencies(checkout, monkeypatch
     monkeypatch.setattr(audit_module, "_run_process", altered)
     report = run_audit(root)
     assert report["checks"]["record_encoding"]["status"] == "FAIL"
+    assert not report["execution"]["completed"]
+    assert not evaluate_gate(report)
+
+
+@pytest.mark.parametrize("alteration", ["missing", "hidden_choice", "extra_choice", "admission"])
+def test_faithful_model_requires_exact_dependencies(checkout, monkeypatch, alteration):
+    root, _, run = checkout
+
+    def altered(command, *args):
+        code, output = run(command, *args)
+        if command[-1] == "FullAxiomModel.lean":
+            if alteration == "missing":
+                output = "\n".join(line for line in output.splitlines()
+                                   if "FullAxiomModel.interpreted_record_recovered'" not in line)
+            elif alteration == "hidden_choice":
+                output = output.replace("Classical.choice, ", "")
+            elif alteration == "extra_choice":
+                output = output.replace("[propext]", "[Classical.choice, propext]", 1)
+            else:
+                output = output.replace("[propext]", "[propext, sorryAx]", 1)
+        return code, output
+
+    monkeypatch.setattr(audit_module, "_run_process", altered)
+    report = run_audit(root)
+    assert report["checks"]["full_model"]["status"] == "FAIL"
     assert not report["execution"]["completed"]
     assert not evaluate_gate(report)
 
