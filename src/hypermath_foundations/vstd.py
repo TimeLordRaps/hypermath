@@ -37,6 +37,9 @@ _MACHINE_PATH = re.compile(
     r"(?<![\w./>\\-])/(?:Users|home|mnt|Volumes|tmp|var|opt|private|root|workspace|workspaces|"
     r"usr|etc|bin|sbin|run|media)/"
 )
+_LAKE_INCREMENTAL_STATE = re.compile(
+    r"(?m)^([^\r\n]*\[\d+/\d+\] )(?:Built|Replayed)(?= [^\r\n]+$)"
+)
 
 
 def _verifier() -> Any:
@@ -114,8 +117,23 @@ def _parameters(report: Mapping[str, Any]) -> dict[str, str]:
     }
 
 
+def _replay_comparison(report: Mapping[str, Any]) -> dict[str, Any]:
+    """Return the complete report with only known runtime noise normalized."""
+    comparison = json.loads(_bytes(dict(report)))
+    checks = comparison.get("checks")
+    if isinstance(checks, dict):
+        build = checks.get("lean_build")
+        if isinstance(build, dict) and isinstance(build.get("output"), str):
+            # Lake changes only this step-state word when identical module
+            # bytes come from its cache. Preserve every other transcript byte.
+            build["output"] = _LAKE_INCREMENTAL_STATE.sub(
+                r"\g<1><incremental-build-state>", build["output"]
+            )
+    return comparison
+
+
 class _AuditMechanism:
-    mechanism_id = "hypermath-foundations/audit-replay-1"
+    mechanism_id = "hypermath-foundations/audit-replay-2"
 
     def __init__(self, foundation_root: Path | None, timeout: int) -> None:
         self.root = foundation_root
@@ -177,12 +195,11 @@ class _AuditMechanism:
                 differences.append(f"{label} source inventory is not stable")
             if inputs["before"] != inputs["after"]:
                 differences.append(f"{label} input bytes changed during execution")
-        for field in ("subject", "inputs", "target", "declared_assumptions"):
-            if report[field] != self.replay[field]:
+        supplied = _replay_comparison(report)
+        replayed = _replay_comparison(self.replay)
+        for field in sorted(set(supplied) | set(replayed)):
+            if field not in supplied or field not in replayed or supplied[field] != replayed[field]:
                 differences.append(f"native replay differs at {field}")
-        for field in ("requested", "observed"):
-            if report["toolchain"].get(field) != self.replay["toolchain"].get(field):
-                differences.append(f"native replay differs at toolchain.{field}")
         current_inventory = {
             path.name: _digest(path.read_bytes())
             for path in sorted(Path(__file__).parent.glob("*.py"))
@@ -224,7 +241,7 @@ class _AuditMechanism:
                 vstd.MechanismOutcome.FAIL if differences else vstd.MechanismOutcome.PASS
             )
             return vstd.MechanismDecision(
-                outcome, "Exact source, toolchain and target comparison after native replay.",
+                outcome, "Complete normalized audit-report comparison after native replay.",
                 observations,
             )
         if binding.predicate != "self_derivation":

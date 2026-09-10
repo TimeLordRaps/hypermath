@@ -87,6 +87,7 @@ def test_input_pass_cannot_replace_native_replay(report):
     assert result["conformance"] == "NOT_ESTABLISHED"
     for item in result["results"].values():
         proposition = verifier.BoundProposition.from_dict(item["proposition"])
+        assert proposition.mechanism_id == "hypermath-foundations/audit-replay-2"
         assert proposition.digest() == item["evaluation"]["binding_digest"]
         assert proposition.expected is True
     store = verifier.EvidenceStore()
@@ -131,6 +132,86 @@ def test_wrong_foundation_coordinate_never_supports_derivation(report, monkeypat
     monkeypatch.setattr(hypermath_foundations, "run_audit", lambda *_args, **_kwargs: replay)
     result = evaluate_audit_report(report, foundation_root=tmp_path)
     assert outcomes(result)["self_derivation"] == "UNKNOWN"
+    assert outcomes(result)["audit_replay_matches"] == "FAIL"
+
+
+@pytest.mark.parametrize(
+    ("field", "mutate"),
+    [
+        (
+            "checks",
+            lambda replay: replay["checks"]["dependency_output"].__setitem__(
+                "output", "changed dependency evidence"
+            ),
+        ),
+        (
+            "checks",
+            lambda replay: replay["checks"]["finite_action"].__setitem__(
+                "output", "changed finite-action evidence"
+            ),
+        ),
+        (
+            "claims",
+            lambda replay: replay["claims"]["self_derivation"].__setitem__(
+                "reasons", ["changed claim basis"]
+            ),
+        ),
+        (
+            "claims",
+            lambda replay: replay["claims"]["source_adequacy"].__setitem__("status", "FAIL"),
+        ),
+        (
+            "admissions",
+            lambda replay: replay["admissions"].__setitem__("transitive_targets", []),
+        ),
+        (
+            "runner",
+            lambda replay: replay["runner"].__setitem__("version", "different-runner"),
+        ),
+        (
+            "subject_after",
+            lambda replay: replay["subject_after"].__setitem__("revision", "2" * 40),
+        ),
+        (
+            "execution",
+            lambda replay: replay["execution"].__setitem__("worker", "unexpected-worker"),
+        ),
+        (
+            "toolchain",
+            lambda replay: replay["toolchain"].__setitem__("python", "different-python"),
+        ),
+    ],
+)
+def test_semantic_report_difference_never_matches_replay(
+    report, monkeypatch, tmp_path, field, mutate
+):
+    report["subject_after"] = copy.deepcopy(report["subject"])
+    replay = copy.deepcopy(report)
+    mutate(replay)
+    monkeypatch.setattr(hypermath_foundations, "run_audit", lambda *_args, **_kwargs: replay)
+    result = evaluate_audit_report(report, foundation_root=tmp_path)
+    evaluation = result["results"]["audit_replay_matches"]["evaluation"]
+    assert evaluation["outcome"] == "FAIL"
+    assert f"native replay differs at {field}" in evaluation["observations"]["binding_differences"]
+
+
+def test_incremental_build_transcript_is_the_only_normalized_process_output(
+    report, monkeypatch, tmp_path
+):
+    replay = copy.deepcopy(report)
+    report["checks"]["lean_build"]["output"] = "✔ [2/10] Built Hypermath.Core\n"
+    replay["checks"]["lean_build"]["output"] = "✔ [2/10] Replayed Hypermath.Core\n"
+    monkeypatch.setattr(hypermath_foundations, "run_audit", lambda *_args, **_kwargs: replay)
+    result = evaluate_audit_report(report, foundation_root=tmp_path)
+    assert outcomes(result)["audit_replay_matches"] == "PASS"
+
+
+def test_other_incremental_build_transcript_changes_never_match(report, monkeypatch, tmp_path):
+    replay = copy.deepcopy(report)
+    report["checks"]["lean_build"]["output"] = "✔ [2/10] Built Hypermath.Core\n"
+    replay["checks"]["lean_build"]["output"] = "✔ [2/10] Replayed Hypermath.Other\n"
+    monkeypatch.setattr(hypermath_foundations, "run_audit", lambda *_args, **_kwargs: replay)
+    result = evaluate_audit_report(report, foundation_root=tmp_path)
     assert outcomes(result)["audit_replay_matches"] == "FAIL"
 
 
@@ -277,7 +358,7 @@ def test_failed_required_replay_preserves_receipt_but_raises(report, monkeypatch
     assert verifier.validate_run_receipt(output / "receipt.json") == 0
     native = json.loads((output / "verification.json").read_bytes())
     assert outcomes(native)["self_derivation"] == "UNKNOWN"
-    expected_match = {"coordinate": "FAIL", "unavailable": "UNKNOWN", "downgraded_claim": "PASS"}
+    expected_match = {"coordinate": "FAIL", "unavailable": "UNKNOWN", "downgraded_claim": "FAIL"}
     assert outcomes(native)["audit_replay_matches"] == expected_match[failure]
 
 

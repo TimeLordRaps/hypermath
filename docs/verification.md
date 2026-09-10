@@ -91,8 +91,16 @@ conditional host-action construction does not establish native adequacy.
 
 The adapter uses the released VSTD proposition, evidence-store, and verification
 session APIs. A mathematical claim supplied without a source checkout stays
-`UNKNOWN`. With the checkout, the mechanism replays the audit and checks its input
-bindings. It keeps native-source adequacy and arithmetic completeness unresolved.
+`UNKNOWN`. With the checkout, the versioned `audit-replay-2` mechanism replays the
+audit and checks its input bindings. Replay agreement compares the complete report,
+including runner and before/after source coordinates, execution metadata, admissions,
+every claim status and rationale, and every check payload. The verbose `lean_build`
+transcript is the only normalized value: Lake's `Built`/`Replayed` step-state word is
+ignored on an otherwise exact progress line because it records cache use rather than
+different module bytes. Every other build-transcript byte, the attempt flag, status,
+exit code, and reasons remain exact, while dependency and probe transcripts are
+compared exactly. It keeps native-source adequacy and arithmetic completeness
+unresolved.
 If a requested replay fails or disagrees with the supplied evidence, the adapter
 retains the bundle and raises an error. Packaging cannot override that failure.
 
