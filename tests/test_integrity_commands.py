@@ -11,6 +11,8 @@ from pathlib import Path
 import pytest
 
 from hypermath_foundations._baseline import (
+    GROUND_DERIVATION_CHECKS_SOURCE_SHA256,
+    GROUND_DERIVATION_SOURCE_SHA256,
     GROUND_SYNTAX_CHECKS_SOURCE_SHA256,
     GROUND_SYNTAX_SOURCE_SHA256,
 )
@@ -65,6 +67,8 @@ def test_fresh_autocrlf_checkout_preserves_primitive_checker_policy_bytes(tmp_pa
     expected = {
         "lean4/Hypermath/GroundSyntax.lean": GROUND_SYNTAX_SOURCE_SHA256,
         "lean4/GroundSyntaxChecks.lean": GROUND_SYNTAX_CHECKS_SOURCE_SHA256,
+        "lean4/Hypermath/GroundDerivation.lean": GROUND_DERIVATION_SOURCE_SHA256,
+        "lean4/GroundDerivationChecks.lean": GROUND_DERIVATION_CHECKS_SOURCE_SHA256,
     }
     for relative in expected:
         destination = source / relative

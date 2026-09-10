@@ -180,8 +180,17 @@ Fractal reuse must retain or justify the observations needed for its actual
 domain of application; neither this obstruction nor the finite-orbit result
 establishes a completeness verdict.
 
-1. Define typed representation, expansion, and closure evidence, including how
-   predicates and derivations become forms.
+The [composed ground calculus](COMPOSED_GROUND_DERIVATIONS.md) now supplies
+typed finite derivations and structured records for primitive rules, predicate
+closes, conjunction, and projections. Its record-only checker is sound under
+the explicit source premises, accepts every derivation of that calculus, and
+preserves the complete rule tree through typed reconstruction. This is a
+constructive representation result at the host level; the structured records,
+predicates, and checker still need native encoding and ranked acceptance.
+
+1. Encode the typed composed records, predicates, and checking operations as
+   native expressions, with preserved observations after interpretation.
+   Derive ranked acceptance through explicit source rules.
 2. Resolve the current relation, composition, and finite/transfinite path
    conflicts documented in the audit.
 3. Prove preservation of the declared observations under compression and reuse.
