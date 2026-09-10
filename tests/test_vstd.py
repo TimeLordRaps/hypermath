@@ -195,21 +195,42 @@ def test_semantic_report_difference_never_matches_replay(
     assert f"native replay differs at {field}" in evaluation["observations"]["binding_differences"]
 
 
-def test_incremental_build_transcript_is_the_only_normalized_process_output(
+def test_incremental_build_step_state_and_line_order_are_normalized(
     report, monkeypatch, tmp_path
 ):
     replay = copy.deepcopy(report)
-    report["checks"]["lean_build"]["output"] = "✔ [2/10] Built Hypermath.Core\n"
-    replay["checks"]["lean_build"]["output"] = "✔ [2/10] Replayed Hypermath.Core\n"
+    report["checks"]["lean_build"]["output"] = (
+        "✔ [1/2] Built Hypermath.Core\n✔ [2/2] Built Hypermath.Action\n"
+    )
+    replay["checks"]["lean_build"]["output"] = (
+        "✔ [2/2] Replayed Hypermath.Action\n✔ [1/2] Replayed Hypermath.Core\n"
+    )
     monkeypatch.setattr(hypermath_foundations, "run_audit", lambda *_args, **_kwargs: replay)
     result = evaluate_audit_report(report, foundation_root=tmp_path)
     assert outcomes(result)["audit_replay_matches"] == "PASS"
 
 
-def test_other_incremental_build_transcript_changes_never_match(report, monkeypatch, tmp_path):
+@pytest.mark.parametrize(
+    "replay_output",
+    [
+        "✔ [1/2] Replayed Hypermath.Core\n✔ [2/2] Replayed Hypermath.Other\n",
+        "✔ [1/2] Replayed Hypermath.Core\n",
+        (
+            "✔ [1/2] Replayed Hypermath.Core\n"
+            "✔ [1/2] Replayed Hypermath.Core\n"
+            "✔ [2/2] Replayed Hypermath.Action\n"
+        ),
+    ],
+    ids=("changed-line", "removed-line", "duplicated-line"),
+)
+def test_incremental_build_line_content_and_multiplicity_remain_exact(
+    report, monkeypatch, tmp_path, replay_output
+):
     replay = copy.deepcopy(report)
-    report["checks"]["lean_build"]["output"] = "✔ [2/10] Built Hypermath.Core\n"
-    replay["checks"]["lean_build"]["output"] = "✔ [2/10] Replayed Hypermath.Other\n"
+    report["checks"]["lean_build"]["output"] = (
+        "✔ [1/2] Built Hypermath.Core\n✔ [2/2] Built Hypermath.Action\n"
+    )
+    replay["checks"]["lean_build"]["output"] = replay_output
     monkeypatch.setattr(hypermath_foundations, "run_audit", lambda *_args, **_kwargs: replay)
     result = evaluate_audit_report(report, foundation_root=tmp_path)
     assert outcomes(result)["audit_replay_matches"] == "FAIL"
