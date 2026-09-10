@@ -1,4 +1,5 @@
 import Hypermath.FiniteAction
+import Hypermath.GroundSyntax
 
 /-!
 A finite interpretation of all 38 current logical axiom clauses, with colliding
@@ -367,6 +368,31 @@ theorem no_numeral_equality_decoder :
   intro first second equal query
   exact Hypermath.Observation.decoder_implies_compatible correct equal query
 
+/-- The source-syntax decoder needs the record, not merely its semantic value.
+The encoded diff and box instances have depths one and three, which collide
+in this full-clause model even though their syntactic rule tags differ. -/
+theorem primitive_records_collide :
+    (Hypermath.GroundSyntax.encode (.diff .ground)).interpret ground f2f =
+      (Hypermath.GroundSyntax.encode (.box .ground)).interpret ground f2f := rfl
+
+theorem primitive_conclusions_differ :
+    (Hypermath.GroundSyntax.AxiomInstance.diff .ground).conclusion ≠
+      (Hypermath.GroundSyntax.AxiomInstance.box .ground).conclusion := by
+  intro same
+  exact Hypermath.GroundSyntax.Statement.noConfusion same
+
+theorem no_semantic_primitive_record_decoder :
+    ¬ ∃ decoder : Form → Option Hypermath.GroundSyntax.AxiomInstance,
+      ∀ proof, decoder ((Hypermath.GroundSyntax.encode proof).interpret ground f2f) =
+        some proof := by
+  intro ⟨decoder, correct⟩
+  have same := (correct (.diff .ground)).symm.trans
+    ((congrArg decoder primitive_records_collide).trans (correct (.box .ground)))
+  exact Hypermath.GroundSyntax.AxiomInstance.noConfusion (Option.some.inj same)
+
+#print axioms primitive_records_collide
+#print axioms primitive_conclusions_differ
+#print axioms no_semantic_primitive_record_decoder
 #print axioms full_axioms_hold
 #print axioms numeral_collision
 #print axioms action_disagreement

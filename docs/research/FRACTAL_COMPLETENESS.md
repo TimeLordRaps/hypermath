@@ -22,6 +22,15 @@ as forms and recover the evidence needed to use them. That construction is
 directly relevant to fractal meta-representation, rather than a formatting
 detail of a future checker.
 
+The [finite ground-syntax construction](GROUND_SYNTAX.md) now represents
+instances of the four primitive ground rules as terms in the source's
+`ground`/`apply` grammar. It supplies a record-only decoder and conclusion
+checker, a source-relative soundness proof, and a concrete finite reuse
+operation. This is a positive fragment of the representation task. It does
+not yet represent arbitrary derivations or derive the checker's acceptance
+claim internally. A full-clause countermodel also proves why interpreting
+those syntax records as semantic Forms can lose their rule identities.
+
 An initial proposed representation is a derivation graph with references to
 closed subderivations and their closure evidence. References may be reused
 recursively by the same constructors. This is a formalization candidate,

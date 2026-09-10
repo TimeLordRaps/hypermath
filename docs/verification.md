@@ -22,6 +22,7 @@ an adjacent development checkout.
 | Finite arithmetic observations | Thirteen parameter-only results and four source-relative results | Least finite closure, length interpretation and reuse preservation; universal ground-spanning is refuted |
 | Observation boundary and full model | 24 observation reports: 22 axiom-free, two with classical choice; an interpretation of all 38 logical clauses | Decoder factorization and finite reuse preservation have explicit premises; the noncomputable existence result is not a native checker |
 | Finite action | Eleven production milestone results and a six-form model of all 38 logical clauses | Finite-orbit operations descend, but preserving all standard numeral-equality queries requires injectivity; the countermodel refutes a decoder for those queries |
+| Finite ground syntax | 23 exact dependency reports for primitive-rule records, their checker, and reuse | Four-rule checker soundness uses the existing source premises; native reification of acceptance and arithmetic interpretation remain open |
 | Self-derivation | Target theorem, transitive assumptions, stable inputs, fresh replay, and a full-clause separation model | Conditional proof admissibility remains unresolved; even the exact target does not imply the tested finite-action or ordinal-computation bridges |
 | Source adequacy | Required correspondence with native propositions and derivations | `UNKNOWN`; no checked correspondence theorem exists |
 | Recursive arithmetic completeness | Required arithmetic interpretation, self-representation, and completeness proof | `UNKNOWN`; the dependency and receipt do not discharge these obligations |
@@ -53,10 +54,11 @@ explicit mathematical requirement, completing an audit is a software operation;
 it is not a proof-completion verdict. A source-only inventory cannot discharge a
 proof gate.
 
-A completed native execution requires all seven process checks:
+A completed native execution requires all eight process checks:
 `lean_build`, `dependency_output`, `countermodel`, `finite_trace`, `observation`,
-`full_model`, and `finite_action`. The last runs
-`lean4/FiniteActionCountermodel.lean`; omitting it or supplying failed evidence
+`full_model`, `finite_action`, and `ground_syntax`. The final two run
+`lean4/FiniteActionCountermodel.lean` and `lean4/GroundSyntaxChecks.lean`;
+omitting either or supplying failed evidence
 cannot satisfy the execution or replay gate.
 
 For another run, select a fresh directory with `--output`; existing evidence
@@ -72,7 +74,10 @@ mechanism.
 The package also binds the exact self-derivation statement and the 67 reviewed
 parameter/axiom declarations, finite construction and retained proposal definition
 bodies, 35 proved milestone statements with their individually reviewed
-dependencies, and trace, observation, finite-action, and model sources. A new assumption,
+dependencies, and trace, observation, finite-action, ground-syntax, and model sources.
+The ground-syntax reporter separately binds 23 exact dependency reports,
+including the four existing native rules used by its checker-soundness theorem.
+A new assumption,
 weakened target or definition, or substituted reporter cannot pass by merely
 removing `sorry`. These declaration identities
 are a review baseline, not a consistency proof. Changing the mathematical basis

@@ -214,6 +214,7 @@ def run_audit(root, timeout=60, *, inventory_only=False, lake=None) -> dict:
                 "observation": [executable, "env", "lean", "ObservationChecks.lean"],
                 "full_model": [executable, "env", "lean", "FullAxiomModel.lean"],
                 "finite_action": [executable, "env", "lean", "FiniteActionCountermodel.lean"],
+                "ground_syntax": [executable, "env", "lean", "GroundSyntaxChecks.lean"],
             }
             for name, command in commands.items():
                 check = report["checks"][name]

@@ -24,6 +24,7 @@ from hypermath_foundations._reports import (
     ACTION_COUNTERMODEL_DEPENDENCIES,
     COUNTERMODEL_TARGETS,
     DEPENDENCY_TARGETS,
+    GROUND_SYNTAX_DEPENDENCIES,
     OBSERVATION_DEPENDENCIES,
     PROBE_TARGETS,
     REPOSITORY,
@@ -81,6 +82,10 @@ def checkout(tmp_path, monkeypatch):
         "lean4/Hypermath/Trace.lean": (project / "lean4/Hypermath/Trace.lean").read_text(encoding="utf-8"),
         "lean4/Hypermath/Observation.lean": (project / "lean4/Hypermath/Observation.lean").read_text(encoding="utf-8"),
         "lean4/ObservationChecks.lean": (project / "lean4/ObservationChecks.lean").read_text(encoding="utf-8"),
+        "lean4/Hypermath/GroundSyntax.lean": (
+            project / "lean4/Hypermath/GroundSyntax.lean").read_text(encoding="utf-8"),
+        "lean4/GroundSyntaxChecks.lean": (
+            project / "lean4/GroundSyntaxChecks.lean").read_text(encoding="utf-8"),
         "lean4/FullAxiomModel.lean": (project / "lean4/FullAxiomModel.lean").read_text(encoding="utf-8"),
         "lean4/Hypermath/FiniteAction.lean": (
             project / "lean4/Hypermath/FiniteAction.lean").read_text(encoding="utf-8"),
@@ -112,6 +117,12 @@ def checkout(tmp_path, monkeypatch):
             return 0, "\n".join(f"'{name}' does not depend on any axioms" for name in TRACE_CHECK_TARGETS)
         if command[-1] == "FiniteActionCountermodel.lean":
             return 0, action_countermodel_output()
+        if command[-1] == "GroundSyntaxChecks.lean":
+            return 0, "\n".join(
+                f"'{name}' depends on axioms: [{', '.join(dependencies)}]"
+                if dependencies else f"'{name}' does not depend on any axioms"
+                for name, dependencies in GROUND_SYNTAX_DEPENDENCIES.items()
+            )
         for filename, key in (("ObservationChecks.lean", "observation"), ("FullAxiomModel.lean", "full_model")):
             if command[-1] == filename:
                 return 0, "\n".join(
@@ -386,12 +397,39 @@ def test_reification_dependency_policy_is_exact(checkout, monkeypatch, name, rep
 @pytest.mark.parametrize("path", ["lean4/Audit.lean", "lean4/Hypermath/Trace.lean", "lean4/TraceChecks.lean",
                                   "lean4/Hypermath/Observation.lean", "lean4/ObservationChecks.lean",
                                   "lean4/FullAxiomModel.lean", "lean4/Hypermath/FiniteAction.lean",
-                                  "lean4/FiniteActionCountermodel.lean"])
+                                  "lean4/FiniteActionCountermodel.lean",
+                                  "lean4/Hypermath/GroundSyntax.lean", "lean4/GroundSyntaxChecks.lean"])
 def test_replaced_reporter_or_trace_cannot_authorize_its_own_output(checkout, path):
     root, _, _ = checkout
     (root / path).write_text('#eval IO.println "forged report"', encoding="utf-8")
     report = run_audit(root)
     assert report["checks"]["assumption_policy"]["status"] == "FAIL"
+    assert not evaluate_gate(report)
+
+
+@pytest.mark.parametrize("alteration", ["missing", "hidden_source_rule", "admission", "failure"])
+def test_ground_syntax_requires_exact_proof_dependencies(checkout, monkeypatch, alteration):
+    root, _, run = checkout
+
+    def altered(command, *args):
+        code, output = run(command, *args)
+        if command[-1] == "GroundSyntaxChecks.lean":
+            if alteration == "missing":
+                output = "\n".join(line for line in output.splitlines()
+                                   if "GroundSyntax.native_check_sound'" not in line)
+            elif alteration == "hidden_source_rule":
+                output = output.replace("Hypermath.axDiff, ", "")
+            elif alteration == "admission":
+                output = output.replace("does not depend on any axioms",
+                                        "depends on axioms: [sorryAx]", 1)
+            else:
+                code = 1
+        return code, output
+
+    monkeypatch.setattr(audit_module, "_run_process", altered)
+    report = run_audit(root)
+    assert report["checks"]["ground_syntax"]["status"] == "FAIL"
+    assert not report["execution"]["completed"]
     assert not evaluate_gate(report)
 
 
