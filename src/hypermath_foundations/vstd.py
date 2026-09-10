@@ -37,8 +37,8 @@ _MACHINE_PATH = re.compile(
     r"(?<![\w./>\\-])/(?:Users|home|mnt|Volumes|tmp|var|opt|private|root|workspace|workspaces|"
     r"usr|etc|bin|sbin|run|media)/"
 )
-_LAKE_INCREMENTAL_STATE = re.compile(
-    r"(?m)^([^\r\n]*\[\d+/\d+\] )(?:Built|Replayed)(?= [^\r\n]+$)"
+_LAKE_BUILD_PROGRESS = re.compile(
+    r"(?m)^([^\r\n]*?)\[\d+/(\d+)\] (?:Built|Replayed)(?= [^\r\n]+\r?$)"
 )
 
 
@@ -124,11 +124,12 @@ def _replay_comparison(report: Mapping[str, Any]) -> dict[str, Any]:
     if isinstance(checks, dict):
         build = checks.get("lean_build")
         if isinstance(build, dict) and isinstance(build.get("output"), str):
-            # Lake changes this step-state word and can interleave independent
-            # progress lines differently. Preserve every complete line and its
-            # multiplicity while comparing their order-independent multiset.
-            output = _LAKE_INCREMENTAL_STATE.sub(
-                r"\g<1><incremental-build-state>", build["output"]
+            # Lake changes this step-state word and the schedule position when
+            # independent jobs interleave differently. Preserve the prefix,
+            # total job count, target, line ending and multiplicity.
+            output = _LAKE_BUILD_PROGRESS.sub(
+                r"\g<1>[<schedule-position>/\g<2>] <incremental-build-state>",
+                build["output"],
             )
             build["output"] = sorted(output.splitlines(keepends=True))
     return comparison

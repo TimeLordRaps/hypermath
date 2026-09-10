@@ -95,11 +95,12 @@ session APIs. A mathematical claim supplied without a source checkout stays
 audit and checks its input bindings. Replay agreement compares the complete report,
 including runner and before/after source coordinates, execution metadata, admissions,
 every claim status and rationale, and every check payload. The verbose `lean_build`
-transcript is the only normalized value: Lake's `Built`/`Replayed` step-state word is
-ignored because it records cache use rather than different module bytes. After that
-substitution, complete build-output lines are compared as an order-independent
-multiset because parallel progress lines can be interleaved differently; line content
-and multiplicity remain exact. The attempt flag, status, exit code, and reasons also
+transcript is the only normalized value: Lake's `Built`/`Replayed` step-state word and
+the scheduling numerator on those build-progress lines are ignored because they record
+cache use and parallel completion order rather than different module bytes. Complete
+build-output lines are then compared as an order-independent multiset. The total job
+count, marker, target, message, line ending, and multiplicity remain exact. The attempt
+flag, status, exit code, and reasons also
 remain exact, while dependency and probe transcripts are compared in their original
 order. It keeps native-source adequacy and arithmetic completeness unresolved.
 If a requested replay fails or disagrees with the supplied evidence, the adapter
