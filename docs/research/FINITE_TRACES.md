@@ -41,9 +41,11 @@ These seven production theorem reports depend only on the existing parameters
 `Form`, `f2f`, and `Congruent`. They do not depend on an admitted proof or a logical
 axiom clause. The subsequent [finite arithmetic repair](FINITE_ARITHMETIC.md)
 closes the finite ground predicate and refutes universal ground-spanning.
-The overall translation now has 19 admissions and 67 declared assumptions:
+The overall translation now has 16 admissions and 67 declared assumptions:
 29 source parameters and 38 logical clauses. The remaining `selfDerivation`
-components have not all been proved.
+components have not all been proved. The latest three admissions were withdrawn
+because a full-clause countermodel refutes the proposed ordinal computation
+laws; their statements remain named claims, not completed proofs.
 
 ## Reuse and preservation
 
@@ -93,11 +95,20 @@ edge count is not silently equated with those path lengths or source quanta.
 Its congruence floor does not prove congruent-index substitution, nor endpoint
 congruence without additional relation laws. A bridge must state these differences.
 
-The next arithmetic obligation is to connect a native finite continuation
-`E(n) = f2f^n(ground)` and native `ordinalApply` to Ordinatics' finite ordinals.
-It requires a justified arithmetic observation and a preservation theorem, not
-an integer label added to a form. In particular, if the observation factors
-through congruence, distinguishability of the required numerals must be proved.
+The finite continuation `E(n) = f2f^n(ground)` now respects addition on its
+represented ground-orbit values without assuming numeral injectivity.
+Extending these values to an exact action on every Form requires the separate
+compatibility condition in [finite arithmetic](FINITE_ARITHMETIC.md).
+A six-form model satisfies all 38 current logical clauses, with Congruent an
+equivalence relation, yet admits neither an exact nor a congruence-valued
+action agreeing with all finite iteration counts on every Form. It does not
+formalize the stronger native generativity intent.
+
+Agreement with `ordinalApply`, opaque `pathLength`, and Ordinatics' ordinal
+values remains a correspondence obligation. The former admitted
+`ordinalZeroIdentity`, `ordinalSuccApplies`, and `pathLengthArithmetic` are now
+retained as proposition definitions with a `Claim` suffix. No observation may
+silently discard the path evidence or assume the remaining numeral distinctions.
 
 Full self-representation, arithmetic soundness, the selected completeness
 statement, and its effectiveness boundary remain open. See
@@ -107,7 +118,8 @@ statement, and its effectiveness boundary remain open. See
 
 Run the bounded audit as described in [the verification guide](../verification.md).
 It builds the library and independently runs `Audit.lean`, `Countermodels.lean`,
-`TraceChecks.lean`, `ObservationChecks.lean`, and `FullAxiomModel.lean`. The
+`TraceChecks.lean`, `ObservationChecks.lean`, `FullAxiomModel.lean`, and
+`FiniteActionCountermodel.lean` (the required `finite_action` process). The
 expected strict mathematical gate still exits 2.
 
 The policy binds the definition bodies, milestone statements, exact per-theorem

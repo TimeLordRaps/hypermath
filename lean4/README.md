@@ -13,7 +13,8 @@ python -u audit.py
 
 The command prints source counts, performs a verbose build, reports the transitive
 axiom dependencies of selected central declarations, checks independent finite
-countermodels, finite traces, observations, and a model of all logical clauses. Each subprocess
+countermodels, finite traces, observations, and models of all logical clauses,
+including the required finite-action countermodel. Each subprocess
 has a 60-second timeout, output streams as
 it arrives, and a silent subprocess receives a progress observation after 40 seconds.
 Use `--timeout 90` to adjust the bound or `--lake PATH` to select the Lake executable.
@@ -47,8 +48,11 @@ the `D` parameter with its finite congruence-preserving witness definition.
 It constructively proves `dIsReflexive` without changing its proposition-level API.
 The subsequent [finite arithmetic repair](../docs/research/FINITE_ARITHMETIC.md)
 defines the finite ground closure and refutes the universal ground-spanning
-claim. There are now 29 source parameters, 38 logical clauses, and 19 admissions;
-the last admission decrease is withdrawal of a refuted theorem.
+claim. There are now 29 source parameters, 38 logical clauses, and 16 admissions.
+The latest three admissions were withdrawn after a full-clause countermodel
+refuted their entailment. Their original propositions remain as
+`ordinalZeroIdentityClaim`, `ordinalSuccAppliesClaim`, and
+`pathLengthArithmeticClaim`; they were not proved or replaced by new axioms.
 
 Missing external `ℕ`/iteration notation was replaced by Lean core `Nat` and
 `Nat.repeat`. `orbitStructure` now uses the already declared `traceLevels` axiom
@@ -85,6 +89,28 @@ explicit two-chain interpretation. It excludes admitted theorems and stronger
 prose glosses; its vacuous upper-bound implication and opaque path endpoints
 make the remaining specification gaps visible. `ObservationChecks.lean` checks
 that endpoint-only observations can lose path length while retained traces keep it.
+
+`Hypermath/FiniteAction.lean` proves that finite addition respects equality of
+ground-orbit numeral representations without an injectivity assumption. Its
+stronger exact-action criterion concerns every starting Form: equal numeral
+Forms must induce equal iterates on all of them. The existence direction uses
+classical choice, is noncomputable, and remains conditional on that criterion.
+Agreement through a relation requires the corresponding compatibility; the
+generic necessity theorem takes symmetry and transitivity as explicit premises.
+
+`FiniteActionCountermodel.lean` checks all 38 clauses on six Forms. Ground enters
+a two-cycle while the limit lies in a separate three-cycle. Congruent is an
+explicit equivalence relation. The first and third numeral Forms coincide,
+yet their actions on the other cycle differ even modulo Congruent. Thus neither
+an exact nor a congruence-valued action can agree with every finite iteration
+on every Form in this model. The same model refutes the three retained
+computation claims. It does not encode the stronger unformalized native intent
+that all Forms arise from ground, and does not refute finite-orbit addition.
+
+The audit binds 29 proved production milestone declarations and their reviewed
+dependencies. Its seven required processes are `lean_build`,
+`dependency_output`, `countermodel`, `finite_trace`, `observation`, `full_model`,
+and `finite_action`; the last runs the six-form model and its failure witnesses.
 
 `Audit.lean` prints dependencies without exporting its report as library theorems.
 In particular, `Hypermath.selfDerivation` currently depends on `sorryAx` through

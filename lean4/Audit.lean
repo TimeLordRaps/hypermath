@@ -344,7 +344,6 @@ set_option pp.fullNames true
 #print axioms Hypermath.dIsReflexive
 #print axioms Hypermath.plusAndAdditionallyAreDistinct
 #print axioms Hypermath.pathGroundIsIdentity
-#print axioms Hypermath.pathLengthArithmetic
 #print axioms Hypermath.simulationPairExists
 #print axioms Hypermath.driverCycleIsClosed
 #print axioms Hypermath.selfDerivation
@@ -435,6 +434,54 @@ set_option pp.fullNames true
 #print Hypermath.notGroundSpanningClaim
 #eval IO.println "HYPERMATH_DECL_END:Hypermath.notGroundSpanningClaim"
 
+#eval IO.println "HYPERMATH_DECL_BEGIN:Hypermath.ordinalZeroIdentityClaim"
+#print Hypermath.ordinalZeroIdentityClaim
+#eval IO.println "HYPERMATH_DECL_END:Hypermath.ordinalZeroIdentityClaim"
+
+#eval IO.println "HYPERMATH_DECL_BEGIN:Hypermath.ordinalSuccAppliesClaim"
+#print Hypermath.ordinalSuccAppliesClaim
+#eval IO.println "HYPERMATH_DECL_END:Hypermath.ordinalSuccAppliesClaim"
+
+#eval IO.println "HYPERMATH_DECL_BEGIN:Hypermath.pathLengthArithmeticClaim"
+#print Hypermath.pathLengthArithmeticClaim
+#eval IO.println "HYPERMATH_DECL_END:Hypermath.pathLengthArithmeticClaim"
+
+#eval IO.println "HYPERMATH_DECL_BEGIN:Hypermath.FiniteNumeralEq"
+#print Hypermath.FiniteNumeralEq
+#eval IO.println "HYPERMATH_DECL_END:Hypermath.FiniteNumeralEq"
+
+#eval IO.println "HYPERMATH_DECL_BEGIN:Hypermath.FiniteActionCompatible"
+#print Hypermath.FiniteActionCompatible
+#eval IO.println "HYPERMATH_DECL_END:Hypermath.FiniteActionCompatible"
+
+#eval IO.println "HYPERMATH_DECL_BEGIN:Hypermath.ExactFiniteAction"
+#print Hypermath.ExactFiniteAction
+#eval IO.println "HYPERMATH_DECL_END:Hypermath.ExactFiniteAction"
+
+#eval IO.println "HYPERMATH_DECL_BEGIN:Hypermath.hostFiniteAction"
+#print Hypermath.hostFiniteAction
+#eval IO.println "HYPERMATH_DECL_END:Hypermath.hostFiniteAction"
+
+#eval IO.println "HYPERMATH_DECL_BEGIN:Hypermath.finiteNumeralEq_action_on_finite_orbit"
+#print Hypermath.finiteNumeralEq_action_on_finite_orbit
+#eval IO.println "HYPERMATH_DECL_END:Hypermath.finiteNumeralEq_action_on_finite_orbit"
+
+#eval IO.println "HYPERMATH_DECL_BEGIN:Hypermath.finiteNumeralEq_add"
+#print Hypermath.finiteNumeralEq_add
+#eval IO.println "HYPERMATH_DECL_END:Hypermath.finiteNumeralEq_add"
+
+#eval IO.println "HYPERMATH_DECL_BEGIN:Hypermath.exactFiniteAction_implies_compatible"
+#print Hypermath.exactFiniteAction_implies_compatible
+#eval IO.println "HYPERMATH_DECL_END:Hypermath.exactFiniteAction_implies_compatible"
+
+#eval IO.println "HYPERMATH_DECL_BEGIN:Hypermath.hostFiniteAction_exact"
+#print Hypermath.hostFiniteAction_exact
+#eval IO.println "HYPERMATH_DECL_END:Hypermath.hostFiniteAction_exact"
+
+#eval IO.println "HYPERMATH_DECL_BEGIN:Hypermath.finiteActionCompatible_iff_exists_exact"
+#print Hypermath.finiteActionCompatible_iff_exists_exact
+#eval IO.println "HYPERMATH_DECL_END:Hypermath.finiteActionCompatible_iff_exists_exact"
+
 #print axioms Hypermath.finiteApplyIffIteration
 
 #print axioms Hypermath.finiteApplyGround
@@ -468,3 +515,13 @@ set_option pp.fullNames true
 #print axioms Hypermath.ordinalLimitNotInD
 
 #print axioms Hypermath.notGroundSpanningClaim
+
+#print axioms Hypermath.finiteNumeralEq_action_on_finite_orbit
+
+#print axioms Hypermath.finiteNumeralEq_add
+
+#print axioms Hypermath.exactFiniteAction_implies_compatible
+
+#print axioms Hypermath.hostFiniteAction_exact
+
+#print axioms Hypermath.finiteActionCompatible_iff_exists_exact

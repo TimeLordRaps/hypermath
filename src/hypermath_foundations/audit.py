@@ -213,6 +213,7 @@ def run_audit(root, timeout=60, *, inventory_only=False, lake=None) -> dict:
                 "finite_trace": [executable, "env", "lean", "TraceChecks.lean"],
                 "observation": [executable, "env", "lean", "ObservationChecks.lean"],
                 "full_model": [executable, "env", "lean", "FullAxiomModel.lean"],
+                "finite_action": [executable, "env", "lean", "FiniteActionCountermodel.lean"],
             }
             for name, command in commands.items():
                 check = report["checks"][name]

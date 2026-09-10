@@ -203,11 +203,12 @@ theorem compositionLengthAdditive_FRAME :
   sorry
   -- FRAME/L3: path-length(p) ~~ f2f^n(ground) for n = |p|.
   -- Addition f2f^n(f2f^m(ground)) = f2f^{n+m}(ground) requires ordinal_succ from L3.
-  -- Discharged in L3Ordinatics.lean, theorem pathLengthArithmetic.
+  -- The proposed L3 discharge remains pathLengthArithmeticClaim. A checked
+  -- full-clause model shows that the current axioms do not imply it.
 
 -- ============================================================================
 -- §VII  Graduation — L2 → L3
--- Four NCs. All discharged. Graduation status: FORM. L3 licensed.
+-- Four source NCs. Their current Lean proof status is reported individually.
 -- ============================================================================
 
 -- NC-1: + is a well-defined Form operation staying within ~~ (axSeq). FORM.

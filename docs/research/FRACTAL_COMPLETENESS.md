@@ -114,6 +114,23 @@ and Form-valued length observations. Its refutation of universal ground-spanning
 and endpoint-decoding obstruction constrain the next native representation;
 the full arithmetic objective remains open.
 
+Finite addition respects equal ground-orbit numeral representations without
+an injectivity assumption. The stronger task of making those representations
+act on every Form requires representative independence. The exact-action
+criterion is now characterized in Lean, with classical choice used for the
+conditional existence direction. A six-form interpretation satisfies all 38
+declared logical clauses, with Congruent an equivalence relation, but refutes
+both exact and congruence-valued uniform finite actions. This concerns the
+declared clauses; it does not encode the stronger native generativity intent.
+
+The proposed `ordinalZeroIdentity`, `ordinalSuccApplies`, and
+`pathLengthArithmetic` statements are retained as `Claim` definitions after
+the model refuted their entailment. Their withdrawal from the admitted theorem
+list does not prove them or settle the intended ordinal interpretation.
+Fractal reuse must retain or justify the observations needed for its actual
+domain of application; neither this obstruction nor the finite-orbit result
+establishes a completeness verdict.
+
 1. Define typed representation, expansion, and closure evidence, including how
    predicates and derivations become forms.
 2. Resolve the current relation, composition, and finite/transfinite path

@@ -21,6 +21,7 @@ from hypermath_foundations._baseline import (
 )
 from hypermath_foundations._inventory import SOURCE_PARAMETERS, lean_code
 from hypermath_foundations._reports import (
+    ACTION_COUNTERMODEL_DEPENDENCIES,
     COUNTERMODEL_TARGETS,
     DEPENDENCY_TARGETS,
     PROBE_TARGETS,
@@ -54,6 +55,16 @@ def countermodel_output():
     return "\n".join(f"'{name}' does not depend on any axioms" for name in COUNTERMODEL_TARGETS)
 
 
+def action_countermodel_output():
+    lines = []
+    for name, dependencies in ACTION_COUNTERMODEL_DEPENDENCIES.items():
+        if dependencies:
+            lines.append(f"'{name}' depends on axioms: [{', '.join(dependencies)}]")
+        else:
+            lines.append(f"'{name}' does not depend on any axioms")
+    return "\n".join(lines)
+
+
 @pytest.fixture
 def checkout(tmp_path, monkeypatch):
     root = tmp_path / "checkout"
@@ -70,6 +81,10 @@ def checkout(tmp_path, monkeypatch):
         "lean4/Hypermath/Observation.lean": (project / "lean4/Hypermath/Observation.lean").read_text(encoding="utf-8"),
         "lean4/ObservationChecks.lean": (project / "lean4/ObservationChecks.lean").read_text(encoding="utf-8"),
         "lean4/FullAxiomModel.lean": (project / "lean4/FullAxiomModel.lean").read_text(encoding="utf-8"),
+        "lean4/Hypermath/FiniteAction.lean": (
+            project / "lean4/Hypermath/FiniteAction.lean").read_text(encoding="utf-8"),
+        "lean4/FiniteActionCountermodel.lean": (
+            project / "lean4/FiniteActionCountermodel.lean").read_text(encoding="utf-8"),
         "lean4/Hypermath/L0Ground.lean": "-- fixture",
         "lean4/Hypermath/L1Relations.lean": "-- fixture",
         "lean4/Hypermath/L2Operations.lean": "-- fixture",
@@ -94,6 +109,8 @@ def checkout(tmp_path, monkeypatch):
             return 0, countermodel_output()
         if command[-1] == "TraceChecks.lean":
             return 0, "\n".join(f"'{name}' does not depend on any axioms" for name in TRACE_CHECK_TARGETS)
+        if command[-1] == "FiniteActionCountermodel.lean":
+            return 0, action_countermodel_output()
         for filename, key in (("ObservationChecks.lean", "observation"), ("FullAxiomModel.lean", "full_model")):
             if command[-1] == filename:
                 return 0, "\n".join(f"'{name}' does not depend on any axioms" for name in PROBE_TARGETS[key])
@@ -337,7 +354,8 @@ def test_constructive_trace_probes_require_no_axioms(checkout, monkeypatch, depe
 
 @pytest.mark.parametrize("path", ["lean4/Audit.lean", "lean4/Hypermath/Trace.lean", "lean4/TraceChecks.lean",
                                   "lean4/Hypermath/Observation.lean", "lean4/ObservationChecks.lean",
-                                  "lean4/FullAxiomModel.lean"])
+                                  "lean4/FullAxiomModel.lean", "lean4/Hypermath/FiniteAction.lean",
+                                  "lean4/FiniteActionCountermodel.lean"])
 def test_replaced_reporter_or_trace_cannot_authorize_its_own_output(checkout, path):
     root, _, _ = checkout
     (root / path).write_text('#eval IO.println "forged report"', encoding="utf-8")
@@ -352,11 +370,15 @@ def test_timeout_validation(checkout):
             run_audit(checkout[0], timeout=timeout)
 
 
-def test_full_model_covers_exact_reviewed_logical_clause_types():
+@pytest.mark.parametrize("relative_path", [
+    "lean4/FullAxiomModel.lean",
+    "lean4/FiniteActionCountermodel.lean",
+])
+def test_full_models_cover_exact_reviewed_logical_clause_types(relative_path):
     """The model must cover the actual axiom list, not a smaller lookalike."""
     import re
 
-    path = Path(__file__).resolve().parents[1] / "lean4/FullAxiomModel.lean"
+    path = Path(__file__).resolve().parents[1] / relative_path
     source = lean_code(path.read_text(encoding="utf-8"))
     fields = source.split("structure FullAxioms : Prop where\n", 1)[1].split("\ntheorem ", 1)[0]
     actual = dict(re.findall(r"^  (\w+) : (.+)$", fields, re.M))
@@ -367,3 +389,37 @@ def test_full_model_covers_exact_reviewed_logical_clause_types():
     }
     assert len(actual) == len(expected) == 38
     assert actual == expected
+
+
+@pytest.mark.parametrize("alter", [
+    lambda out: out.replace(
+        "depends on axioms: [Quot.sound, propext]",
+        "depends on axioms: [propext]",
+        1,
+    ),
+    lambda out: out.replace(
+        "does not depend on any axioms",
+        "depends on axioms: [Classical.choice]",
+        1,
+    ),
+    lambda out: out.replace(
+        "depends on axioms: [Quot.sound, propext]",
+        "depends on axioms: [Quot.sound,, propext]",
+        1,
+    ),
+    lambda out: out + "\n'HypermathFiniteActionCountermodel.full_axioms_hold' "
+    "depends on axioms: [sorryAx",
+])
+def test_finite_action_model_requires_exact_dependency_surface(checkout, monkeypatch, alter):
+    root, _, run = checkout
+
+    def altered(command, *args):
+        if command[-1] == "FiniteActionCountermodel.lean":
+            return 0, alter(action_countermodel_output())
+        return run(command, *args)
+
+    monkeypatch.setattr(audit_module, "_run_process", altered)
+    report = run_audit(root)
+    assert report["checks"]["finite_action"]["status"] == "FAIL"
+    assert not report["execution"]["completed"]
+    assert not evaluate_gate(report)

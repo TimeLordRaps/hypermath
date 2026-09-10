@@ -21,6 +21,7 @@ an adjacent development checkout.
 | Finite traces | Seven parameter-relative production proofs and 28 axiom-free generic/concrete checks | Constructive self-read, composition, endpoint iteration, and recorded-step preservation; no native arithmetic interpretation yet |
 | Finite arithmetic observations | Thirteen parameter-only results and four source-relative results | Least finite closure, length interpretation and reuse preservation; universal ground-spanning is refuted |
 | Observation boundary and full model | Thirteen axiom-free observation reports and an interpretation of all 38 logical clauses | Endpoint-only length decoding can fail; declared axioms have a model relative to Lean foundations, not a full native adequacy proof |
+| Finite action | Five production milestone results and a six-form model of all 38 logical clauses | Finite-orbit addition descends unconditionally; actions on every Form need compatibility, which can fail even with congruence an equivalence relation |
 | Self-derivation | Target theorem, transitive assumptions, stable inputs and fresh replay | Conditional proof admissibility under disclosed Lean assumptions; unresolved while admissions remain |
 | Source adequacy | Required correspondence with native propositions and derivations | `UNKNOWN`; no checked correspondence theorem exists |
 | Recursive arithmetic completeness | Required arithmetic interpretation, self-representation, and completeness proof | `UNKNOWN`; the dependency and receipt do not discharge these obligations |
@@ -52,6 +53,12 @@ explicit mathematical requirement, completing an audit is a software operation;
 it is not a proof-completion verdict. A source-only inventory cannot discharge a
 proof gate.
 
+A completed native execution requires all seven process checks:
+`lean_build`, `dependency_output`, `countermodel`, `finite_trace`, `observation`,
+`full_model`, and `finite_action`. The last runs
+`lean4/FiniteActionCountermodel.lean`; omitting it or supplying failed evidence
+cannot satisfy the execution or replay gate.
+
 For another run, select a fresh directory with `--output`; existing evidence
 bundles are preserved rather than overwritten.
 
@@ -63,15 +70,22 @@ authenticated proof: the downstream integration checks the source and reruns the
 mechanism.
 
 The package also binds the exact self-derivation statement and the 67 reviewed
-parameter/axiom declarations, finite construction definition bodies, 24 milestone
-statements with their individually reviewed dependencies, and trace, observation,
-and model sources. A new assumption,
+parameter/axiom declarations, finite construction and retained proposal definition
+bodies, 29 proved milestone statements with their individually reviewed
+dependencies, and trace, observation, finite-action, and model sources. A new assumption,
 weakened target or definition, or substituted reporter cannot pass by merely
 removing `sorry`. These declaration identities
 are a review baseline, not a consistency proof. Changing the mathematical basis
 requires reviewing that policy along with the corresponding source changes.
 The byte-bound Python package and Lean reporters use explicit line-feed endings
 so Windows checkouts and Linux-built wheels share the same source identities.
+
+The translation currently contains 16 admissions. The zero, successor, and
+opaque path-length computation proposals are now named `Claim` definitions
+because a model of the declared clauses refutes them. The decrease records
+withdrawal of unsupported theorems, not completed proofs. The model does not
+encode the stronger unformalized native generativity requirement, and the
+conditional host-action construction does not establish native adequacy.
 
 ## VSTD boundary
 
