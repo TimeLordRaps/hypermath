@@ -24,6 +24,7 @@ from hypermath_foundations._reports import (
     ACTION_COUNTERMODEL_DEPENDENCIES,
     COUNTERMODEL_TARGETS,
     DEPENDENCY_TARGETS,
+    OBSERVATION_DEPENDENCIES,
     PROBE_TARGETS,
     REPOSITORY,
     TARGET,
@@ -113,7 +114,12 @@ def checkout(tmp_path, monkeypatch):
             return 0, action_countermodel_output()
         for filename, key in (("ObservationChecks.lean", "observation"), ("FullAxiomModel.lean", "full_model")):
             if command[-1] == filename:
-                return 0, "\n".join(f"'{name}' does not depend on any axioms" for name in PROBE_TARGETS[key])
+                return 0, "\n".join(
+                    f"'{name}' depends on axioms: [{', '.join(OBSERVATION_DEPENDENCIES[name])}]"
+                    if key == "observation" and OBSERVATION_DEPENDENCIES[name]
+                    else f"'{name}' does not depend on any axioms"
+                    for name in PROBE_TARGETS[key]
+                )
         return 0, "Build completed successfully.\n"
 
     monkeypatch.setattr(audit_module, "_run_process", run)
@@ -348,6 +354,31 @@ def test_constructive_trace_probes_require_no_axioms(checkout, monkeypatch, depe
     monkeypatch.setattr(audit_module, "_run_process", altered)
     report = run_audit(root)
     assert report["checks"][process]["status"] == "FAIL"
+    assert not report["execution"]["completed"]
+    assert not evaluate_gate(report)
+
+
+@pytest.mark.parametrize("name,replacement", [
+    ("Hypermath.Observation.chosenDecoder_correct", "does not depend on any axioms"),
+    ("Hypermath.Observation.compatible_iff_decoder", "depends on axioms: [propext]"),
+    ("Hypermath.Observation.reuse_preserves_observations", "depends on axioms: [Classical.choice]"),
+    ("Hypermath.Observation.equality_queries_iff_injective", "depends on axioms: [sorryAx]"),
+])
+def test_reification_dependency_policy_is_exact(checkout, monkeypatch, name, replacement):
+    root, _, run = checkout
+
+    def altered(cmd, *args):
+        code, output = run(cmd, *args)
+        if cmd[-1] == "ObservationChecks.lean":
+            output = "\n".join(
+                f"'{name}' {replacement}" if line.startswith(f"'{name}' ") else line
+                for line in output.splitlines()
+            )
+        return code, output
+
+    monkeypatch.setattr(audit_module, "_run_process", altered)
+    report = run_audit(root)
+    assert report["checks"]["observation"]["status"] == "FAIL"
     assert not report["execution"]["completed"]
     assert not evaluate_gate(report)
 

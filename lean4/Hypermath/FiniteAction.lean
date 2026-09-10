@@ -1,4 +1,5 @@
 import Hypermath.L3Ordinatics
+import Hypermath.Observation
 
 /-!
 # Host-level finite numeral actions
@@ -259,6 +260,14 @@ theorem finiteOrbitInjective_implies_actionCompatible
   have indices : m = n := injective equal
   cases indices
   rfl
+
+/-- Native numeral Forms can preserve every standard numeral-equality query
+exactly when the finite orbit is injective. This premise is not established by
+the declared clauses or by the fact that addition and multiplication descend. -/
+theorem finiteNumeralEqualityExact_iff_injective :
+    Observation.Compatible finiteApplyPosition Observation.equalityQuery ↔
+      FiniteOrbitInjective :=
+  Observation.equality_queries_iff_injective finiteApplyPosition
 
 /-- Exact host action agreement on the existing `finiteApplyPosition` representation. -/
 def ExactFiniteAction (action : Form → Form → Form) : Prop :=

@@ -346,6 +346,27 @@ theorem self_derivation_without_arithmetic_bridge :
     ordinal_zero_identity_claim_fails, ordinal_successor_action_claim_fails,
     path_length_arithmetic_claim_fails⟩
 
+/-- Even standard equality-to-a-numeral questions cannot be recovered from
+the colliding numeral Forms. Operation descent does not preserve arithmetic
+truth for the original natural-number inputs. -/
+theorem numeral_equality_observation_fails :
+    ¬ Hypermath.Observation.Compatible finiteApplyPosition
+      Hypermath.Observation.equalityQuery := by
+  intro compatible
+  have impossible : (1 : Nat) = 3 :=
+    (Hypermath.Observation.equality_queries_iff_injective finiteApplyPosition).mp
+      compatible numeral_collision
+  exact (by decide : (1 : Nat) ≠ 3) impossible
+
+theorem no_numeral_equality_decoder :
+    ¬ ∃ decoder : Hypermath.Observation.Image finiteApplyPosition → Nat → Bool,
+      Hypermath.Observation.Decodes finiteApplyPosition
+        Hypermath.Observation.equalityQuery decoder := by
+  intro ⟨decoder, correct⟩
+  apply numeral_equality_observation_fails
+  intro first second equal query
+  exact Hypermath.Observation.decoder_implies_compatible correct equal query
+
 #print axioms full_axioms_hold
 #print axioms numeral_collision
 #print axioms action_disagreement
@@ -359,5 +380,7 @@ theorem self_derivation_without_arithmetic_bridge :
 #print axioms path_length_arithmetic_claim_fails
 #print axioms self_derivation_target_holds
 #print axioms self_derivation_without_arithmetic_bridge
+#print axioms numeral_equality_observation_fails
+#print axioms no_numeral_equality_decoder
 
 end HypermathFiniteActionCountermodel

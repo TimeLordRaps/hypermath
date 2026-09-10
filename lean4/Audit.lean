@@ -571,3 +571,8 @@ set_option pp.fullNames true
 #print axioms Hypermath.hostFiniteAction_exact
 
 #print axioms Hypermath.finiteActionCompatible_iff_exists_exact
+
+#eval IO.println "HYPERMATH_DECL_BEGIN:Hypermath.finiteNumeralEqualityExact_iff_injective"
+#print Hypermath.finiteNumeralEqualityExact_iff_injective
+#eval IO.println "HYPERMATH_DECL_END:Hypermath.finiteNumeralEqualityExact_iff_injective"
+#print axioms Hypermath.finiteNumeralEqualityExact_iff_injective

@@ -52,6 +52,38 @@ round trip suffices only after proving that the required observations are
 invariant under that similarity. A pointer to a retained derivation may
 preserve information; the retained store is part of the representation cost.
 
+The criterion is now checked in `lean4/Hypermath/Observation.lean` as
+`compatible_iff_decoder`, including uniqueness on the encoding's actual image.
+The existence construction uses Lean's classical choice; it is not an executable
+native decoder. Its two choice-dependent reports are distinguished from the
+22 observation reports with no axiom dependencies.
+
+There is also a constructive sufficient condition for recursive reuse. For an
+encoding `e` and every permitted reuse operation `c`, require
+
+\[
+e(d)=e(d')\;\Longrightarrow\;e(c(d))=e(c(d')).
+\]
+
+Together with the base observation criterion, this preserves the observations
+after every finite sequence of those operations. The checked
+`reuse_preserves_observations` proves this by induction on the sequence.
+It does not cover transfinite limits or silently supply the premise for a
+native operation. A concrete two-bit example separates the requirements:
+retaining the first bit supports arbitrary first-bit flips, but a swap exposes
+the discarded second bit and breaks observation exactness. Thus a successful
+single-stage decoder alone cannot certify fractal reuse.
+
+For native finite numeral Forms there is a further exact boundary.
+`finiteNumeralEqualityExact_iff_injective` proves that preserving every standard
+question "does this input numeral equal k?" is equivalent to injectivity of
+`E(n) = f2f^n(ground)`. The existing six-form model has `E(1) = E(3)` and now
+formally refutes a decoder for these queries. Addition and multiplication
+descending to represented values does not ensure preservation of even these
+atomic arithmetic truths about the original natural numbers. A candidate must
+derive injectivity for this encoding or supply a different, adequately proved
+representation; the result does not rule out all native representations.
+
 ## Completeness must have a stated meaning
 
 The following are different claims:
