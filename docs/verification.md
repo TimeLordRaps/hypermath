@@ -71,6 +71,8 @@ The adapter uses the released VSTD proposition, evidence-store, and verification
 session APIs. A mathematical claim supplied without a source checkout stays
 `UNKNOWN`. With the checkout, the mechanism replays the audit and checks its input
 bindings. It keeps native-source adequacy and arithmetic completeness unresolved.
+If a requested replay fails or disagrees with the supplied evidence, the adapter
+retains the bundle and raises an error. Packaging cannot override that failure.
 
 The generated VSTD-1 generic-run receipt records the evidence-packaging operation;
 the domain verification-session records are bound artifacts within that receipt.

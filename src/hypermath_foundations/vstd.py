@@ -32,8 +32,9 @@ _TRUST_ROOTS = (
     "Explicit source parameters and logical axioms carried in audit evidence",
 )
 _MACHINE_PATH = re.compile(
-    r"(?<![A-Za-z0-9])[A-Za-z]:[\\/]|file://|\\\\[A-Za-z]|"
-    r"/(?:Users|home|mnt|Volumes|tmp|var|opt|private|root|workspace|workspaces|"
+    r"(?<![A-Za-z0-9])[A-Za-z]:[\\/]|file://|"
+    r"(?<![\w.\\])\\\\(?:[?.]\\|[A-Za-z0-9][\w.-]*(?:\\|(?=$|[\s\"'<>])))|"
+    r"(?<![\w./>\\-])/(?:Users|home|mnt|Volumes|tmp|var|opt|private|root|workspace|workspaces|"
     r"usr|etc|bin|sbin|run|media)/"
 )
 
@@ -152,6 +153,16 @@ class _AuditMechanism:
             return [self.replay_error or "no native foundation checkout was supplied"]
         differences = []
         for label, candidate in (("supplied", report), ("replayed", self.replay)):
+            execution = candidate.get("execution")
+            if (not isinstance(execution, dict) or execution.get("mode") != "lean"
+                    or execution.get("completed") is not True):
+                differences.append(f"{label} audit has no completed Lean execution")
+            for name in ("lean_build", "dependency_output", "countermodel"):
+                check = candidate["checks"].get(name)
+                if (not isinstance(check, dict) or check.get("status") != "PASS"
+                        or check.get("attempted") is not True
+                        or type(check.get("exit_code")) is not int or check["exit_code"] != 0):
+                    differences.append(f"{label} Lean process {name} did not complete successfully")
             subject = candidate["subject"]
             if subject.get("repository", "").removesuffix(".git") != _REPOSITORY[:-4]:
                 differences.append(f"{label} repository is not canonical Hypermath")
@@ -296,6 +307,9 @@ def write_verification_receipt(
     ``output_directory`` must be absent or empty. The real VSTD capture command
     only packages completed evidence; native audits execute first with streaming
     output. Receipt validity never changes a mathematical UNKNOWN into PASS.
+    When ``foundation_root`` is supplied, a failed or unavailable matching replay,
+    or a replay that cannot support the supplied proof PASS, raises RuntimeError
+    after preserving the diagnostic evidence package.
     """
     destination = Path(output_directory)
     if destination.exists() and (not destination.is_dir() or any(destination.iterdir())):
@@ -353,5 +367,18 @@ def write_verification_receipt(
     # logs. Fail rather than silently rewriting any already hashed evidence.
     for path in destination.rglob("*"):
         if path.is_file():
-            _portable(path.read_text(encoding="utf-8"))
+            text = path.read_text(encoding="utf-8")
+            # JSON escaping doubles relative Windows separators. Check the
+            # decoded values, not that serialization syntax, without changing
+            # the bytes bound by the receipt.
+            _portable(json.loads(text) if path.suffix.lower() == ".json" else text)
+    if foundation_root is not None:
+        replay_status = result["results"]["audit_replay_matches"]["evaluation"]["outcome"]
+        proof_status = result["results"]["self_derivation"]["evaluation"]["outcome"]
+        supplied_status = json.loads(payload)["claims"]["self_derivation"]["status"]
+        if replay_status != "PASS" or (supplied_status == "PASS" and proof_status != "PASS"):
+            raise RuntimeError(
+                "required native replay did not support the supplied audit; "
+                "diagnostic evidence remains in the output directory"
+            )
     return receipt_path
