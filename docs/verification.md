@@ -122,6 +122,16 @@ environment, pinned checker and stated assumptions remain part of the trust boun
 
 ## Workflow policy
 
+Successful process execution and a matching replay can reproduce a failed
+source-byte or assumption policy. The audit commands therefore require an
+attempted, passing assumption policy before returning integrity success.
+Failures retain their evidence and return exit code 1; unresolved mathematical
+requirements return 2 only after the integrity check passes. Inventory-only
+operation keeps its documented non-proof scope. Byte-bound Lean checker sources
+have explicit line-feed checkout attributes, including the primitive source
+syntax and reporter. A fresh-checkout regression exercises Git's automatic
+Windows line-ending conversion without weakening the recorded byte digests.
+
 The mathematical job intentionally fails while its obligation is unresolved;
 there is no `continue-on-error` conversion to a passing result. Software jobs run
 independently so repairs can still be tested. Ordinatics' publishing workflow

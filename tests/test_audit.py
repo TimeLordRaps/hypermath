@@ -278,6 +278,17 @@ def test_redaction_preserves_relative_evidence(tmp_path):
     assert redact("Hypermath/L0Ground.lean:12") == "Hypermath/L0Ground.lean:12"
 
 
+@pytest.mark.parametrize("flags", [[], ["--require-self-derivation"]])
+def test_cli_rejects_completed_execution_with_changed_policy_source(checkout, flags):
+    root = checkout[0]
+    with (root / "lean4/Hypermath/GroundSyntax.lean").open("a", encoding="utf-8") as file:
+        file.write("\n-- Byte policy no longer matches the reviewed source.\n")
+    assert main(["audit", "--root", str(root), "--output", "report.json", *flags]) == 1
+    report = json.loads((root / "report.json").read_text())
+    assert report["execution"]["completed"] is True
+    assert report["checks"]["assumption_policy"]["status"] == "FAIL"
+
+
 def test_cli_software_completion_and_strict_gates(checkout, capsys):
     root = str(checkout[0])
     argv = ["audit", "--root", root, "--output", "report.json"]
