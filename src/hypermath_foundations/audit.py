@@ -21,16 +21,16 @@ from pathlib import Path
 
 from ._inventory import inventory
 from ._reports import (
-    COUNTERMODEL_TARGETS,
     DEPENDENCY_TARGETS,
     FORMAT,
+    PROBE_TARGETS,
     REPOSITORY,
     TARGET,
-    TRACE_CHECK_TARGETS,
     dependency_records,
     digest,
     kernel_declarations,
     policy_errors,
+    probe_dependencies_valid,
     target_is_theorem,
 )
 
@@ -191,7 +191,7 @@ def run_audit(root, timeout=60, *, inventory_only=False, lake=None) -> dict:
         "execution": {"mode": "inventory" if inventory_only else "lean", "completed": False},
         "inputs": {"before": before, "after": {}, "stable": False, "sha256": digest(before)},
         "checks": {name: _check("Lean execution not attempted") for name in
-                   ("lean_build", "dependency_output", "countermodel", "finite_trace")},
+                   ("lean_build", "dependency_output", *PROBE_TARGETS)},
         "target": {"name": TARGET, "kind": None, "dependencies": None, "statement": None},
         "admissions": {"source": admissions, "transitive_targets": []},
         "declared_assumptions": assumptions,
@@ -211,6 +211,8 @@ def run_audit(root, timeout=60, *, inventory_only=False, lake=None) -> dict:
                 "dependency_output": [executable, "env", "lean", "Audit.lean"],
                 "countermodel": [executable, "env", "lean", "Countermodels.lean"],
                 "finite_trace": [executable, "env", "lean", "TraceChecks.lean"],
+                "observation": [executable, "env", "lean", "ObservationChecks.lean"],
+                "full_model": [executable, "env", "lean", "FullAxiomModel.lean"],
             }
             for name, command in commands.items():
                 check = report["checks"][name]
@@ -231,13 +233,10 @@ def run_audit(root, timeout=60, *, inventory_only=False, lake=None) -> dict:
                         assumption["kernel_declaration"] = declarations.get(assumption["name"])
                     report["admissions"]["transitive_targets"] = sorted(
                         name for name, deps in records.items() if "sorryAx" in deps)
-                elif name in {"countermodel", "finite_trace"}:
-                    targets = COUNTERMODEL_TARGETS if name == "countermodel" else TRACE_CHECK_TARGETS
-                    records = dependency_records(output, targets)
-                    if any("sorryAx" in deps for deps in records.values()):
-                        raise ValueError(f"{name} report depends on an admitted proof")
-                    if name == "finite_trace" and any(records.values()):
-                        raise ValueError("finite trace probes have an unexpected axiom dependency")
+                elif name in PROBE_TARGETS:
+                    records = dependency_records(output, PROBE_TARGETS[name])
+                    if not probe_dependencies_valid(name, records):
+                        raise ValueError(f"{name} probes have an unreviewed axiom dependency")
         except (OSError, subprocess.SubprocessError, ValueError, RuntimeError) as error:
             reason = redact(f"{type(error).__name__}: {error}")
             print(reason, file=sys.stderr, flush=True)

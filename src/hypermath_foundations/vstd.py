@@ -149,6 +149,8 @@ class _AuditMechanism:
             self.replay_error = f"native replay unavailable: {type(exc).__name__}"
 
     def _differences(self, report: dict[str, Any]) -> list[str]:
+        from ._reports import PROBE_TARGETS
+
         if self.replay is None:
             return [self.replay_error or "no native foundation checkout was supplied"]
         differences = []
@@ -157,7 +159,7 @@ class _AuditMechanism:
             if (not isinstance(execution, dict) or execution.get("mode") != "lean"
                     or execution.get("completed") is not True):
                 differences.append(f"{label} audit has no completed Lean execution")
-            for name in ("lean_build", "dependency_output", "countermodel", "finite_trace"):
+            for name in ("lean_build", "dependency_output", *PROBE_TARGETS):
                 check = candidate["checks"].get(name)
                 if (not isinstance(check, dict) or check.get("status") != "PASS"
                         or check.get("attempted") is not True

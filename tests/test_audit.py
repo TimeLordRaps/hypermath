@@ -16,12 +16,14 @@ from hypermath_foundations._baseline import (
     AXIOM_DECLARATIONS,
     DEFINITION_DECLARATIONS,
     PROVED_DECLARATIONS,
+    PROVED_DEPENDENCIES,
     TARGET_STATEMENT,
 )
-from hypermath_foundations._inventory import lean_code
+from hypermath_foundations._inventory import SOURCE_PARAMETERS, lean_code
 from hypermath_foundations._reports import (
     COUNTERMODEL_TARGETS,
     DEPENDENCY_TARGETS,
+    PROBE_TARGETS,
     REPOSITORY,
     TARGET,
     TRACE_CHECK_TARGETS,
@@ -40,7 +42,8 @@ def dependency_output(*, admitted=False, kind="theorem", missing=None):
     for name in DEPENDENCY_TARGETS:
         if name == missing:
             continue
-        deps = "Hypermath.Form" if name in PROVED_DECLARATIONS else "Hypermath.axGroundSelf"
+        deps = (", ".join(sorted(PROVED_DEPENDENCIES[name]))
+                if name in PROVED_DECLARATIONS else "Hypermath.axGroundSelf")
         if admitted and name == TARGET:
             deps = "sorryAx"
         lines.append(f"'{name}' depends on axioms: [{deps}]")
@@ -64,6 +67,9 @@ def checkout(tmp_path, monkeypatch):
         "lean4/Countermodels.lean": (project / "lean4/Countermodels.lean").read_text(encoding="utf-8"),
         "lean4/TraceChecks.lean": (project / "lean4/TraceChecks.lean").read_text(encoding="utf-8"),
         "lean4/Hypermath/Trace.lean": (project / "lean4/Hypermath/Trace.lean").read_text(encoding="utf-8"),
+        "lean4/Hypermath/Observation.lean": (project / "lean4/Hypermath/Observation.lean").read_text(encoding="utf-8"),
+        "lean4/ObservationChecks.lean": (project / "lean4/ObservationChecks.lean").read_text(encoding="utf-8"),
+        "lean4/FullAxiomModel.lean": (project / "lean4/FullAxiomModel.lean").read_text(encoding="utf-8"),
         "lean4/Hypermath/L0Ground.lean": "-- fixture",
         "lean4/Hypermath/L1Relations.lean": "-- fixture",
         "lean4/Hypermath/L2Operations.lean": "-- fixture",
@@ -88,6 +94,9 @@ def checkout(tmp_path, monkeypatch):
             return 0, countermodel_output()
         if command[-1] == "TraceChecks.lean":
             return 0, "\n".join(f"'{name}' does not depend on any axioms" for name in TRACE_CHECK_TARGETS)
+        for filename, key in (("ObservationChecks.lean", "observation"), ("FullAxiomModel.lean", "full_model")):
+            if command[-1] == filename:
+                return 0, "\n".join(f"'{name}' does not depend on any axioms" for name in PROBE_TARGETS[key])
         return 0, "Build completed successfully.\n"
 
     monkeypatch.setattr(audit_module, "_run_process", run)
@@ -101,7 +110,7 @@ def test_fresh_success_preserves_relative_assumptions_and_unknown_bridges(checko
     assert report["claims"]["self_derivation"]["status"] == "PASS"
     assert report["claims"]["source_adequacy"]["status"] == "UNKNOWN"
     assert not evaluate_gate(report, "recursive_arithmetic_completeness")
-    assert len(report["declared_assumptions"]) == 68
+    assert len(report["declared_assumptions"]) == 67
     assert str(root) not in json.dumps(report)
 
 
@@ -264,9 +273,13 @@ def test_legacy_tool_failure_precedes_remaining_admissions(checkout, monkeypatch
                            "def Hypermath.D : Hypermath.Form → Hypermath.Form → Prop := fun _ _ => True"),
     lambda out: out.replace(PROVED_DECLARATIONS["Hypermath.dEntryEndpointIteration"],
                            "theorem Hypermath.dEntryEndpointIteration : True"),
-    lambda out: out.replace("'Hypermath.dIsReflexive' depends on axioms: [Hypermath.Form]",
+    lambda out: out.replace(DEFINITION_DECLARATIONS["Hypermath.finiteApplyFromGround"],
+                           "def Hypermath.finiteApplyFromGround : Hypermath.Form → Prop := fun _ => True"),
+    lambda out: out.replace(PROVED_DECLARATIONS["Hypermath.notGroundSpanningClaim"],
+                           "theorem Hypermath.notGroundSpanningClaim : Hypermath.groundSpanningClaim"),
+    lambda out: out.replace("'Hypermath.dIsReflexive' depends on axioms: [Hypermath.Congruent, Hypermath.Form, Hypermath.f2f]",
                            "'Hypermath.dIsReflexive' depends on axioms: [sorryAx, Hypermath.Form]"),
-    lambda out: out.replace("'Hypermath.dIsReflexive' depends on axioms: [Hypermath.Form]",
+    lambda out: out.replace("'Hypermath.dIsReflexive' depends on axioms: [Hypermath.Congruent, Hypermath.Form, Hypermath.f2f]",
                            "'Hypermath.dIsReflexive' depends on axioms: [Hypermath.axGroundSelf]"),
     lambda out: out.replace("depends on axioms: [Hypermath.axGroundSelf]",
                            "depends on axioms: [Foreign.hiddenOracle]"),
@@ -286,25 +299,45 @@ def test_changed_statement_or_unreviewed_assumption_is_unknown(checkout, monkeyp
     assert not evaluate_gate(report)
 
 
+@pytest.mark.parametrize("name,deps", [
+    ("Hypermath.finiteApplyGround", "Hypermath.Form, Hypermath.f2f, Hypermath.ground, Hypermath.axLimitNotFinite"),
+    ("Hypermath.notGroundSpanningClaim", "Hypermath.Form"),
+])
+def test_milestone_dependencies_cannot_gain_or_hide_assumptions(checkout, monkeypatch, name, deps):
+    root, _, run = checkout
+    expected = ", ".join(sorted(PROVED_DEPENDENCIES[name]))
+    output = dependency_output().replace(f"'{name}' depends on axioms: [{expected}]",
+                                         f"'{name}' depends on axioms: [{deps}]")
+    monkeypatch.setattr(audit_module, "_run_process", lambda cmd, *args:
+                        (0, output) if cmd[-1] == "Audit.lean" else run(cmd, *args))
+    report = run_audit(root)
+    assert report["checks"]["assumption_policy"]["status"] == "FAIL"
+    assert not evaluate_gate(report)
+
+
+@pytest.mark.parametrize("process,filename", [("finite_trace", "TraceChecks.lean"),
+                                             ("observation", "ObservationChecks.lean")])
 @pytest.mark.parametrize("dependency", ["sorryAx", "Foreign.oracle", "propext"])
-def test_constructive_trace_probes_require_no_axioms(checkout, monkeypatch, dependency):
+def test_constructive_trace_probes_require_no_axioms(checkout, monkeypatch, dependency, process, filename):
     root, _, run = checkout
 
     def altered(cmd, *args):
         code, output = run(cmd, *args)
-        if cmd[-1] == "TraceChecks.lean":
+        if cmd[-1] == filename:
             output = output.replace("does not depend on any axioms",
                                     f"depends on axioms: [{dependency}]", 1)
         return code, output
 
     monkeypatch.setattr(audit_module, "_run_process", altered)
     report = run_audit(root)
-    assert report["checks"]["finite_trace"]["status"] == "FAIL"
+    assert report["checks"][process]["status"] == "FAIL"
     assert not report["execution"]["completed"]
     assert not evaluate_gate(report)
 
 
-@pytest.mark.parametrize("path", ["lean4/Audit.lean", "lean4/Hypermath/Trace.lean", "lean4/TraceChecks.lean"])
+@pytest.mark.parametrize("path", ["lean4/Audit.lean", "lean4/Hypermath/Trace.lean", "lean4/TraceChecks.lean",
+                                  "lean4/Hypermath/Observation.lean", "lean4/ObservationChecks.lean",
+                                  "lean4/FullAxiomModel.lean"])
 def test_replaced_reporter_or_trace_cannot_authorize_its_own_output(checkout, path):
     root, _, _ = checkout
     (root / path).write_text('#eval IO.println "forged report"', encoding="utf-8")
@@ -317,3 +350,20 @@ def test_timeout_validation(checkout):
     for timeout in (0, -1, 301, True, float("nan")):
         with pytest.raises(ValueError):
             run_audit(checkout[0], timeout=timeout)
+
+
+def test_full_model_covers_exact_reviewed_logical_clause_types():
+    """The model must cover the actual axiom list, not a smaller lookalike."""
+    import re
+
+    path = Path(__file__).resolve().parents[1] / "lean4/FullAxiomModel.lean"
+    source = lean_code(path.read_text(encoding="utf-8"))
+    fields = source.split("structure FullAxioms : Prop where\n", 1)[1].split("\ntheorem ", 1)[0]
+    actual = dict(re.findall(r"^  (\w+) : (.+)$", fields, re.M))
+    expected = {
+        name.removeprefix("Hypermath."): declaration.split(" : ", 1)[1].replace("Hypermath.", "")
+        for name, declaration in AXIOM_DECLARATIONS.items()
+        if name.removeprefix("Hypermath.") not in SOURCE_PARAMETERS
+    }
+    assert len(actual) == len(expected) == 38
+    assert actual == expected

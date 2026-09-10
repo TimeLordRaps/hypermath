@@ -11,7 +11,7 @@ SOURCE_PARAMETERS = frozenset({
     "Derives", "Discharge", "Definition", "FormClosure", "deriver",
     "DerivationPath", "pathStep", "pathGround", "pathLength", "pathTrace",
     "compose", "congruentPath", "pathStart", "pathEnd", "ordinalLimit",
-    "ordinalSucc", "finiteApplyFromGround", "ordinalApply",
+    "ordinalSucc", "ordinalApply",
 })
 
 

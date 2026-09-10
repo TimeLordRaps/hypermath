@@ -248,11 +248,11 @@ theorem dIsTransitive {x y z : Form} : D x y → D y z → D x z := by
   rintro ⟨p⟩ ⟨q⟩
   exact ⟨dEntryCompose p q⟩
 
-/-- D[ground][y] for all y: ground can reach any Form via an apply-chain. FORM. -/
-theorem dSpansGround : ∀ y : Form, D ground y := by
-  sorry
-  -- FORM: ax-sim gives f2f(ground) ~~ ground. By iteration, ground derives
-  -- toward any Form in the ~~ orbit. D[ground][y] exists for all y in orbit.
+/-- The universal ground-spanning claim proposed in L1_relations.hm:418–425.
+    This is a proposition, not an assumed theorem. With finite D witnesses,
+    L3's limit separation refutes it in notGroundSpanningClaim. The original
+    admitted dSpansGround theorem has therefore been withdrawn. -/
+def groundSpanningClaim : Prop := ∀ y : Form, D ground y
 
 /-- D[deriver][deriver] entry exists. Schema: FORM.
     Content at ≡ level: FRAME/L3 (discharged in L3Ordinatics). -/

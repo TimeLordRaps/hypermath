@@ -31,6 +31,12 @@ witnesses and proves self-read, composition, and recorded-step preservation.
 It removes one admission and one unconstrained parameter. A checked countermodel
 still separates an endpoint cycle from preservation throughout that cycle.
 
+The [finite arithmetic bridge](docs/research/FINITE_ARITHMETIC.md) now proves
+least finite closure and preservation of Form-valued length observations. It
+also refutes the proposed universal ground-spanning claim under the existing
+limit axiom. A separate interpretation satisfies all 38 declared logical
+clauses while exposing their weaker treatment of limits and path endpoints.
+
 ## Ground and relations
 
 `Form` names the source's forming structure, `ground` its distinguished base,

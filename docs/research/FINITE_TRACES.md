@@ -39,9 +39,11 @@ The checked finite statements include:
 
 These seven production theorem reports depend only on the existing parameters
 `Form`, `f2f`, and `Congruent`. They do not depend on an admitted proof or a logical
-axiom clause. The overall translation still has 20 admissions and 68 declared
-assumptions: 30 source parameters and 38 logical clauses. The remaining
-`selfDerivation` components have not all been proved.
+axiom clause. The subsequent [finite arithmetic repair](FINITE_ARITHMETIC.md)
+closes the finite ground predicate and refutes universal ground-spanning.
+The overall translation now has 19 admissions and 67 declared assumptions:
+29 source parameters and 38 logical clauses. The remaining `selfDerivation`
+components have not all been proved.
 
 ## Reuse and preservation
 
@@ -73,10 +75,10 @@ Lean checks all 24 selected ground/relation axiom clauses in this model. The
 deriver `1` returns exactly after two applications, but neither step preserves
 congruence. Consequently every `DEntry` has zero length, and `D 0 1` fails.
 
-Thus neither endpoint return nor the selected prefix establishes the advertised
-`dSpansGround` theorem. This does not refute all later assumptions or every possible
-completion of Hypermath. It identifies the precise missing implication that a
-repair must address without assuming the desired conclusion.
+Thus neither endpoint return nor the selected prefix establishes universal
+ground-spanning. The [finite arithmetic repair](FINITE_ARITHMETIC.md) goes
+further: the L3 limit axiom implies its negation, so the admitted `dSpansGround`
+theorem has been withdrawn and the exact proposition retained as a claim.
 
 ## Remaining correspondence obligations
 
@@ -105,9 +107,10 @@ statement, and its effectiveness boundary remain open. See
 
 Run the bounded audit as described in [the verification guide](../verification.md).
 It builds the library and independently runs `Audit.lean`, `Countermodels.lean`,
-and `TraceChecks.lean`. The expected strict mathematical gate still exits 2.
+`TraceChecks.lean`, `ObservationChecks.lean`, and `FullAxiomModel.lean`. The
+expected strict mathematical gate still exits 2.
 
-The policy binds the definition bodies, seven milestone statements, allowed
+The policy binds the definition bodies, milestone statements, exact per-theorem
 dependencies, generic trace source, and reporting/probe sources. Weakening `D`
 to an always-true predicate, reinstating an admission, substituting the generic
 trace, or skipping the new probes does not satisfy the updated policy. Report

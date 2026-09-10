@@ -1,13 +1,13 @@
 -- Hypermath.L3Ordinatics
--- Layer 3: Ordinatics — Terminal Layer
+-- Layer 3: Ordinatics — proposed terminal layer
 -- Lean4 mechanization scaffold for L3_ordinatics.hm
 --
 -- Introduces: ordinalLimit, ordinalSucc, ordinalApply, finiteApplyFromGround.
--- Closes all L1/L2 FRAME residuals.
--- Terminal graduation: self-derivation is FORM. No further layer necessary.
+-- Finite closure and witnessed-length observations are now constructive.
+-- The source's terminal-closure claims still include admitted proof obligations.
 --
 -- P_3 = 18.  N_3_atomic = 2 (ordinalLimit, ordinalSucc).
--- FRAME residuals: NONE. All prior FRAMEs discharged here.
+-- FORM/FRAME comments below retain source classifications, not proof verdicts.
 -- Source: L3_ordinatics.hm
 
 import Hypermath.L2Operations
@@ -76,11 +76,114 @@ axiom axLimitIsLimit :
 -- §IV  Ordinal Arithmetic
 -- ============================================================================
 
-/-- finiteApplyFromGround(x): x is reachable by a finite f2f-chain from ground.
-    The finite ordinals. Defined by least-fixed-point:
-    (a) finiteApplyFromGround(ground); (b) closed under f2f;
-    (c) ordinalLimit is NOT in this set. -/
-axiom finiteApplyFromGround : Form → Prop
+/-- The native Form at finite apply-position n, as in L3_ordinatics.hm:163–167.
+    This observes the existing ground/f2f parameters, not a tagged substitute
+    for Form. Distinct n are not asserted to produce distinct Forms. -/
+noncomputable def finiteApplyPosition (n : Nat) : Form := Nat.repeat f2f n ground
+
+/-- The least finite f2f-closure of ground specified in L3_ordinatics.hm:123–128.
+    Membership retains a finite iteration witness; it does not assert unique
+    numeral representations or agreement with the opaque ordinalApply. -/
+def finiteApplyFromGround (x : Form) : Prop := ∃ n : Nat, finiteApplyPosition n = x
+
+theorem finiteApplyIffIteration (x : Form) :
+    finiteApplyFromGround x ↔ ∃ n : Nat, Nat.repeat f2f n ground = x := Iff.rfl
+
+theorem finiteApplyGround : finiteApplyFromGround ground := ⟨0, rfl⟩
+
+theorem finiteApplyPositionMember (n : Nat) :
+    finiteApplyFromGround (finiteApplyPosition n) := ⟨n, rfl⟩
+
+theorem finiteApplyClosed {x : Form} (hx : finiteApplyFromGround x) :
+    finiteApplyFromGround (f2f x) := by
+  obtain ⟨n, rfl⟩ := hx
+  exact ⟨n + 1, rfl⟩
+
+/-- Any predicate containing ground and closed under f2f contains this closure. -/
+theorem finiteApplyMinimal (P : Form → Prop) (base : P ground)
+    (step : ∀ x : Form, P x → P (f2f x))
+    {x : Form} (hx : finiteApplyFromGround x) : P x := by
+  obtain ⟨n, rfl⟩ := hx
+  induction n with
+  | zero => exact base
+  | succ n ih => exact step _ ih
+
+/-- Iteration counts add under sequential application. This is an exact equality
+    of existing Forms and does not identify ordinalSucc with f2f. -/
+theorem finiteApplyIterationAdd (m n : Nat) (x : Form) :
+    Nat.repeat f2f (m + n) x = Nat.repeat f2f n (Nat.repeat f2f m x) := by
+  induction n with
+  | zero => rfl
+  | succ n ih => exact congrArg f2f ih
+
+/-- A Form-valued length observation obtained from the witness's actual edges.
+    No conversion to opaque DerivationPath, pathLength, or ordinalApply is assumed. -/
+noncomputable def finiteTraceLength {x y : Form} (p : DEntry x y) : Form :=
+  finiteApplyPosition (Trace.length p)
+
+theorem finiteTraceLengthMember {x y : Form} (p : DEntry x y) :
+    finiteApplyFromGround (finiteTraceLength p) :=
+  finiteApplyPositionMember (Trace.length p)
+
+theorem finiteTraceLengthSelfRead (x : Form) :
+    finiteTraceLength (selfRead x) = ground := rfl
+
+theorem finiteTraceLengthStep (x : Form) (h : Congruent (f2f x) x) :
+    finiteTraceLength (dEntryStep x h) = f2f ground := rfl
+
+theorem finiteTraceLengthCompose {x y z : Form} (p : DEntry x y) (q : DEntry y z) :
+    finiteTraceLength (dEntryCompose p q) =
+      Nat.repeat f2f (Trace.length q) (finiteTraceLength p) := by
+  unfold finiteTraceLength dEntryCompose
+  rw [Trace.length_compose]
+  exact finiteApplyIterationAdd _ _ ground
+
+/-- Expansion preserves the Form-valued observation extracted from actual atoms. -/
+theorem finiteTraceLengthExpand {x y : Form} (e : TraceExpr DStep x y) :
+    finiteTraceLength e.expand = finiteApplyPosition e.length :=
+  congrArg finiteApplyPosition (TraceExpr.length_expand e)
+
+theorem finiteTraceLengthExpandSeq {x y z : Form}
+    (p : TraceExpr DStep x y) (q : TraceExpr DStep y z) :
+    finiteTraceLength (TraceExpr.seq p q).expand =
+      Nat.repeat f2f q.length (finiteApplyPosition p.length) := by
+  rw [finiteTraceLengthExpand]
+  exact finiteApplyIterationAdd _ _ ground
+
+/-- A real D-entry from ground supplies a native finite-closure witness. -/
+theorem dEntryFromGroundFinite {y : Form} (p : DEntry ground y) :
+    finiteApplyFromGround y := ⟨Trace.length p, dEntryEndpointIteration p⟩
+
+/-- Simulation reflexivity at finite apply-positions follows from the existing
+    trace floor and syntax/substance/semantics axioms. It is not assumed globally. -/
+theorem finiteApplyPositionSimulation (n : Nat) :
+    Simulation (finiteApplyPosition n) (finiteApplyPosition n) := by
+  have syntaxWitness : HMSyntax (finiteApplyPosition n) :=
+    (closeSyntaxOpaque _).mpr ⟨n + 1, (traceLevels (finiteApplyPosition n)).1⟩
+  have semanticsWitness : Semantics (finiteApplyPosition n) :=
+    axSubstanceRequiresSemantics _ (axSyntaxRequiresSubstance _ syntaxWitness)
+  exact (closeSemanticsOpaque _).mp semanticsWitness
+
+/-- Source clause (c): ordinalLimit is outside the finite closure. This uses
+    axLimitNotFinite plus the explicitly derived finite Simulation reflexivity,
+    separately from the logical-axiom-free finite observation proofs above. -/
+theorem finiteApplyLimitExcluded : ¬ finiteApplyFromGround ordinalLimit := by
+  rintro ⟨n, hn⟩
+  apply axLimitNotFinite n
+  change Simulation (finiteApplyPosition n) ordinalLimit
+  rw [← hn]
+  exact finiteApplyPositionSimulation n
+
+/-- The finite derivation matrix cannot reach ordinalLimit from ground. -/
+theorem ordinalLimitNotInD : ¬ D ground ordinalLimit := by
+  rintro ⟨p⟩
+  exact finiteApplyLimitExcluded (dEntryFromGroundFinite p)
+
+/-- The retained native ground-spanning claim is refuted for the finite D
+    interpretation: its universal quantifier would include ordinalLimit. -/
+theorem notGroundSpanningClaim : ¬ groundSpanningClaim := by
+  intro spans
+  exact ordinalLimitNotInD (spans ordinalLimit)
 
 /-- ordinalApply(p)(x): apply p to x in the ordinal sense.
     ordinalApply(ground)(x) =~ x; ordinalApply(f2f(ground))(x) =~ f2f(x);
@@ -228,9 +331,9 @@ theorem selfDerivation :
     f2f (f2f deriver) ≡ deriver :=
   ⟨axGroundSelf, dIsReflexive, axComposeIdentity, driverCycleIsClosed⟩
 
--- Terminal graduation: self-derivation is FORM.
--- The universe verifies itself from □ without an external kernel.
--- No L4 needed:
+-- The source proposes terminal graduation and no external kernel.
+-- The theorem above still depends on sorryAx and does not establish that claim.
+-- Source rationale for proposing no L4:
 --   (a) ClosureStatus as a type adds nothing (FORM/FRAME labels exist from L0).
 --   (b) classify as a procedure adds nothing (self-kernels perform classification).
 --   (c) reflexion is L2 content.
@@ -253,6 +356,6 @@ theorem selfDerivation :
 -- Step 17:    selfDerivation — FORM. Discharges all remaining FRAMEs.
 -- Step 18:    Terminal graduation — FORM.
 --
--- All 18 steps represented above. Census: COMPLETE. FORM.
+-- This is the source's 18-step census, not a completed Lean proof census.
 
 end Hypermath
