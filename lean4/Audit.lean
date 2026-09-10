@@ -462,6 +462,22 @@ set_option pp.fullNames true
 #print Hypermath.hostFiniteAction
 #eval IO.println "HYPERMATH_DECL_END:Hypermath.hostFiniteAction"
 
+#eval IO.println "HYPERMATH_DECL_BEGIN:Hypermath.FiniteOrbit"
+#print Hypermath.FiniteOrbit
+#eval IO.println "HYPERMATH_DECL_END:Hypermath.FiniteOrbit"
+
+#eval IO.println "HYPERMATH_DECL_BEGIN:Hypermath.finiteOrbitEncode"
+#print Hypermath.finiteOrbitEncode
+#eval IO.println "HYPERMATH_DECL_END:Hypermath.finiteOrbitEncode"
+
+#eval IO.println "HYPERMATH_DECL_BEGIN:Hypermath.finiteOrbitDecode"
+#print Hypermath.finiteOrbitDecode
+#eval IO.println "HYPERMATH_DECL_END:Hypermath.finiteOrbitDecode"
+
+#eval IO.println "HYPERMATH_DECL_BEGIN:Hypermath.FiniteOrbitInjective"
+#print Hypermath.FiniteOrbitInjective
+#eval IO.println "HYPERMATH_DECL_END:Hypermath.FiniteOrbitInjective"
+
 #eval IO.println "HYPERMATH_DECL_BEGIN:Hypermath.finiteNumeralEq_action_on_finite_orbit"
 #print Hypermath.finiteNumeralEq_action_on_finite_orbit
 #eval IO.println "HYPERMATH_DECL_END:Hypermath.finiteNumeralEq_action_on_finite_orbit"
@@ -469,6 +485,26 @@ set_option pp.fullNames true
 #eval IO.println "HYPERMATH_DECL_BEGIN:Hypermath.finiteNumeralEq_add"
 #print Hypermath.finiteNumeralEq_add
 #eval IO.println "HYPERMATH_DECL_END:Hypermath.finiteNumeralEq_add"
+
+#eval IO.println "HYPERMATH_DECL_BEGIN:Hypermath.finiteNumeralEq_mul"
+#print Hypermath.finiteNumeralEq_mul
+#eval IO.println "HYPERMATH_DECL_END:Hypermath.finiteNumeralEq_mul"
+
+#eval IO.println "HYPERMATH_DECL_BEGIN:Hypermath.finiteOrbitEncode_surjective"
+#print Hypermath.finiteOrbitEncode_surjective
+#eval IO.println "HYPERMATH_DECL_END:Hypermath.finiteOrbitEncode_surjective"
+
+#eval IO.println "HYPERMATH_DECL_BEGIN:Hypermath.finiteOrbitDecode_spec"
+#print Hypermath.finiteOrbitDecode_spec
+#eval IO.println "HYPERMATH_DECL_END:Hypermath.finiteOrbitDecode_spec"
+
+#eval IO.println "HYPERMATH_DECL_BEGIN:Hypermath.finiteOrbitEquivalence_laws"
+#print Hypermath.finiteOrbitEquivalence_laws
+#eval IO.println "HYPERMATH_DECL_END:Hypermath.finiteOrbitEquivalence_laws"
+
+#eval IO.println "HYPERMATH_DECL_BEGIN:Hypermath.finiteOrbitInjective_implies_actionCompatible"
+#print Hypermath.finiteOrbitInjective_implies_actionCompatible
+#eval IO.println "HYPERMATH_DECL_END:Hypermath.finiteOrbitInjective_implies_actionCompatible"
 
 #eval IO.println "HYPERMATH_DECL_BEGIN:Hypermath.exactFiniteAction_implies_compatible"
 #print Hypermath.exactFiniteAction_implies_compatible
@@ -519,6 +555,16 @@ set_option pp.fullNames true
 #print axioms Hypermath.finiteNumeralEq_action_on_finite_orbit
 
 #print axioms Hypermath.finiteNumeralEq_add
+
+#print axioms Hypermath.finiteNumeralEq_mul
+
+#print axioms Hypermath.finiteOrbitEncode_surjective
+
+#print axioms Hypermath.finiteOrbitDecode_spec
+
+#print axioms Hypermath.finiteOrbitEquivalence_laws
+
+#print axioms Hypermath.finiteOrbitInjective_implies_actionCompatible
 
 #print axioms Hypermath.exactFiniteAction_implies_compatible
 

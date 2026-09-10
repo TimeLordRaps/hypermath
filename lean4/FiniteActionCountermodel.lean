@@ -310,6 +310,42 @@ theorem path_length_arithmetic_claim_fails : ¬ pathLengthArithmeticClaim := by
   change (1 : Nat) = 0 at impossible
   exact Nat.noConfusion impossible
 
+/-- The exact proposition currently exported as `Hypermath.selfDerivation`,
+specialized to this interpretation.  It combines a ground self-continuation,
+finite zero-step self-reads, identities for the separate Nat path scaffold, and
+the deriver's two-step return.  It contains no arithmetic interpretation law. -/
+def selfDerivationTarget : Prop :=
+  structContinues ground ground ∧
+  (∀ x : Form, D x x) ∧
+  (∀ p : DerivationPath,
+    congruentPath (compose p pathGround) p ∧
+    congruentPath (compose pathGround p) p) ∧
+  Simulation (f2f (f2f deriver)) deriver
+
+theorem self_derivation_target_holds : selfDerivationTarget := by
+  constructor
+  · trivial
+  constructor
+  · intro x
+    exact ⟨Hypermath.Trace.nil x⟩
+  constructor
+  · intro p
+    simp [congruentPath, compose, pathGround]
+  · rfl
+
+/-- All declared logical clauses and the current self-derivation target can hold
+while finite numeral actions and all three proposed ordinal computation laws
+fail.  Therefore an additional typed arithmetic bridge is logically necessary. -/
+theorem self_derivation_without_arithmetic_bridge :
+    FullAxioms ∧ selfDerivationTarget ∧
+      ¬ Hypermath.FiniteAction.FiniteActionCompatible f2f ground ∧
+      ¬ ordinalZeroIdentityClaim ∧
+      ¬ ordinalSuccAppliesClaim ∧
+      ¬ pathLengthArithmeticClaim :=
+  ⟨full_axioms_hold, self_derivation_target_holds, finite_action_incompatible,
+    ordinal_zero_identity_claim_fails, ordinal_successor_action_claim_fails,
+    path_length_arithmetic_claim_fails⟩
+
 #print axioms full_axioms_hold
 #print axioms numeral_collision
 #print axioms action_disagreement
@@ -321,5 +357,7 @@ theorem path_length_arithmetic_claim_fails : ¬ pathLengthArithmeticClaim := by
 #print axioms ordinal_zero_identity_claim_fails
 #print axioms ordinal_successor_action_claim_fails
 #print axioms path_length_arithmetic_claim_fails
+#print axioms self_derivation_target_holds
+#print axioms self_derivation_without_arithmetic_bridge
 
 end HypermathFiniteActionCountermodel

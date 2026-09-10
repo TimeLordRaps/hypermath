@@ -91,10 +91,15 @@ ACTION_COUNTERMODEL_TARGETS = tuple("HypermathFiniteActionCountermodel." + name 
     "finite_action_incompatible", "no_exact_finite_action", "congruence_is_equivalence",
     "relation_action_incompatible", "no_congruent_finite_action",
     "ordinal_zero_identity_claim_fails", "ordinal_successor_action_claim_fails",
-    "path_length_arithmetic_claim_fails",
+    "path_length_arithmetic_claim_fails", "self_derivation_target_holds",
+    "self_derivation_without_arithmetic_bridge",
 ))
 ACTION_COUNTERMODEL_DEPENDENCIES = {
-    name: (["Quot.sound", "propext"] if name.endswith(".full_axioms_hold") else [])
+    name: (
+        ["Quot.sound", "propext"]
+        if name.endswith((".full_axioms_hold", ".self_derivation_without_arithmetic_bridge"))
+        else ["propext"] if name.endswith(".self_derivation_target_holds") else []
+    )
     for name in ACTION_COUNTERMODEL_TARGETS
 }
 PROBE_TARGETS = {"countermodel": COUNTERMODEL_TARGETS, "finite_trace": TRACE_CHECK_TARGETS,

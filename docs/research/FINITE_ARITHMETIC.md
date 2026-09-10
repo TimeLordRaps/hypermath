@@ -34,7 +34,7 @@ This does not yet identify the observation with opaque L2 `pathLength` or L3
 need separate proofs. The definitions involving abstract `f2f` are
 noncomputable; they do not supply an executable native arithmetic evaluator.
 
-## Finite-orbit addition needs no new compatibility assumption
+## Finite-orbit arithmetic needs no new compatibility assumption
 
 Define `FiniteNumeralEq m n` by `E(m) = E(n)`. Equal representations always
 act equally on starting forms in the finite ground orbit:
@@ -47,10 +47,16 @@ E(m)=E(n)\;\Longrightarrow\;
 Iterates of the same function commute, so both sides can be written as
 `f2f^k(E(m))` and `f2f^k(E(n))`. The checked
 `finiteNumeralEq_action_on_finite_orbit` formalizes this argument, and
-`finiteNumeralEq_add` proves that equality of both input representations
-implies equality of the representations of their sums. Finite addition
-therefore descends to represented values unconditionally. No numeral
-injectivity, action on other Forms, or agreement with `ordinalApply` follows.
+`finiteNumeralEq_add` and `finiteNumeralEq_mul` prove that equality of both
+input representations implies equality of the representations of their sums
+and products. Finite addition and multiplication therefore descend to
+represented values unconditionally. Every witnessed finite-orbit Form also has
+a natural-number representative. Under an explicit `FiniteOrbitInjective`
+premise, the checked encode/decode laws form a two-sided correspondence and
+equal numeral Forms act identically on every starting Form. The current clauses
+do not prove that premise. Without it, numeral injectivity and action on all
+Forms do not follow. Even with it, agreement with `ordinalApply` still requires
+a separate bridge theorem.
 
 ## Application to every Form is a stronger obligation
 
@@ -146,7 +152,14 @@ Here `E(1) = E(3) = a1`, but one and three applications to `b0` produce `b1`
 and `b0`, which are not even congruent. The model therefore refutes both
 the exact and congruence-valued compatibility conditions for actions on all
 Forms, and proves that neither kind of action exists in this interpretation.
-It leaves the unconditional finite-orbit addition result intact.
+It leaves the unconditional finite-orbit addition and multiplication results
+intact.
+
+The same model satisfies the exact proposition currently exported as
+`selfDerivation` while all of those global arithmetic bridges fail. The current
+self-derivation theorem is therefore a structural closure result, not an
+arithmetic interpretation theorem. Typed reification, transfinite generation,
+and semantic preservation remain separate proof obligations.
 
 The model also refutes each former admitted computation statement. Their
 exact propositions, including the path-length operand order, are retained as
@@ -167,8 +180,8 @@ Neither the declarations nor the model supplies that missing correspondence.
 The current translation has **16 admissions and 67 declared assumptions**
 (29 source parameters and 38 logical clauses). The latest three removed
 admissions were withdrawn after these counterexamples; they were not proved.
-The audit binds 29 proved production milestone declarations, including five
-finite-action results. The classical existence results disclose their Lean
+The audit binds 34 proved production milestone declarations, including ten
+finite-orbit/action results. The classical existence results disclose their Lean
 foundation dependencies; no new native axiom was added.
 
 ## Information that recursive reuse must retain
