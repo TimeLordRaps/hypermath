@@ -12,8 +12,9 @@ python -u audit.py
 ```
 
 The command prints source counts, performs a verbose build, reports the transitive
-axiom dependencies of selected central declarations, and checks an independent
-finite countermodel. Each subprocess has a 60-second timeout, output streams as
+axiom dependencies of selected central declarations, checks independent finite
+countermodels, and checks constructive finite trace examples. Each subprocess
+has a 60-second timeout, output streams as
 it arrives, and a silent subprocess receives a progress observation after 40 seconds.
 Use `--timeout 90` to adjust the bound or `--lake PATH` to select the Lake executable.
 `--inventory-only --details` lists every declared assumption without running Lean.
@@ -41,6 +42,11 @@ clause of `L3_ordinatics.hm:97–99`; the earlier translation confused path obje
 with Forms and path length with the endpoint. No endpoint equations were invented.
 The remaining 38 declarations are the translation's logical axiom clauses.
 
+The [finite-trace repair](../docs/research/FINITE_TRACES.md) subsequently replaces
+the `D` parameter with its finite congruence-preserving witness definition.
+There are now 30 source parameters, 38 logical clauses, and 20 admissions. It
+constructively proves `dIsReflexive` without changing its proposition-level API.
+
 Missing external `ℕ`/iteration notation was replaced by Lean core `Nat` and
 `Nat.repeat`. `orbitStructure` now uses the already declared `traceLevels` axiom
 for its third pair, rather than applying symmetry to a proposition with the wrong
@@ -49,15 +55,22 @@ endpoints. The attempted reverse-filtration argument in
 
 ## What the independent countermodel establishes
 
-`Countermodels.lean` imports no Hypermath module and declares no custom axiom or
-admitted proof. It constructs a Boolean model of all 24 logical L0/L1 axiom clauses:
+`Countermodels.lean` imports only the generic, axiom-free `Hypermath.Trace` module
+and declares no custom axiom or admitted proof. It constructs a Boolean model
+of all 24 logical L0/L1 axiom clauses:
 similarity and congruence are universal, simulation is equality, application maps
 every element to `true`, and ground is `false`. In that model:
 
 - non-simulation does not imply non-congruence;
 - `Derives` is symmetric, contradicting the advertised directionality consequence;
-- the unrestricted `D` parameter may be false everywhere, so its reflexivity does not follow;
 - the promised simulation cycle is not a consequence of that axiom prefix.
+
+A second model uses three forms, equality for congruence and simulation, and
+application `0 ↦ 1`, `1 ↦ 2`, `2 ↦ 1`. It satisfies the same prefix but has no
+congruence-preserving application edge. Its trace-defined `D` is equality, so
+ground does not reach every form even though the deriver `1` returns after two
+applications. The earlier unconstrained-`D` reflexivity probe has been replaced;
+it would no longer model the current definition.
 
 These are missing-implication witnesses for the stated prefix. They are not models
 of all later L2/L3 assumptions and do not refute every possible completion of the

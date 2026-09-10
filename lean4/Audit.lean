@@ -12,6 +12,58 @@ set_option pp.fullNames true
 #print Hypermath.D
 #eval IO.println "HYPERMATH_DECL_END:Hypermath.D"
 
+#eval IO.println "HYPERMATH_DECL_BEGIN:Hypermath.DStep"
+#print Hypermath.DStep
+#eval IO.println "HYPERMATH_DECL_END:Hypermath.DStep"
+
+#eval IO.println "HYPERMATH_DECL_BEGIN:Hypermath.DEntry"
+#print Hypermath.DEntry
+#eval IO.println "HYPERMATH_DECL_END:Hypermath.DEntry"
+
+#eval IO.println "HYPERMATH_DECL_BEGIN:Hypermath.selfRead"
+#print Hypermath.selfRead
+#eval IO.println "HYPERMATH_DECL_END:Hypermath.selfRead"
+
+#eval IO.println "HYPERMATH_DECL_BEGIN:Hypermath.dEntryStep"
+#print Hypermath.dEntryStep
+#eval IO.println "HYPERMATH_DECL_END:Hypermath.dEntryStep"
+
+#eval IO.println "HYPERMATH_DECL_BEGIN:Hypermath.dEntryCompose"
+#print Hypermath.dEntryCompose
+#eval IO.println "HYPERMATH_DECL_END:Hypermath.dEntryCompose"
+
+#eval IO.println "HYPERMATH_DECL_BEGIN:Hypermath.reflexionTrace"
+#print Hypermath.reflexionTrace
+#eval IO.println "HYPERMATH_DECL_END:Hypermath.reflexionTrace"
+
+#eval IO.println "HYPERMATH_DECL_BEGIN:Hypermath.selfReadLength"
+#print Hypermath.selfReadLength
+#eval IO.println "HYPERMATH_DECL_END:Hypermath.selfReadLength"
+
+#eval IO.println "HYPERMATH_DECL_BEGIN:Hypermath.dEntryStepLength"
+#print Hypermath.dEntryStepLength
+#eval IO.println "HYPERMATH_DECL_END:Hypermath.dEntryStepLength"
+
+#eval IO.println "HYPERMATH_DECL_BEGIN:Hypermath.dEntryEndpointIteration"
+#print Hypermath.dEntryEndpointIteration
+#eval IO.println "HYPERMATH_DECL_END:Hypermath.dEntryEndpointIteration"
+
+#eval IO.println "HYPERMATH_DECL_BEGIN:Hypermath.dEntryNoSteps"
+#print Hypermath.dEntryNoSteps
+#eval IO.println "HYPERMATH_DECL_END:Hypermath.dEntryNoSteps"
+
+#eval IO.println "HYPERMATH_DECL_BEGIN:Hypermath.dIsReflexive"
+#print Hypermath.dIsReflexive
+#eval IO.println "HYPERMATH_DECL_END:Hypermath.dIsReflexive"
+
+#eval IO.println "HYPERMATH_DECL_BEGIN:Hypermath.dIsTransitive"
+#print Hypermath.dIsTransitive
+#eval IO.println "HYPERMATH_DECL_END:Hypermath.dIsTransitive"
+
+#eval IO.println "HYPERMATH_DECL_BEGIN:Hypermath.reflexionTraceComposeIdentity"
+#print Hypermath.reflexionTraceComposeIdentity
+#eval IO.println "HYPERMATH_DECL_END:Hypermath.reflexionTraceComposeIdentity"
+
 #eval IO.println "HYPERMATH_DECL_BEGIN:Hypermath.Definition"
 #print Hypermath.Definition
 #eval IO.println "HYPERMATH_DECL_END:Hypermath.Definition"
@@ -296,3 +348,9 @@ set_option pp.fullNames true
 #print axioms Hypermath.simulationPairExists
 #print axioms Hypermath.driverCycleIsClosed
 #print axioms Hypermath.selfDerivation
+#print axioms Hypermath.selfReadLength
+#print axioms Hypermath.dEntryStepLength
+#print axioms Hypermath.dEntryEndpointIteration
+#print axioms Hypermath.dEntryNoSteps
+#print axioms Hypermath.dIsTransitive
+#print axioms Hypermath.reflexionTraceComposeIdentity

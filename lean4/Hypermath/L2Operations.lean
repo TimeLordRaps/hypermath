@@ -162,8 +162,19 @@ theorem pathGroundIsIdentity :
       congruentPath (compose pathGround p) p :=
   axComposeIdentity
 
-/-- reflexion(x): D[x][x] is the zero-step identity path at x under compose. FORM.
-    Conjunction of: D-is-reflexive (L1) + path-ground-is-identity (L2). -/
+/-- The concrete self-read trace. No conversion to opaque DerivationPath is
+    assumed: that source-to-scaffold bridge remains a separate obligation. -/
+def reflexionTrace (x : Form) : DEntry x x := selfRead x
+
+/-- Self-read is a two-sided identity for finite D-entry composition, at the
+    correct endpoints. This concerns dEntryCompose, not opaque compose. -/
+theorem reflexionTraceComposeIdentity {x y : Form} (p : DEntry x y) :
+    dEntryCompose (reflexionTrace x) p = p ∧
+    dEntryCompose p (reflexionTrace y) = p := by
+  exact ⟨Trace.nil_compose p, Trace.compose_nil p⟩
+
+/-- The existing proposition-level reflexion API, now backed by selfRead.
+    reflexionTrace exposes its actual witness and composition identity. -/
 theorem reflexion : ∀ x : Form, D x x :=
   dIsReflexive
 

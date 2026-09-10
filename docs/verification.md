@@ -18,6 +18,7 @@ an adjacent development checkout.
 | --- | --- | --- |
 | Software | Unit tests, source hashes, built and installed wheels | The exercised software contracts hold in the tested environment |
 | Lean elaboration | Fresh build and dependency output | The translation compiles; admitted proofs can still exist |
+| Finite traces | Seven parameter-relative production proofs and 28 axiom-free generic/concrete checks | Constructive self-read, composition, endpoint iteration, and recorded-step preservation; no native arithmetic interpretation yet |
 | Self-derivation | Target theorem, transitive assumptions, stable inputs and fresh replay | Conditional proof admissibility under disclosed Lean assumptions; unresolved while admissions remain |
 | Source adequacy | Required correspondence with native propositions and derivations | `UNKNOWN`; no checked correspondence theorem exists |
 | Recursive arithmetic completeness | Required arithmetic interpretation, self-representation, and completeness proof | `UNKNOWN`; the dependency and receipt do not discharge these obligations |
@@ -59,9 +60,11 @@ accepted as a clean pinned downstream foundation. Supplied JSON is not an
 authenticated proof: the downstream integration checks the source and reruns the
 mechanism.
 
-The package also binds the exact self-derivation statement and the 69 reviewed
-parameter/axiom declarations. A new assumption, weakened target, or substituted
-reporter cannot pass by merely removing `sorry`. These declaration identities
+The package also binds the exact self-derivation statement and the 68 reviewed
+parameter/axiom declarations, the new `D` definition bodies, seven constructive
+milestone statements, and the generic trace and probe sources. A new assumption,
+weakened target or definition, or substituted reporter cannot pass by merely
+removing `sorry`. These declaration identities
 are a review baseline, not a consistency proof. Changing the mathematical basis
 requires reviewing that policy along with the corresponding source changes.
 The byte-bound Python package and Lean reporters use explicit line-feed endings

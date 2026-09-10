@@ -105,6 +105,11 @@ comparison, not an exhaustive novelty assessment.
 
 ## Next proof sequence
 
+The [finite-trace milestone](FINITE_TRACES.md) supplies witnessed `D` entries,
+typed reuse, and preservation of their recorded edges. It does not yet represent
+those witnesses as native forms or interpret arithmetic through them. Its new
+countermodel shows why an endpoint return cannot discharge per-step preservation.
+
 1. Define typed representation, expansion, and closure evidence, including how
    predicates and derivations become forms.
 2. Resolve the current relation, composition, and finite/transfinite path

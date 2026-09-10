@@ -3,6 +3,8 @@ references/seed-ai/** -text
 # The trusted Lean reporters have byte-bound policy identities on every platform.
 lean4/Audit.lean text eol=lf
 lean4/Countermodels.lean text eol=lf
+lean4/TraceChecks.lean text eol=lf
+lean4/Hypermath/Trace.lean text eol=lf
 lean4/lake-manifest.json text eol=lf
 # Installed foundation bytes must match the pinned checkout on every platform.
 src/hypermath_foundations/*.py text eol=lf

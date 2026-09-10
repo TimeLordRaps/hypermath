@@ -8,6 +8,7 @@
 -- Source: L1_relations.hm
 
 import Hypermath.L0Ground
+import Hypermath.Trace
 
 namespace Hypermath
 
@@ -184,16 +185,68 @@ theorem orbitStructure :
     discharged in L3Ordinatics.lean. -/
 axiom deriver : Form
 
-/-- The derivation matrix.
-    D[x][y] = there exists a trace-path from x to y at =~+.
-    Schema is FORM at L1. Cycle-closure content at ≡ level is FRAME/L3. -/
-axiom D : Form → Form → Prop
+/-- One apply-step admitted to D, with evidence that it preserves at least =~.
+    A ~~ step alone is insufficient. Simulation steps enter by filtrationSimCong. -/
+def DStep (x y : Form) : Prop := y = f2f x ∧ Congruent y x
+
+/-- The finite trace witness for a D-entry, with its start and end in the type.
+    This implements the =~ floor in L1_relations.hm:401–415. It does not yet
+    encode the strongest per-step relation, nondecreasing trace metadata, or
+    the separate opaque DerivationPath and its L3 limit-path interpretation. -/
+abbrev DEntry (x y : Form) := Trace DStep x y
+
+/-- D[x][y] holds precisely when a finite apply-trace preserving =~ exists.
+    The witness remains available in DEntry; D is its proposition of existence. -/
+def D (x y : Form) : Prop := Nonempty (DEntry x y)
+
+/-- The concrete zero-step self-read at x, requiring no congruence premise. -/
+def selfRead (x : Form) : DEntry x x := Trace.nil x
+
+/-- A nonempty D-entry requires actual evidence of the edge's congruence.
+    f2f remains an uninterpreted source parameter, so this is not executable. -/
+noncomputable def dEntryStep (x : Form) (h : Congruent (f2f x) x) : DEntry x (f2f x) :=
+  Trace.cons ⟨rfl, h⟩ (Trace.nil (f2f x))
+
+/-- Composition preserves every edge witness and requires matching endpoints. -/
+def dEntryCompose {x y z : Form} (p : DEntry x y) (q : DEntry y z) : DEntry x z :=
+  Trace.compose p q
+
+theorem selfReadLength (x : Form) : Trace.length (selfRead x) = 0 := rfl
+
+/-- The guarded step constructor records exactly one edge. -/
+theorem dEntryStepLength (x : Form) (h : Congruent (f2f x) x) :
+    Trace.length (dEntryStep x h) = 1 := rfl
+
+/-- A D-entry's recorded length gives its exact finite apply-iteration. -/
+theorem dEntryEndpointIteration {x y : Form} (p : DEntry x y) :
+    Nat.repeat f2f (Trace.length p) x = y := by
+  have iterate_step : ∀ (n : Nat) (a : Form),
+      Nat.repeat f2f (n + 1) a = Nat.repeat f2f n (f2f a) := by
+    intro n a
+    induction n with
+    | zero => rfl
+    | succ n ih => exact congrArg f2f ih
+  induction p with
+  | nil => rfl
+  | cons edge tail ih =>
+    rw [Trace.length, iterate_step, ← edge.1]
+    exact ih
+
+/-- Without an admissible D-step, every existing witness is a zero-step read. -/
+theorem dEntryNoSteps (noSteps : ∀ x y : Form, ¬ DStep x y)
+    {x y : Form} (p : DEntry x y) : Trace.length p = 0 ∧ x = y := by
+  cases p with
+  | nil => exact ⟨rfl, rfl⟩
+  | cons edge tail => exact False.elim (noSteps _ _ edge)
 
 /-- D[x][x] for every x: every Form has a zero-step self-read in D. FORM. -/
-theorem dIsReflexive : ∀ x : Form, D x x := by
-  sorry
-  -- FORM: zero-step path = path-ground (L2). D[x][x] := path-ground at x.
-  -- The path-ground-is-identity (L2) makes this the identity entry.
+theorem dIsReflexive : ∀ x : Form, D x x :=
+  fun x => ⟨selfRead x⟩
+
+/-- D is transitive by composition of its finite trace witnesses. -/
+theorem dIsTransitive {x y z : Form} : D x y → D y z → D x z := by
+  rintro ⟨p⟩ ⟨q⟩
+  exact ⟨dEntryCompose p q⟩
 
 /-- D[ground][y] for all y: ground can reach any Form via an apply-chain. FORM. -/
 theorem dSpansGround : ∀ y : Form, D ground y := by

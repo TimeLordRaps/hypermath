@@ -8,7 +8,7 @@ from pathlib import Path
 SOURCE_PARAMETERS = frozenset({
     "Form", "ground", "f2f", "structContinues", "structDistinct", "structOrbits",
     "Similar", "Congruent", "Simulation", "HMSyntax", "Substance", "Semantics",
-    "Derives", "Discharge", "Definition", "FormClosure", "deriver", "D",
+    "Derives", "Discharge", "Definition", "FormClosure", "deriver",
     "DerivationPath", "pathStep", "pathGround", "pathLength", "pathTrace",
     "compose", "congruentPath", "pathStart", "pathEnd", "ordinalLimit",
     "ordinalSucc", "finiteApplyFromGround", "ordinalApply",
