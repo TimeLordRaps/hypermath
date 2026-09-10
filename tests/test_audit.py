@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import copy
 import json
+import re
 import sys
 from pathlib import Path
 
@@ -536,6 +537,29 @@ def test_record_machine_requires_exact_execution_dependencies(checkout, monkeypa
     assert report["checks"]["record_machine"]["status"] == "FAIL"
     assert not report["execution"]["completed"]
     assert not evaluate_gate(report)
+
+
+def test_default_library_build_covers_reporter_imports():
+    """A cached local module must not conceal a missing clean-build dependency."""
+    root = Path(__file__).resolve().parents[1] / "lean4"
+
+    def local_imports(path):
+        source = lean_code(path.read_text(encoding="utf-8"))
+        return {name for name in re.findall(r"(?m)^import\s+(Hypermath(?:\.[\w]+)*)", source)}
+
+    def closure(pending):
+        visited = set()
+        while pending:
+            name = pending.pop()
+            if name not in visited:
+                visited.add(name)
+                pending.update(local_imports(root / (name.replace(".", "/") + ".lean")))
+        return visited
+
+    built = closure({"Hypermath"})
+    for reporter in root.glob("*.lean"):
+        required = closure(local_imports(reporter))
+        assert required <= built, f"{reporter.name} imports modules absent from the default build"
 
 
 @pytest.mark.parametrize("alteration", [
