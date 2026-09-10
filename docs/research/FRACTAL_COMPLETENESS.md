@@ -188,12 +188,14 @@ preserves the complete rule tree through typed reconstruction. This is a
 constructive representation result at the host level. The
 [record encoding](RECORD_ENCODING.md) now supplies free ground-term codes for
 records and formulas, exact recovery, and checking of packed numerical inputs.
-Preservation through semantic interpretation, internal representation of the
-checker, and ranked acceptance are still open. The unary expansion is
+The existing two-chain model of all 38 clauses now supplies a concrete faithful
+interpretation, with full recovery and checker correspondence. Faithfulness
+for the intended native realization, internal representation of the checker,
+and ranked acceptance are still open. The unary expansion is
 exponential in the prefix length; no compression result is claimed.
 
-1. Prove a faithful semantic interpretation of the typed composed-record codes,
-   and internally represent the predicates and checking operations.
+1. Establish source adequacy for a faithful interpretation of the typed
+   composed-record codes, and internally represent their checking operations.
    Derive ranked acceptance through explicit source rules.
 2. Resolve the current relation, composition, and finite/transfinite path
    conflicts documented in the audit.

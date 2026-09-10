@@ -77,7 +77,9 @@ formulas to single free ground terms, with proved recovery, preservation of all
 record observations, and agreement with the composed checker. Its packed
 numerical interface avoids expanding the enormous unary term. The 45 additional
 dependency reports expose all host assumptions, including classical choice in
-the size-bound proof. Semantic interpretation and internally derived acceptance
+the size-bound proof. The existing model of all 38 clauses now supplies one
+faithful semantic interpretation and exact checker correspondence. This is a
+compatibility witness; source adequacy and internally derived acceptance
 remain necessary before this realizes the ranked meta-surface.
 
 ## Ground and relations

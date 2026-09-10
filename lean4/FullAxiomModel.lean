@@ -1,4 +1,5 @@
 import Hypermath.Trace
+import Hypermath.RecordEncoding
 
 /-!
 An explicit model of all 38 logical axiom clauses declared in L0Ground,
@@ -301,6 +302,150 @@ theorem ground_does_not_reach_limit : ¬ D ground ordinalLimit := by
 theorem boundary_probe :
     (∀ x : Form, HMSyntax x) ∧ ¬ finiteApplyFromGround ordinalLimit ∧ ¬ D ground ordinalLimit :=
   ⟨fun _ => trivial, limit_not_finite, ground_does_not_reach_limit⟩
+
+/-! A concrete faithful interpretation of composed records. The model and all
+38 clauses above are unchanged. Decoding and checking below are host functions
+on these model values; they are not added to the native source signature. -/
+
+open Hypermath.GroundSyntax Hypermath.GroundDerivation Hypermath.RecordEncoding
+
+def groundModel : Hypermath.GroundDerivation.Model where
+  Carrier := Form
+  base := ground
+  step := f2f
+  distinct := structDistinct
+  continues := structContinues
+  orbits := structOrbits
+  diffRule := model_axDiff
+  simRule := model_axSim
+  boxRule := model_axBox
+  groundRule := model_axGroundSelf
+  similar := Similar
+  simulation := Simulation
+  closeContinues := model_closeStructContinues
+  closeDistinct := model_closeStructDistinct
+  closeOrbits := model_closeStructOrbits
+
+/-- Packed model values avoid constructing the unary term. -/
+def recordValue (record : Record) : Form := (recordCode record, false)
+def formulaValue (formula : Formula) : Form := (formulaCode formula, false)
+
+theorem recordValue_is_interpretation (record : Record) :
+    recordValue record = (recordTerm record).interpret ground f2f := by
+  simp [recordValue, recordTerm, Term.interpret_ofDepth, repeat_value, ground]
+
+theorem formulaValue_is_interpretation (formula : Formula) :
+    formulaValue formula = (formulaTerm formula).interpret ground f2f := by
+  simp [formulaValue, formulaTerm, Term.interpret_ofDepth, repeat_value, ground]
+
+def readRecordValue : Form → Option Record
+  | (number, false) => decodeRecord number
+  | (_, true) => none
+
+def readFormulaValue : Form → Option Formula
+  | (number, false) => decodeFormula number
+  | (_, true) => none
+
+theorem readRecordValue_recordValue (record : Record) :
+    readRecordValue (recordValue record) = some record := decode_recordCode record
+
+theorem readFormulaValue_formulaValue (formula : Formula) :
+    readFormulaValue (formulaValue formula) = some formula := decode_formulaCode formula
+
+theorem interpreted_record_recovered (record : Record) :
+    readRecordValue ((recordTerm record).interpret ground f2f) = some record := by
+  rw [← recordValue_is_interpretation]
+  exact readRecordValue_recordValue record
+
+theorem interpreted_observation_preserved {β : Type} (query : Record → β) (record : Record) :
+    (readRecordValue ((recordTerm record).interpret ground f2f)).map query =
+      some (query record) := by
+  rw [interpreted_record_recovered]
+  rfl
+
+theorem recordValue_injective {first second : Record}
+    (same : recordValue first = recordValue second) : first = second :=
+  recordCode_injective (congrArg Prod.fst same)
+
+def checkValues (record formula : Form) : Bool :=
+  checkDecoded (readRecordValue record) (readFormulaValue formula)
+
+theorem checkValues_values (record : Record) (formula : Formula) :
+    checkValues (recordValue record) (formulaValue formula) =
+      Hypermath.GroundDerivation.check record formula := checkNumbers_codes record formula
+
+theorem checkValues_sound (record formula : Form)
+    (accepted : checkValues record formula = true) :
+    ∃ claim, readFormulaValue formula = some claim ∧ claim.holds groundModel := by
+  cases r : readRecordValue record with
+  | none => simp [checkValues, checkDecoded, r] at accepted
+  | some proof =>
+      cases f : readFormulaValue formula with
+      | none => simp [checkValues, checkDecoded, r, f] at accepted
+      | some claim =>
+          exact ⟨claim, rfl, Hypermath.GroundDerivation.check_sound groundModel proof claim
+            (by simpa [checkValues, checkDecoded, r, f] using accepted)⟩
+
+/-- This is one faithful model of the clauses, not a universal recovery law. -/
+theorem full_clauses_with_faithful_records :
+    FullAxioms ∧
+    (∀ record, readRecordValue ((recordTerm record).interpret ground f2f) = some record) ∧
+    (∀ record formula, checkValues (recordValue record) (formulaValue formula) =
+      Hypermath.GroundDerivation.check record formula) :=
+  ⟨full_axioms_hold, interpreted_record_recovered, checkValues_values⟩
+
+theorem other_chain_not_a_record (number : Nat) : readRecordValue (number, true) = none := rfl
+theorem other_chain_not_a_formula (number : Nat) : readFormulaValue (number, true) = none := rfl
+
+theorem record_formula_values_disjoint (record : Record) (formula : Formula) :
+    recordValue record ≠ formulaValue formula := by
+  intro same
+  have decoded := congrArg readRecordValue same
+  change decodeRecord (recordCode record) = decodeRecord (formulaCode formula) at decoded
+  rw [decode_recordCode, decodeRecord_formulaCode] at decoded
+  cases decoded
+
+/-- The existing preserving path relation cannot implement this direct
+record-to-conclusion transition, even in the faithful model. This refutes that
+particular realization, not other ranked or source-native mechanisms. -/
+theorem no_preserving_record_to_formula (record : Record) (formula : Formula) :
+    ¬ D (recordValue record) (formulaValue formula) := by
+  rintro ⟨path⟩
+  exact record_formula_values_disjoint record formula (trace_is_zero path).1
+
+theorem interpreted_separation_checked (term : Term) :
+    checkValues (recordValue (quote (separation term)))
+      (formulaValue (.both (.similar (.apply term) .ground)
+        (.notSimulation (.apply term) .ground))) = true := by
+  rw [checkValues_values]
+  exact check_quote (separation term)
+
+theorem interpreted_wrong_claim_rejected :
+    checkValues (recordValue (.primitive .groundSelf))
+      (formulaValue (.notSimulation .ground .ground)) = false := by
+  rw [checkValues_values]
+  rfl
+
+theorem other_chain_rejected (number : Nat) (formula : Form) :
+    checkValues (number, true) formula = false := rfl
+
+#print axioms recordValue_is_interpretation
+#print axioms formulaValue_is_interpretation
+#print axioms readRecordValue_recordValue
+#print axioms readFormulaValue_formulaValue
+#print axioms interpreted_record_recovered
+#print axioms interpreted_observation_preserved
+#print axioms recordValue_injective
+#print axioms checkValues_values
+#print axioms checkValues_sound
+#print axioms full_clauses_with_faithful_records
+#print axioms other_chain_not_a_record
+#print axioms other_chain_not_a_formula
+#print axioms record_formula_values_disjoint
+#print axioms no_preserving_record_to_formula
+#print axioms interpreted_separation_checked
+#print axioms interpreted_wrong_claim_rejected
+#print axioms other_chain_rejected
 
 #print axioms full_axioms_hold
 #print axioms finite_numerals_injective
