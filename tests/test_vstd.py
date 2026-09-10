@@ -195,15 +195,18 @@ def test_semantic_report_difference_never_matches_replay(
     assert f"native replay differs at {field}" in evaluation["observations"]["binding_differences"]
 
 
+@pytest.mark.parametrize("line_ending", ["\n", "\r\n"], ids=("lf", "crlf"))
 def test_incremental_build_step_state_and_line_order_are_normalized(
-    report, monkeypatch, tmp_path
+    report, monkeypatch, tmp_path, line_ending
 ):
     replay = copy.deepcopy(report)
     report["checks"]["lean_build"]["output"] = (
-        "✔ [1/2] Built Hypermath.Core\n✔ [2/2] Built Hypermath.Action\n"
+        f"✔ [1/2] Built Hypermath.Core{line_ending}"
+        f"⚠ [2/2] Built Hypermath.Action: declaration uses 'sorry'{line_ending}"
     )
     replay["checks"]["lean_build"]["output"] = (
-        "✔ [2/2] Replayed Hypermath.Action\n✔ [1/2] Replayed Hypermath.Core\n"
+        f"⚠ [1/2] Replayed Hypermath.Action: declaration uses 'sorry'{line_ending}"
+        f"✔ [2/2] Replayed Hypermath.Core{line_ending}"
     )
     monkeypatch.setattr(hypermath_foundations, "run_audit", lambda *_args, **_kwargs: replay)
     result = evaluate_audit_report(report, foundation_root=tmp_path)
@@ -213,24 +216,61 @@ def test_incremental_build_step_state_and_line_order_are_normalized(
 @pytest.mark.parametrize(
     "replay_output",
     [
-        "✔ [1/2] Replayed Hypermath.Core\n✔ [2/2] Replayed Hypermath.Other\n",
+        (
+            "✔ [2/3] Replayed Hypermath.Core\n"
+            "⚠ [1/3] Replayed Hypermath.Action: declaration uses 'sorry'\n"
+        ),
+        (
+            "✔ [2/2] Replayed Hypermath.Core\n"
+            "⚠ [1/2] Replayed Hypermath.Other: declaration uses 'sorry'\n"
+        ),
+        (
+            "✔ [2/2] Replayed Hypermath.Core\n"
+            "⚠ [1/2] Replayed Hypermath.Action: declaration uses 'unsafe'\n"
+        ),
+        (
+            "✔ [2/2] Replayed Hypermath.Core\n"
+            "✔ [1/2] Replayed Hypermath.Action: declaration uses 'sorry'\n"
+        ),
         "✔ [1/2] Replayed Hypermath.Core\n",
         (
             "✔ [1/2] Replayed Hypermath.Core\n"
             "✔ [1/2] Replayed Hypermath.Core\n"
-            "✔ [2/2] Replayed Hypermath.Action\n"
+            "⚠ [2/2] Replayed Hypermath.Action: declaration uses 'sorry'\n"
+        ),
+        (
+            "✔ [2/2] Replayed Hypermath.Core\r\n"
+            "⚠ [1/2] Replayed Hypermath.Action: declaration uses 'sorry'\r\n"
         ),
     ],
-    ids=("changed-line", "removed-line", "duplicated-line"),
+    ids=(
+        "changed-total",
+        "changed-module",
+        "changed-content",
+        "changed-marker",
+        "removed-line",
+        "duplicated-line",
+        "changed-line-ending",
+    ),
 )
 def test_incremental_build_line_content_and_multiplicity_remain_exact(
     report, monkeypatch, tmp_path, replay_output
 ):
     replay = copy.deepcopy(report)
     report["checks"]["lean_build"]["output"] = (
-        "✔ [1/2] Built Hypermath.Core\n✔ [2/2] Built Hypermath.Action\n"
+        "✔ [1/2] Built Hypermath.Core\n"
+        "⚠ [2/2] Built Hypermath.Action: declaration uses 'sorry'\n"
     )
     replay["checks"]["lean_build"]["output"] = replay_output
+    monkeypatch.setattr(hypermath_foundations, "run_audit", lambda *_args, **_kwargs: replay)
+    result = evaluate_audit_report(report, foundation_root=tmp_path)
+    assert outcomes(result)["audit_replay_matches"] == "FAIL"
+
+
+def test_non_build_progress_schedule_position_remains_exact(report, monkeypatch, tmp_path):
+    replay = copy.deepcopy(report)
+    report["checks"]["lean_build"]["output"] = "✔ [1/2] Ran Hypermath:extraDep\n"
+    replay["checks"]["lean_build"]["output"] = "✔ [2/2] Ran Hypermath:extraDep\n"
     monkeypatch.setattr(hypermath_foundations, "run_audit", lambda *_args, **_kwargs: replay)
     result = evaluate_audit_report(report, foundation_root=tmp_path)
     assert outcomes(result)["audit_replay_matches"] == "FAIL"
