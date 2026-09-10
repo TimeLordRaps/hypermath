@@ -66,10 +66,27 @@ source snapshots retain their original wording for comparison; they do not
 replace the current specifications or become checked proofs through import.
 The [term dictionary](docs/terms/Form.md) explains the project's vocabulary.
 
+## Install and check the foundation
+
+The Python distribution is `hypermath-foundations`; its import name is
+`hypermath_foundations`. The unrelated package named `hypermath` on the Python
+Package Index is not this project. From a checkout, with Python 3.10 or newer:
+
+```console
+python -m pip install '.[verification]'
+python -u scripts/check_foundation.py --require-self-derivation
+```
+
+This runs fresh Lean checks and a Verifier Standard (VSTD) evidence session,
+then applies the self-derivation gate. Unresolved claims remain `UNKNOWN`, and
+the gate exits with status 2. Evidence is retained under `build/verification`.
+The current package is prepared for source installation; an index release is
+a separate publication step.
+
 ## Lean translation
 
 The pinned toolchain is recorded in [lean4/lean-toolchain](lean4/lean-toolchain).
-After installing that toolchain, run from `lean4`:
+After installing that toolchain and the Python package, run from `lean4`:
 
 ```console
 python -u audit.py
@@ -88,8 +105,12 @@ for exact ordinal operations, a rational-function value layer, and bounded
 formula evaluation. Its present evaluator does not implement this repository's
 fractal closure or prove the full completeness claim. The existing paper's
 external truth hierarchy is background for the stronger research objective.
-No correctness or completeness result transfers between the projects merely
-because their notation overlaps.
+Ordinatics depends on a specific Hypermath commit and checks that its installed
+foundation package matches that source before running verification. Its
+publication gate also requires the source-to-arithmetic bridge and completeness
+claim to be established. The current bridge remains unproved. See
+[continuous integration and grounding](docs/verification.md) for the dependency
+contract, evidence boundaries, and checks.
 
 ## License
 

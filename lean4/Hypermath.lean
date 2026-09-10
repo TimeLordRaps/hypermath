@@ -1,5 +1,5 @@
 -- Hypermath
--- A closed formal universe built from one primitive operation (□).
+-- A proposed self-derivational universe built around the operation □.
 --
 -- L0  Ground      — Form, ground, f2f, three relations
 -- L1  Relations   — ~~, =~, ≡ derived properties; deriver; D matrix

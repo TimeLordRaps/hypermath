@@ -1,0 +1,8 @@
+include L0_ground.hm L1_relations.hm L2_operations.hm L3_ordinatics.hm
+recursive-include lean4 *.lean *.toml lean-toolchain lake-manifest.json
+recursive-include docs *.md
+recursive-include scripts *.py
+recursive-include references *.hm *.md *.json
+prune lean4/.lake
+prune build
+global-exclude *.py[cod]

@@ -1,6 +1,6 @@
 name = "Hypermath"
 version = "0.1.0"
-description = "A closed formal universe built from one primitive operation (□)."
+description = "A proposed self-derivational universe built around the operation □."
 
 defaultTargets = ["Hypermath"]
 

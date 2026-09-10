@@ -73,7 +73,8 @@ def double_return_does_not_identify_single_steps():
 def universal_asymmetry_conflicts_with_identity():
     # A representative nontrivial monoid; the contradiction uses only its unit.
     identity, element = (), ("a",)
-    concatenate = lambda left, right: left + right
+    def concatenate(left, right):
+        return left + right
     assert element != identity
     assert concatenate(element, identity) == element
     assert concatenate(identity, element) == element

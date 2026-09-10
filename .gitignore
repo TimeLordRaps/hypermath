@@ -1,5 +1,10 @@
 lean4/.lake/
-lean4/lake-manifest.json
 __pycache__/
 *.py[cod]
 build/
+.venv/
+.pytest_cache/
+.ruff_cache/
+dist/
+*.egg-info/
+.coverage
