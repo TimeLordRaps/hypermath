@@ -194,9 +194,19 @@ for the intended native realization, internal representation of the checker,
 and ranked acceptance are still open. The unary expansion is
 exponential in the prefix length; no compression result is claimed.
 
+The [native acceptance boundary](NATIVE_ACCEPTANCE.md) now separates executive
+closure from record checking in that faithful model. A valid primitive record
+and an invalid projection have the same true conclusion; both representations
+satisfy syntax, substance, semantics, form closure, and ground anchoring. The
+checker distinguishes their inference trees. Replacing acceptance with those
+closure conditions or the conclusion alone therefore fails on an explicit
+counterexample. This identifies a missing correspondence theorem, not a
+contradiction in the source clauses or a refutation of all native mechanisms.
+
 1. Establish source adequacy for a faithful interpretation of the typed
    composed-record codes, and internally represent their checking operations.
-   Derive ranked acceptance through explicit source rules.
+   Derive ranked acceptance through explicit source rules that check every
+   premise and bind the exact record to its claimed conclusion.
 2. Resolve the current relation, composition, and finite/transfinite path
    conflicts documented in the audit.
 3. Prove preservation of the declared observations under compression and reuse.

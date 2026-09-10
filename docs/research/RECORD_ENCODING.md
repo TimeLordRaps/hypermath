@@ -116,13 +116,18 @@ the gate; native replay requires this process. Negative probes include wrong
 sorts, unknown tags, wrong arity, malformed primitive records, incomplete tree
 prefixes, trailing bits, incorrect claims, and a projection hiding a bad premise.
 
-The separate full-model process now checks 20 exact dependency reports:
-three using propositional extensionality, 13 also using quotient soundness,
-and four additionally using classical choice. The four include the existing
-full-clause and boundary proofs and the two results that combine them with
-record interpretation. The policy rejects omitted or extra dependencies as
-well as admissions; it no longer permits any built-in assumption indiscriminately
-within this group.
+The separate full-model process now checks 26 exact dependency reports:
+two without axioms, four using propositional extensionality, 15 also using
+quotient soundness, and five additionally using classical choice. The five
+include the full-clause proof and boundary results that use it or the existing
+trace obstruction. The policy rejects omitted or extra dependencies as well
+as admissions; it does not permit built-in assumptions indiscriminately.
+
+The [native acceptance boundary](NATIVE_ACCEPTANCE.md) gives a further
+counterexample in this faithful model. Every encoded raw record satisfies the
+listed executive closure and ground-anchoring predicates, including a malformed
+projection with a true, derivable conclusion. Closure of its representation
+therefore does not certify that its claimed inference is valid.
 
 The broader translation still has 67 declared assumptions and 16 admission
 sites. Source-adequate native self-representation, internal acceptance, arithmetic

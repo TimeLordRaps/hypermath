@@ -429,6 +429,73 @@ theorem interpreted_wrong_claim_rejected :
 theorem other_chain_rejected (number : Nat) (formula : Form) :
     checkValues (number, true) formula = false := rfl
 
+/-! Source executive closure and proof-record acceptance are different claims.
+The predicates below use the existing model parameters without changing any
+of the 38 clauses. Every encoded raw record is a generated, closed Form,
+including records with invalid inference steps. -/
+
+/-- Exactly the existing executive predicates and ground anchoring, not a
+new acceptance predicate or a native proof rule. -/
+def NativeRecordReady (record : Record) : Prop :=
+  HMSyntax (recordValue record) ∧ Substance (recordValue record) ∧
+  Semantics (recordValue record) ∧ FormClosure (recordValue record) ∧
+  Derives ground (recordValue record) ∧ Definition ground (recordValue record) ∧
+  Discharge (recordValue record) ground
+
+theorem record_native_ready (record : Record) : NativeRecordReady record := by
+  have generated : Derives ground (recordValue record) :=
+    ⟨recordCode record, by simp [repeat_value, ground, recordValue]⟩
+  exact ⟨trivial, trivial, trivial, trivial, generated, generated, generated⟩
+
+def groundClaim : Formula := .structural (.continues .ground .ground)
+def validGroundRecord : Record := .primitive .groundSelf
+/-- A projection falsely annotates a primitive premise as a conjunction. -/
+def invalidGroundRecord : Record :=
+  .projectLeft groundClaim groundClaim validGroundRecord
+
+theorem same_conclusion_opposite_acceptance :
+    validGroundRecord.conclusion = invalidGroundRecord.conclusion ∧
+    Hypermath.GroundDerivation.check validGroundRecord groundClaim = true ∧
+    Hypermath.GroundDerivation.check invalidGroundRecord groundClaim = false := by
+  exact ⟨rfl, rfl, rfl⟩
+
+/-- The rejected record has a true, derivable conclusion and satisfies every
+listed native executive condition. The defect is in its claimed inference. -/
+theorem rejected_record_has_native_closure :
+    NativeRecordReady invalidGroundRecord ∧ groundClaim.holds groundModel ∧
+    Nonempty (Derivation groundClaim) ∧
+    checkValues (recordValue invalidGroundRecord) (formulaValue groundClaim) = false := by
+  refine ⟨record_native_ready _, model_axGroundSelf, ⟨.primitive .groundSelf⟩, ?_⟩
+  rw [checkValues_values]
+  rfl
+
+/-- Reading only the conclusion loses the distinction between a valid and
+invalid formation tree, even though both have the same native closure status. -/
+theorem no_conclusion_only_record_checker :
+    ¬ ∃ checker : Formula → Formula → Bool, ∀ record claimed,
+      checker record.conclusion claimed = Hypermath.GroundDerivation.check record claimed := by
+  rintro ⟨checker, agreement⟩
+  have accepted := agreement validGroundRecord groundClaim
+  have rejected := agreement invalidGroundRecord groundClaim
+  change checker groundClaim groundClaim = true at accepted
+  change checker groundClaim groundClaim = false at rejected
+  exact Bool.noConfusion (accepted.symm.trans rejected)
+
+theorem native_closure_is_not_record_acceptance :
+    ¬ ∀ record, NativeRecordReady record ↔
+      checkValues (recordValue record) (formulaValue record.conclusion) = true := by
+  intro agreement
+  have accepted := (agreement invalidGroundRecord).mp (record_native_ready _)
+  rw [checkValues_values] at accepted
+  change false = true at accepted
+  exact Bool.noConfusion accepted
+
+theorem full_clauses_with_rejected_closed_record :
+    FullAxioms ∧ NativeRecordReady invalidGroundRecord ∧
+    checkValues (recordValue invalidGroundRecord) (formulaValue groundClaim) = false :=
+  ⟨full_axioms_hold, rejected_record_has_native_closure.1,
+    rejected_record_has_native_closure.2.2.2⟩
+
 #print axioms recordValue_is_interpretation
 #print axioms formulaValue_is_interpretation
 #print axioms readRecordValue_recordValue
@@ -446,6 +513,12 @@ theorem other_chain_rejected (number : Nat) (formula : Form) :
 #print axioms interpreted_separation_checked
 #print axioms interpreted_wrong_claim_rejected
 #print axioms other_chain_rejected
+#print axioms record_native_ready
+#print axioms same_conclusion_opposite_acceptance
+#print axioms rejected_record_has_native_closure
+#print axioms no_conclusion_only_record_checker
+#print axioms native_closure_is_not_record_acceptance
+#print axioms full_clauses_with_rejected_closed_record
 
 #print axioms full_axioms_hold
 #print axioms finite_numerals_injective
