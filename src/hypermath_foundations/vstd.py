@@ -124,11 +124,13 @@ def _replay_comparison(report: Mapping[str, Any]) -> dict[str, Any]:
     if isinstance(checks, dict):
         build = checks.get("lean_build")
         if isinstance(build, dict) and isinstance(build.get("output"), str):
-            # Lake changes only this step-state word when identical module
-            # bytes come from its cache. Preserve every other transcript byte.
-            build["output"] = _LAKE_INCREMENTAL_STATE.sub(
+            # Lake changes this step-state word and can interleave independent
+            # progress lines differently. Preserve every complete line and its
+            # multiplicity while comparing their order-independent multiset.
+            output = _LAKE_INCREMENTAL_STATE.sub(
                 r"\g<1><incremental-build-state>", build["output"]
             )
+            build["output"] = sorted(output.splitlines(keepends=True))
     return comparison
 
 

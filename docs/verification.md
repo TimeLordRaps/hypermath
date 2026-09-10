@@ -96,11 +96,12 @@ audit and checks its input bindings. Replay agreement compares the complete repo
 including runner and before/after source coordinates, execution metadata, admissions,
 every claim status and rationale, and every check payload. The verbose `lean_build`
 transcript is the only normalized value: Lake's `Built`/`Replayed` step-state word is
-ignored on an otherwise exact progress line because it records cache use rather than
-different module bytes. Every other build-transcript byte, the attempt flag, status,
-exit code, and reasons remain exact, while dependency and probe transcripts are
-compared exactly. It keeps native-source adequacy and arithmetic completeness
-unresolved.
+ignored because it records cache use rather than different module bytes. After that
+substitution, complete build-output lines are compared as an order-independent
+multiset because parallel progress lines can be interleaved differently; line content
+and multiplicity remain exact. The attempt flag, status, exit code, and reasons also
+remain exact, while dependency and probe transcripts are compared in their original
+order. It keeps native-source adequacy and arithmetic completeness unresolved.
 If a requested replay fails or disagrees with the supplied evidence, the adapter
 retains the bundle and raises an error. Packaging cannot override that failure.
 

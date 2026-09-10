@@ -53,8 +53,8 @@ jobs:
           path: dist/*
           if-no-files-found: error
 
-  self-derivation:
-    name: self-derivation gate
+  native-audit-integrity:
+    name: native audit integrity (build and replay)
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -67,8 +67,37 @@ jobs:
           python-version: "3.12"
       - run: python -m pip install ".[verification]"
       - run: python -u scripts/setup_lean.py
-      - name: Recompute, bind evidence, and require self-derivation
-        run: python -u scripts/check_foundation.py --require-self-derivation --timeout 60
+      - name: Recompute and bind native audit evidence
+        run: >-
+          python -u scripts/check_foundation.py --output build/native-audit-integrity
+          --timeout 60
+      - name: Retain native audit-integrity evidence
+        if: always()
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
+        with:
+          name: native-audit-integrity-evidence
+          path: build/native-audit-integrity/
+          if-no-files-found: error
+          retention-days: 90
+
+  self-derivation:
+    name: self-derivation and completeness gate
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.12"
+      - run: python -m pip install ".[verification]"
+      - run: python -u scripts/setup_lean.py
+      - name: Recompute, bind evidence, and require self-derivation and completeness
+        run: >-
+          python -u scripts/check_foundation.py --require-self-derivation
+          --require-complete --timeout 60
       - name: Retain evidence even when the mathematical gate fails
         if: always()
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
@@ -76,3 +105,4 @@ jobs:
           name: foundation-evidence
           path: build/verification/
           if-no-files-found: error
+          retention-days: 90
