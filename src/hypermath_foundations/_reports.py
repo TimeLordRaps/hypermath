@@ -14,6 +14,8 @@ from ._baseline import (
     DEFINITION_DECLARATIONS,
     FINITE_ACTION_SOURCE_SHA256,
     FULL_MODEL_SOURCE_SHA256,
+    GROUND_SYNTAX_CHECKS_SOURCE_SHA256,
+    GROUND_SYNTAX_SOURCE_SHA256,
     LEAN_BUILTINS,
     OBSERVATION_CHECKS_SOURCE_SHA256,
     OBSERVATION_SOURCE_SHA256,
@@ -101,6 +103,31 @@ OBSERVATION_DEPENDENCIES = {
     for name in OBSERVATION_TARGETS
 }
 CLAIMS = ("self_derivation", "source_adequacy", "recursive_arithmetic_completeness")
+GROUND_SYNTAX_DEPENDENCIES = {
+    **{"Hypermath.GroundSyntax." + name: [] for name in (
+        "Term.depth_ofDepth", "Term.ofDepth_depth", "Term.interpret_ofDepth", "instance_sound",
+    )},
+    **{"Hypermath.GroundSyntax." + name: ["propext"] for name in (
+        "decode_encode", "encode_injective", "observe_encode", "check_encode",
+        "reuse_encode", "reuse_many_encode",
+    )},
+    **{"Hypermath.GroundSyntax." + name: ["Quot.sound", "propext"] for name in (
+        "check_iff", "check_sound",
+    )},
+    "Hypermath.GroundSyntax.native_check_sound": sorted([
+        "Hypermath.Form", "Hypermath.ground", "Hypermath.f2f",
+        "Hypermath.structDistinct", "Hypermath.structContinues", "Hypermath.structOrbits",
+        "Hypermath.axDiff", "Hypermath.axSim", "Hypermath.axBox", "Hypermath.axGroundSelf",
+        "propext", "Quot.sound",
+    ]),
+    **{"Hypermath.GroundSyntaxChecks." + name: [] for name in (
+        "concrete_record_roundtrip", "concrete_conclusion_checked", "wrong_claim_rejected",
+        "wrong_argument_rejected", "wrong_rule_rejected", "malformed_record_rejected",
+        "longer_malformed_record_rejected", "reused_record_checked", "malformed_reuse_rejected",
+    )},
+    "Hypermath.GroundSyntaxChecks.distinct_records_retained": ["propext"],
+}
+GROUND_SYNTAX_TARGETS = tuple(GROUND_SYNTAX_DEPENDENCIES)
 FULL_MODEL_TARGETS = tuple("HypermathFullAxiomModel." + name for name in (
     "full_axioms_hold", "finite_numerals_injective", "boundary_probe",
 ))
@@ -112,6 +139,8 @@ ACTION_COUNTERMODEL_TARGETS = tuple("HypermathFiniteActionCountermodel." + name 
     "path_length_arithmetic_claim_fails", "self_derivation_target_holds",
     "self_derivation_without_arithmetic_bridge",
     "numeral_equality_observation_fails", "no_numeral_equality_decoder",
+    "primitive_records_collide", "primitive_conclusions_differ",
+    "no_semantic_primitive_record_decoder",
 ))
 ACTION_COUNTERMODEL_DEPENDENCIES = {
     name: (
@@ -123,7 +152,8 @@ ACTION_COUNTERMODEL_DEPENDENCIES = {
 }
 PROBE_TARGETS = {"countermodel": COUNTERMODEL_TARGETS, "finite_trace": TRACE_CHECK_TARGETS,
                  "observation": OBSERVATION_TARGETS, "full_model": FULL_MODEL_TARGETS,
-                 "finite_action": ACTION_COUNTERMODEL_TARGETS}
+                 "finite_action": ACTION_COUNTERMODEL_TARGETS,
+                 "ground_syntax": GROUND_SYNTAX_TARGETS}
 
 
 def probe_dependencies_valid(name: str, records: dict[str, list[str]]) -> bool:
@@ -131,6 +161,8 @@ def probe_dependencies_valid(name: str, records: dict[str, list[str]]) -> bool:
         return records == ACTION_COUNTERMODEL_DEPENDENCIES
     if name == "observation":
         return records == OBSERVATION_DEPENDENCIES
+    if name == "ground_syntax":
+        return records == GROUND_SYNTAX_DEPENDENCIES
     allowed = LEAN_BUILTINS if name in {"countermodel", "full_model"} else frozenset()
     return all(dep in allowed for deps in records.values() for dep in deps)
 
@@ -240,4 +272,8 @@ def policy_errors(output: str, inputs: dict, assumptions: list[dict]) -> list[st
         reasons.append("finite action criterion differs from the reviewed construction")
     if inputs.get("lean4/FiniteActionCountermodel.lean") != ACTION_COUNTERMODEL_SOURCE_SHA256:
         reasons.append("finite action countermodel differs from the reviewed model")
+    if inputs.get("lean4/Hypermath/GroundSyntax.lean") != GROUND_SYNTAX_SOURCE_SHA256:
+        reasons.append("ground syntax and checker differ from the reviewed source fragment")
+    if inputs.get("lean4/GroundSyntaxChecks.lean") != GROUND_SYNTAX_CHECKS_SOURCE_SHA256:
+        reasons.append("ground syntax checks differ from the reviewed probes")
     return reasons

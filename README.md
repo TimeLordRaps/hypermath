@@ -58,6 +58,13 @@ not refute a stronger target with typed reification and transfinite semantics.
 The model does not encode the stronger, unformalized native intent that all
 Forms arise from the ground.
 
+The [finite ground-syntax checker](docs/research/GROUND_SYNTAX.md) represents
+instances of the four primitive ground rules as records built from `ground`
+and `apply`. It proves decoding, exact conclusion checking, soundness under the
+existing rules, and repeated argument reinstantiation. Semantic interpretation
+can identify distinct records, so this syntax is not silently identified with
+native `Form` values. The required audit checks 23 additional reports.
+
 ## Ground and relations
 
 `Form` names the source's forming structure, `ground` its distinguished base,

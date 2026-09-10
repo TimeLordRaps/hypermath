@@ -227,7 +227,8 @@ the self-representation and effectiveness obligations in
 
 The [bounded audit](../verification.md) runs the library build, declaration
 report, prefix countermodels, finite traces, observation checks, full axiom
-model, and the required `finite_action` countermodel process. Its policy binds
+model, the required `finite_action` countermodel process, and the
+[`ground_syntax` source-fragment checker](GROUND_SYNTAX.md). Its policy binds
 definition bodies, theorem statements, exact per-theorem
 dependencies, and probe source bytes. Missing or failed probes invalidate an
 execution report and its required Verifier replay. The overall mathematical
