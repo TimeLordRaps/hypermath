@@ -49,6 +49,12 @@ def _execute(args, *, legacy=False):
         return 124
     if not report["execution"]["completed"]:
         return 1
+    policy = report["checks"].get("assumption_policy", {})
+    if not args.inventory_only and (
+        policy.get("status") != "PASS" or policy.get("attempted") is not True
+    ):
+        print("Audit integrity gate is not satisfied: assumption policy did not pass", flush=True)
+        return 1
     if args.require_complete and not all(evaluate_gate(report, c) for c in CLAIMS):
         return 2
     if args.require_self_derivation and not evaluate_gate(report):

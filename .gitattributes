@@ -10,6 +10,8 @@ lean4/ObservationChecks.lean text eol=lf
 lean4/FullAxiomModel.lean text eol=lf
 lean4/Hypermath/FiniteAction.lean text eol=lf
 lean4/FiniteActionCountermodel.lean text eol=lf
+lean4/Hypermath/GroundSyntax.lean text eol=lf
+lean4/GroundSyntaxChecks.lean text eol=lf
 lean4/lake-manifest.json text eol=lf
 # Installed foundation bytes must match the pinned checkout on every platform.
 src/hypermath_foundations/*.py text eol=lf
