@@ -29,6 +29,7 @@ from hypermath_foundations._reports import (
     GROUND_SYNTAX_DEPENDENCIES,
     OBSERVATION_DEPENDENCIES,
     RECORD_ENCODING_DEPENDENCIES,
+    RECORD_MACHINE_DEPENDENCIES,
     REPOSITORY,
     TARGET,
     TRACE_CHECK_TARGETS,
@@ -98,6 +99,10 @@ def checkout(tmp_path, monkeypatch):
             project / "lean4/Hypermath/RecordEncoding.lean").read_text(encoding="utf-8"),
         "lean4/RecordEncodingChecks.lean": (
             project / "lean4/RecordEncodingChecks.lean").read_text(encoding="utf-8"),
+        "lean4/Hypermath/RecordMachine.lean": (
+            project / "lean4/Hypermath/RecordMachine.lean").read_text(encoding="utf-8"),
+        "lean4/RecordMachineChecks.lean": (
+            project / "lean4/RecordMachineChecks.lean").read_text(encoding="utf-8"),
         "lean4/FullAxiomModel.lean": (project / "lean4/FullAxiomModel.lean").read_text(encoding="utf-8"),
         "lean4/Hypermath/FiniteAction.lean": (
             project / "lean4/Hypermath/FiniteAction.lean").read_text(encoding="utf-8"),
@@ -130,10 +135,11 @@ def checkout(tmp_path, monkeypatch):
         if command[-1] == "FiniteActionCountermodel.lean":
             return 0, action_countermodel_output()
         if command[-1] in {"GroundSyntaxChecks.lean", "GroundDerivationChecks.lean",
-                           "RecordEncodingChecks.lean"}:
+                           "RecordEncodingChecks.lean", "RecordMachineChecks.lean"}:
             expected = {"GroundSyntaxChecks.lean": GROUND_SYNTAX_DEPENDENCIES,
                         "GroundDerivationChecks.lean": GROUND_DERIVATION_DEPENDENCIES,
-                        "RecordEncodingChecks.lean": RECORD_ENCODING_DEPENDENCIES}[command[-1]]
+                        "RecordEncodingChecks.lean": RECORD_ENCODING_DEPENDENCIES,
+                        "RecordMachineChecks.lean": RECORD_MACHINE_DEPENDENCIES}[command[-1]]
             return 0, "\n".join(
                 f"'{name}' depends on axioms: [{', '.join(dependencies)}]"
                 if dependencies else f"'{name}' does not depend on any axioms"
@@ -431,7 +437,9 @@ def test_reification_dependency_policy_is_exact(checkout, monkeypatch, name, rep
                                   "lean4/GroundDerivationChecks.lean",
                                   "lean4/Hypermath/GroundCode.lean",
                                   "lean4/Hypermath/RecordEncoding.lean",
-                                  "lean4/RecordEncodingChecks.lean"])
+                                  "lean4/RecordEncodingChecks.lean",
+                                  "lean4/Hypermath/RecordMachine.lean",
+                                  "lean4/RecordMachineChecks.lean"])
 def test_replaced_reporter_or_trace_cannot_authorize_its_own_output(checkout, path):
     root, _, _ = checkout
     (root / path).write_text('#eval IO.println "forged report"', encoding="utf-8")
@@ -494,6 +502,38 @@ def test_record_encoding_requires_exact_proof_dependencies(checkout, monkeypatch
     monkeypatch.setattr(audit_module, "_run_process", altered)
     report = run_audit(root)
     assert report["checks"]["record_encoding"]["status"] == "FAIL"
+    assert not report["execution"]["completed"]
+    assert not evaluate_gate(report)
+
+
+@pytest.mark.parametrize("alteration", [
+    "missing_execution", "missing_replay", "extra_choice", "hidden_propext", "admission", "failure",
+])
+def test_record_machine_requires_exact_execution_dependencies(checkout, monkeypatch, alteration):
+    root, _, run = checkout
+
+    def altered(command, *args):
+        code, output = run(command, *args)
+        if command[-1] == "RecordMachineChecks.lean":
+            if alteration in {"missing_execution", "missing_replay"}:
+                target = "execute_program" if alteration == "missing_execution" else "checkTrace_iff"
+                output = "\n".join(line for line in output.splitlines()
+                                   if f"RecordMachine.{target}'" not in line)
+            elif alteration == "extra_choice":
+                output = output.replace("[propext]", "[Classical.choice, propext]", 1)
+            elif alteration == "hidden_propext":
+                output = output.replace("depends on axioms: [propext]",
+                                        "does not depend on any axioms", 1)
+            elif alteration == "admission":
+                output = output.replace("does not depend on any axioms",
+                                        "depends on axioms: [sorryAx]", 1)
+            else:
+                code = 1
+        return code, output
+
+    monkeypatch.setattr(audit_module, "_run_process", altered)
+    report = run_audit(root)
+    assert report["checks"]["record_machine"]["status"] == "FAIL"
     assert not report["execution"]["completed"]
     assert not evaluate_gate(report)
 

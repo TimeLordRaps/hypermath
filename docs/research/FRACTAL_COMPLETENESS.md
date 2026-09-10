@@ -203,8 +203,18 @@ closure conditions or the conclusion alone therefore fails on an explicit
 counterexample. This identifies a missing correspondence theorem, not a
 contradiction in the source clauses or a refutation of all native mechanisms.
 
+The [record execution machine](RECORD_MACHINE.md) now makes the finite checking
+operations explicit. Its instructions check every premise and propagate
+failure; its exact trace check is equivalent to the existing composed-record
+checker on the stated claim. Packed-input checking also agrees on malformed
+inputs. This is a constructive host execution model for the next native
+simulation proof, not that proof itself. Trace replay alone can certify a
+faithful execution of failure and must not be confused with acceptance.
+
 1. Establish source adequacy for a faithful interpretation of the typed
    composed-record codes, and internally represent their checking operations.
+   Realize the record machine's instruction, stack, comparison, and decoding
+   operations by native rules and prove the transition correspondence.
    Derive ranked acceptance through explicit source rules that check every
    premise and bind the exact record to its claimed conclusion.
 2. Resolve the current relation, composition, and finite/transfinite path

@@ -59,6 +59,7 @@ def evaluate_gate(report, claim="self_derivation", *, require_clean=True) -> boo
                     "lean4/Hypermath/GroundDerivation.lean", "lean4/GroundDerivationChecks.lean",
                     "lean4/Hypermath/GroundCode.lean", "lean4/Hypermath/RecordEncoding.lean",
                     "lean4/RecordEncodingChecks.lean",
+                    "lean4/Hypermath/RecordMachine.lean", "lean4/RecordMachineChecks.lean",
                     "lean4/Hypermath/L0Ground.lean", "lean4/Hypermath/L1Relations.lean",
                     "lean4/Hypermath/L2Operations.lean",
                     "lean4/Hypermath/L3Ordinatics.lean",

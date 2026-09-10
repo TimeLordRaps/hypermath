@@ -89,6 +89,15 @@ record, and both encoded forms satisfy the model's executive and ground-anchorin
 conditions. The checker distinguishes their formation trees. An internal
 acceptance proof must bind those trees and their premises to the claimed result.
 
+The [record execution machine](docs/research/RECORD_MACHINE.md) now performs
+those finite rule checks instruction by instruction. It agrees with the
+recursive checker on every record and verifies submitted execution traces
+against the exact record and conclusion. Failed premises remain failed, even
+through later projections or introductions. Its 40 mandatory dependency reports
+contain no admissions or native assumptions. The machine still uses host
+syntax and operations; their native realization and ranked acceptance remain
+open.
+
 ## Ground and relations
 
 `Form` names the source's forming structure, `ground` its distinguished base,
