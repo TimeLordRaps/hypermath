@@ -1,14 +1,15 @@
 """Reviewed declaration identity baseline, not an assertion of consistency.
 
-Captured with Lean4.14.0 from the existing69 axiom declarations and target
-statement at Git revision db141d669491ce6b51d7fe15602c0925398f3154.
+Initially captured with Lean 4.14.0 at revision db141d669491ce6b51d7fe15602c0925398f3154.
+The finite-trace repair removes D from the allowance: its reviewed definitions
+and constructive milestone statements are bound separately below. The remaining
+68 declarations retain their original meaning; consistency is not established.
 The reporter only requests kernel observations; it adds no assumptions.
 Changes to this policy require explicit mathematical review, not regeneration
 as an automatic response to a failing gate.
 """
 
 AXIOM_DECLARATIONS = {'Hypermath.Congruent': 'axiom Hypermath.Congruent : Hypermath.Form → Hypermath.Form → Prop',
- 'Hypermath.D': 'axiom Hypermath.D : Hypermath.Form → Hypermath.Form → Prop',
  'Hypermath.Definition': 'axiom Hypermath.Definition : Hypermath.Form → Hypermath.Form → Prop',
  'Hypermath.DerivationPath': 'axiom Hypermath.DerivationPath : Type',
  'Hypermath.Derives': 'axiom Hypermath.Derives : Hypermath.Form → Hypermath.Form → Prop',
@@ -155,6 +156,50 @@ AXIOM_DECLARATIONS = {'Hypermath.Congruent': 'axiom Hypermath.Congruent : Hyperm
 
 TARGET_STATEMENT = 'theorem Hypermath.selfDerivation : And (Hypermath.structContinues Hypermath.ground Hypermath.ground) (And (∀ (x : Hypermath.Form), Hypermath.D x x) (And (∀ (p : Hypermath.DerivationPath), And (Hypermath.congruentPath (Hypermath.compose p Hypermath.pathGround) p) (Hypermath.congruentPath (Hypermath.compose Hypermath.pathGround p) p)) (Hypermath.Simulation (Hypermath.f2f (Hypermath.f2f Hypermath.deriver)) Hypermath.deriver)))'
 
-AUDIT_SOURCE_SHA256 = '588dc4d324e048206b633714a14e54a087daf8f021c0752ec906cd33080b97dd'
-COUNTERMODEL_SOURCE_SHA256 = 'fbd5a0c209b83e353d4d795b46b680fa82b930d1cf8ba713dd245f561b4c3f5f'
+AUDIT_SOURCE_SHA256 = '1ff961b08b043d2bad3aeda482665f08d58d2158c165d03d6ae18770852d1724'
+COUNTERMODEL_SOURCE_SHA256 = 'b822d53b244418db1c3a505332b6090d9da72bc6e0fe3ce620bd9e5c5413adc7'
 LEAN_BUILTINS = frozenset({"propext", "Classical.choice", "Quot.sound"})
+
+# Reviewed finite congruence-preserving trace construction.
+DEFINITION_DECLARATIONS = {'Hypermath.D': 'def Hypermath.D : Hypermath.Form → Hypermath.Form → Prop := fun x y => Nonempty '
+                '(Hypermath.DEntry x y)',
+ 'Hypermath.DStep': 'def Hypermath.DStep : Hypermath.Form → Hypermath.Form → Prop := fun x y => '
+                    'And (Eq y (Hypermath.f2f x)) (Hypermath.Congruent y x)',
+ 'Hypermath.DEntry': '@[reducible] def Hypermath.DEntry : Hypermath.Form → Hypermath.Form → Type '
+                     ':= fun x y => Hypermath.Trace Hypermath.DStep x y',
+ 'Hypermath.selfRead': 'def Hypermath.selfRead : (x : Hypermath.Form) → Hypermath.DEntry x x := '
+                       'fun x => Hypermath.Trace.nil x',
+ 'Hypermath.dEntryStep': 'def Hypermath.dEntryStep : (x : Hypermath.Form) → Hypermath.Congruent '
+                         '(Hypermath.f2f x) x → Hypermath.DEntry x (Hypermath.f2f x) := fun x h => '
+                         'Hypermath.Trace.cons ⋯ (Hypermath.Trace.nil (Hypermath.f2f x))',
+ 'Hypermath.dEntryCompose': 'def Hypermath.dEntryCompose : {x y z : Hypermath.Form} → '
+                            'Hypermath.DEntry x y → Hypermath.DEntry y z → Hypermath.DEntry x z := '
+                            'fun {x y z} p q => Hypermath.Trace.compose p q',
+ 'Hypermath.reflexionTrace': 'def Hypermath.reflexionTrace : (x : Hypermath.Form) → '
+                             'Hypermath.DEntry x x := fun x => Hypermath.selfRead x'}
+
+PROVED_DECLARATIONS = {'Hypermath.selfReadLength': 'theorem Hypermath.selfReadLength : ∀ (x : Hypermath.Form), Eq '
+                             '(Hypermath.Trace.length (Hypermath.selfRead x)) 0',
+ 'Hypermath.dEntryStepLength': 'theorem Hypermath.dEntryStepLength : ∀ (x : Hypermath.Form) (h : '
+                               'Hypermath.Congruent (Hypermath.f2f x) x), Eq '
+                               '(Hypermath.Trace.length (Hypermath.dEntryStep x h)) 1',
+ 'Hypermath.dEntryEndpointIteration': 'theorem Hypermath.dEntryEndpointIteration : ∀ {x y : '
+                                      'Hypermath.Form} (p : Hypermath.DEntry x y), Eq (Nat.repeat '
+                                      'Hypermath.f2f (Hypermath.Trace.length p) x) y',
+ 'Hypermath.dEntryNoSteps': 'theorem Hypermath.dEntryNoSteps : (∀ (x y : Hypermath.Form), Not '
+                            '(Hypermath.DStep x y)) → ∀ {x y : Hypermath.Form} (p : '
+                            'Hypermath.DEntry x y), And (Eq (Hypermath.Trace.length p) 0) (Eq x y)',
+ 'Hypermath.dIsReflexive': 'theorem Hypermath.dIsReflexive : ∀ (x : Hypermath.Form), Hypermath.D x '
+                           'x',
+ 'Hypermath.dIsTransitive': 'theorem Hypermath.dIsTransitive : ∀ {x y z : Hypermath.Form}, '
+                            'Hypermath.D x y → Hypermath.D y z → Hypermath.D x z',
+ 'Hypermath.reflexionTraceComposeIdentity': 'theorem Hypermath.reflexionTraceComposeIdentity : ∀ '
+                                            '{x y : Hypermath.Form} (p : Hypermath.DEntry x y), '
+                                            'And (Eq (Hypermath.dEntryCompose '
+                                            '(Hypermath.reflexionTrace x) p) p) (Eq '
+                                            '(Hypermath.dEntryCompose p (Hypermath.reflexionTrace '
+                                            'y)) p)'}
+
+TRACE_SOURCE_SHA256 = '82eb4b0d3cfb8a903421686eccddbbe9f9ca63abb70eb4826d4a876911b5cfac'
+
+TRACE_CHECKS_SOURCE_SHA256 = 'f7e8168384b8f56c4a07f29ea21649c91756702a7dc9cd172b0a7ffff29329b2'

@@ -11,6 +11,7 @@ from ._reports import (
     FORMAT,
     REPOSITORY,
     TARGET,
+    TRACE_CHECK_TARGETS,
     dependency_records,
     digest,
     kernel_declarations,
@@ -49,6 +50,7 @@ def evaluate_gate(report, claim="self_derivation", *, require_clean=True) -> boo
         required = {"L0_ground.hm", "L1_relations.hm", "L2_operations.hm", "L3_ordinatics.hm",
                     "lean4/lean-toolchain", "lean4/lakefile.toml", "lean4/Audit.lean",
                     "lean4/Countermodels.lean", "lean4/Hypermath.lean",
+                    "lean4/TraceChecks.lean", "lean4/Hypermath/Trace.lean",
                     "lean4/Hypermath/L0Ground.lean", "lean4/Hypermath/L1Relations.lean",
                     "lean4/Hypermath/L2Operations.lean",
                     "lean4/Hypermath/L3Ordinatics.lean",
@@ -77,7 +79,7 @@ def evaluate_gate(report, claim="self_derivation", *, require_clean=True) -> boo
                 or checks["assumption_policy"]["status"] != "PASS"
                 or checks["assumption_policy"]["attempted"] is not True):
             return False
-        for name in ("lean_build", "dependency_output", "countermodel"):
+        for name in ("lean_build", "dependency_output", "countermodel", "finite_trace"):
             item = checks[name]
             if (item["status"] != "PASS" or item["attempted"] is not True
                     or type(item["exit_code"]) is not int or item["exit_code"] != 0
@@ -120,6 +122,9 @@ def evaluate_gate(report, claim="self_derivation", *, require_clean=True) -> boo
             return False
         countermodels = dependency_records(checks["countermodel"]["output"], COUNTERMODEL_TARGETS)
         if any("sorryAx" in dependencies for dependencies in countermodels.values()):
+            return False
+        traces = dependency_records(checks["finite_trace"]["output"], TRACE_CHECK_TARGETS)
+        if any(dependencies for dependencies in traces.values()):
             return False
         claims = report["claims"]
         if (claims["self_derivation"]["status"] != "PASS"

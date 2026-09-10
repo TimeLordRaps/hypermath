@@ -26,6 +26,11 @@ arithmetic conclusion. The research goal remains in scope. See the
 and the [completeness target](docs/research/FRACTAL_COMPLETENESS.md) for the next
 mathematical obligations.
 
+The [finite-trace repair](docs/research/FINITE_TRACES.md) gives `D` actual finite
+witnesses and proves self-read, composition, and recorded-step preservation.
+It removes one admission and one unconstrained parameter. A checked countermodel
+still separates an endpoint cycle from preservation throughout that cycle.
+
 ## Ground and relations
 
 `Form` names the source's forming structure, `ground` its distinguished base,

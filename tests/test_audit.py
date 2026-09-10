@@ -12,19 +12,27 @@ import pytest
 from hypermath_foundations import audit as audit_module
 from hypermath_foundations import evaluate_gate, run_audit
 from hypermath_foundations.__main__ import legacy_main, main
-from hypermath_foundations._baseline import AXIOM_DECLARATIONS, TARGET_STATEMENT
+from hypermath_foundations._baseline import (
+    AXIOM_DECLARATIONS,
+    DEFINITION_DECLARATIONS,
+    PROVED_DECLARATIONS,
+    TARGET_STATEMENT,
+)
 from hypermath_foundations._inventory import lean_code
 from hypermath_foundations._reports import (
     COUNTERMODEL_TARGETS,
     DEPENDENCY_TARGETS,
     REPOSITORY,
     TARGET,
+    TRACE_CHECK_TARGETS,
 )
 
 
 def dependency_output(*, admitted=False, kind="theorem", missing=None):
     lines = []
-    declarations = {**AXIOM_DECLARATIONS, TARGET: TARGET_STATEMENT + " := proofBody"}
+    declarations = {**AXIOM_DECLARATIONS, **DEFINITION_DECLARATIONS,
+                    **{name: value + " := proofBody" for name, value in PROVED_DECLARATIONS.items()},
+                    TARGET: TARGET_STATEMENT + " := proofBody"}
     for name, declaration in declarations.items():
         if name == TARGET:
             declaration = declaration.replace("theorem ", kind + " ", 1)
@@ -32,7 +40,9 @@ def dependency_output(*, admitted=False, kind="theorem", missing=None):
     for name in DEPENDENCY_TARGETS:
         if name == missing:
             continue
-        deps = "sorryAx" if admitted and name == TARGET else "Hypermath.axGroundSelf"
+        deps = "Hypermath.Form" if name in PROVED_DECLARATIONS else "Hypermath.axGroundSelf"
+        if admitted and name == TARGET:
+            deps = "sorryAx"
         lines.append(f"'{name}' depends on axioms: [{deps}]")
     return "\n".join(lines)
 
@@ -52,6 +62,8 @@ def checkout(tmp_path, monkeypatch):
         "lean4/lakefile.toml": 'name = "Hypermath"', "lean4/Hypermath.lean": "import Hypermath",
         "lean4/Audit.lean": (project / "lean4/Audit.lean").read_text(encoding="utf-8"),
         "lean4/Countermodels.lean": (project / "lean4/Countermodels.lean").read_text(encoding="utf-8"),
+        "lean4/TraceChecks.lean": (project / "lean4/TraceChecks.lean").read_text(encoding="utf-8"),
+        "lean4/Hypermath/Trace.lean": (project / "lean4/Hypermath/Trace.lean").read_text(encoding="utf-8"),
         "lean4/Hypermath/L0Ground.lean": "-- fixture",
         "lean4/Hypermath/L1Relations.lean": "-- fixture",
         "lean4/Hypermath/L2Operations.lean": "-- fixture",
@@ -74,6 +86,8 @@ def checkout(tmp_path, monkeypatch):
             return 0, dependency_output()
         if command[-1] == "Countermodels.lean":
             return 0, countermodel_output()
+        if command[-1] == "TraceChecks.lean":
+            return 0, "\n".join(f"'{name}' does not depend on any axioms" for name in TRACE_CHECK_TARGETS)
         return 0, "Build completed successfully.\n"
 
     monkeypatch.setattr(audit_module, "_run_process", run)
@@ -87,7 +101,7 @@ def test_fresh_success_preserves_relative_assumptions_and_unknown_bridges(checko
     assert report["claims"]["self_derivation"]["status"] == "PASS"
     assert report["claims"]["source_adequacy"]["status"] == "UNKNOWN"
     assert not evaluate_gate(report, "recursive_arithmetic_completeness")
-    assert len(report["declared_assumptions"]) == 69
+    assert len(report["declared_assumptions"]) == 68
     assert str(root) not in json.dumps(report)
 
 
@@ -130,6 +144,7 @@ def test_admitted_target_keeps_build_success_separate(checkout, monkeypatch):
     lambda r: r["subject_after"].update(revision="b" * 40),
     lambda r: r["checks"]["lean_build"].update(exit_code=1),
     lambda r: r["checks"]["countermodel"].update(output=""),
+    lambda r: r["checks"]["finite_trace"].update(output=""),
     lambda r: r["execution"].update(mode="inventory"),
     lambda r: r.update(declared_assumptions=[]),
     lambda r: r["claims"]["source_adequacy"].update(status="PASS"),
@@ -245,6 +260,14 @@ def test_legacy_tool_failure_precedes_remaining_admissions(checkout, monkeypatch
     lambda out: out.replace(TARGET_STATEMENT, f"theorem {TARGET} : True"),
     lambda out: out.replace(AXIOM_DECLARATIONS["Hypermath.axGroundSelf"],
                            "axiom Hypermath.axGroundSelf : False"),
+    lambda out: out.replace(DEFINITION_DECLARATIONS["Hypermath.D"],
+                           "def Hypermath.D : Hypermath.Form → Hypermath.Form → Prop := fun _ _ => True"),
+    lambda out: out.replace(PROVED_DECLARATIONS["Hypermath.dEntryEndpointIteration"],
+                           "theorem Hypermath.dEntryEndpointIteration : True"),
+    lambda out: out.replace("'Hypermath.dIsReflexive' depends on axioms: [Hypermath.Form]",
+                           "'Hypermath.dIsReflexive' depends on axioms: [sorryAx, Hypermath.Form]"),
+    lambda out: out.replace("'Hypermath.dIsReflexive' depends on axioms: [Hypermath.Form]",
+                           "'Hypermath.dIsReflexive' depends on axioms: [Hypermath.axGroundSelf]"),
     lambda out: out.replace("depends on axioms: [Hypermath.axGroundSelf]",
                            "depends on axioms: [Foreign.hiddenOracle]"),
 ])
@@ -263,9 +286,28 @@ def test_changed_statement_or_unreviewed_assumption_is_unknown(checkout, monkeyp
     assert not evaluate_gate(report)
 
 
-def test_replaced_reporter_cannot_authorize_its_own_output(checkout):
+@pytest.mark.parametrize("dependency", ["sorryAx", "Foreign.oracle", "propext"])
+def test_constructive_trace_probes_require_no_axioms(checkout, monkeypatch, dependency):
+    root, _, run = checkout
+
+    def altered(cmd, *args):
+        code, output = run(cmd, *args)
+        if cmd[-1] == "TraceChecks.lean":
+            output = output.replace("does not depend on any axioms",
+                                    f"depends on axioms: [{dependency}]", 1)
+        return code, output
+
+    monkeypatch.setattr(audit_module, "_run_process", altered)
+    report = run_audit(root)
+    assert report["checks"]["finite_trace"]["status"] == "FAIL"
+    assert not report["execution"]["completed"]
+    assert not evaluate_gate(report)
+
+
+@pytest.mark.parametrize("path", ["lean4/Audit.lean", "lean4/Hypermath/Trace.lean", "lean4/TraceChecks.lean"])
+def test_replaced_reporter_or_trace_cannot_authorize_its_own_output(checkout, path):
     root, _, _ = checkout
-    (root / "lean4/Audit.lean").write_text('#eval IO.println "forged report"', encoding="utf-8")
+    (root / path).write_text('#eval IO.println "forged report"', encoding="utf-8")
     report = run_audit(root)
     assert report["checks"]["assumption_policy"]["status"] == "FAIL"
     assert not evaluate_gate(report)
