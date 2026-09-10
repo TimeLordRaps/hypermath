@@ -14,6 +14,7 @@ from ._baseline import (
     DEFINITION_DECLARATIONS,
     FINITE_ACTION_SOURCE_SHA256,
     FULL_MODEL_SOURCE_SHA256,
+    GROUND_CODE_SOURCE_SHA256,
     GROUND_DERIVATION_CHECKS_SOURCE_SHA256,
     GROUND_DERIVATION_SOURCE_SHA256,
     GROUND_SYNTAX_CHECKS_SOURCE_SHA256,
@@ -23,6 +24,8 @@ from ._baseline import (
     OBSERVATION_SOURCE_SHA256,
     PROVED_DECLARATIONS,
     PROVED_DEPENDENCIES,
+    RECORD_ENCODING_CHECKS_SOURCE_SHA256,
+    RECORD_ENCODING_SOURCE_SHA256,
     TARGET_STATEMENT,
     TRACE_CHECKS_SOURCE_SHA256,
     TRACE_SOURCE_SHA256,
@@ -158,6 +161,37 @@ GROUND_DERIVATION_DEPENDENCIES = {
     )},
 }
 GROUND_DERIVATION_TARGETS = tuple(GROUND_DERIVATION_DEPENDENCIES)
+RECORD_ENCODING_DEPENDENCIES = {
+    **{"Hypermath.GroundCode." + name: ["Quot.sound", "propext"] for name in (
+        "unpack_pack", "parse_bits", "decode_code", "decode_toTerm",
+        "code_injective", "toTerm_injective",
+    )},
+    "Hypermath.GroundCode.pack_bounds": ["Classical.choice", "Quot.sound", "propext"],
+    "Hypermath.GroundCode.Tree.bits_length": ["propext"],
+    **{"Hypermath.RecordEncoding." + name: ["propext"] for name in (
+        "readTerm_termTree", "readTag_number",
+    )},
+    **{"Hypermath.RecordEncoding." + name: ["Quot.sound", "propext"] for name in (
+        "readStatement_statementTree", "readFormula_formulaTree", "readRecord_recordTree",
+        "decode_recordCode", "decode_formulaCode", "decodeFormula_recordCode",
+        "decodeRecord_formulaCode", "recordCode_injective", "observe_recordCode",
+        "decode_recordTerm", "decode_formulaTerm", "checkNumbers_codes", "checkTerms_terms",
+        "checkNumbers_sound", "checkTerms_quote", "recordTerm_injective", "observe_recordTerm",
+        "joinCodes_recordCode", "semantic_record_recovery",
+    )},
+    **{"Hypermath.RecordEncodingChecks." + name: ["Quot.sound", "propext"] for name in (
+        "packed_separation_checked", "wrong_claim_rejected",
+        "encoded_projection_cannot_hide_failure", "repeated_record_checked",
+        "empty_code_rejected", "incomplete_tree_rejected", "trailing_bits_rejected",
+        "invalid_inputs_rejected", "invalid_join_rejected",
+    )},
+    **{"Hypermath.RecordEncodingChecks." + name: [] for name in (
+        "no_parse_fuel", "unknown_formula_tag_rejected", "unknown_record_tag_rejected",
+        "wrong_formula_arity_rejected", "wrong_record_arity_rejected",
+        "malformed_primitive_rejected", "malformed_tag_rejected",
+    )},
+}
+RECORD_ENCODING_TARGETS = tuple(RECORD_ENCODING_DEPENDENCIES)
 FULL_MODEL_TARGETS = tuple("HypermathFullAxiomModel." + name for name in (
     "full_axioms_hold", "finite_numerals_injective", "boundary_probe",
 ))
@@ -184,7 +218,8 @@ PROBE_TARGETS = {"countermodel": COUNTERMODEL_TARGETS, "finite_trace": TRACE_CHE
                  "observation": OBSERVATION_TARGETS, "full_model": FULL_MODEL_TARGETS,
                  "finite_action": ACTION_COUNTERMODEL_TARGETS,
                  "ground_syntax": GROUND_SYNTAX_TARGETS,
-                 "ground_derivation": GROUND_DERIVATION_TARGETS}
+                 "ground_derivation": GROUND_DERIVATION_TARGETS,
+                 "record_encoding": RECORD_ENCODING_TARGETS}
 
 
 def probe_dependencies_valid(name: str, records: dict[str, list[str]]) -> bool:
@@ -196,6 +231,8 @@ def probe_dependencies_valid(name: str, records: dict[str, list[str]]) -> bool:
         return records == GROUND_SYNTAX_DEPENDENCIES
     if name == "ground_derivation":
         return records == GROUND_DERIVATION_DEPENDENCIES
+    if name == "record_encoding":
+        return records == RECORD_ENCODING_DEPENDENCIES
     allowed = LEAN_BUILTINS if name in {"countermodel", "full_model"} else frozenset()
     return all(dep in allowed for deps in records.values() for dep in deps)
 
@@ -313,4 +350,10 @@ def policy_errors(output: str, inputs: dict, assumptions: list[dict]) -> list[st
         reasons.append("composed ground calculus differs from the reviewed construction")
     if inputs.get("lean4/GroundDerivationChecks.lean") != GROUND_DERIVATION_CHECKS_SOURCE_SHA256:
         reasons.append("composed ground checks differ from the reviewed probes")
+    if inputs.get("lean4/Hypermath/GroundCode.lean") != GROUND_CODE_SOURCE_SHA256:
+        reasons.append("ground tree encoding differs from the reviewed construction")
+    if inputs.get("lean4/Hypermath/RecordEncoding.lean") != RECORD_ENCODING_SOURCE_SHA256:
+        reasons.append("record encoding differs from the reviewed construction")
+    if inputs.get("lean4/RecordEncodingChecks.lean") != RECORD_ENCODING_CHECKS_SOURCE_SHA256:
+        reasons.append("record encoding checks differ from the reviewed probes")
     return reasons

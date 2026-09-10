@@ -86,16 +86,17 @@ hidden assumptions, admissions, or failed execution. The primitive fragment's
 23 reports remain a separate group. The broader translation still has
 67 declared assumptions and 16 admissions.
 
-These composed records are structured finite rule trees. Unlike the primitive
-fragment's unary code, they have not yet been encoded as a single ground term
-or semantic `Form`. The predicates, formula constructors, and checker are not
+The [record encoding](RECORD_ENCODING.md) now represents these finite rule
+trees and formulas as single free ground terms, with packed numerical inputs
+for execution and checked full recovery. Interpretation as semantic `Form`
+still requires a proved recovery condition. The predicates and checker are not
 internally reified, and there is no native derivation of a ranked acceptance
 statement. Repetition of a record inside a tree makes no sharing or compression
 claim. There is no arithmetic interpretation, transfinite generation rule, or
 coverage theorem here.
 
-The next realization step is a faithful native encoding of the composed records
-and their statement/checking operations, with preservation after interpretation.
+The next realization step is faithful interpretation of the encoded records
+and internal representation of their statement/checking operations.
 It must retain the evidenced rule tree or prove the exact weaker observation
 criterion it needs. A separate source-derived acceptance construction must
 then satisfy the ranked interface; host-level reconstruction does not supply it.
