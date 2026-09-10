@@ -5,7 +5,9 @@ The finite-trace repair removes D from the allowance: its reviewed definitions
 and constructive milestone statements are bound separately below. The remaining
 67 declarations retain their original meaning. The finite ground closure is now
 defined as well; the refuted universal ground-spanning statement is only a claim.
-The reporter only requests kernel observations; it adds no assumptions.
+Three unconstrained ordinal-computation theorems are now retained as claims after
+a full-clause model refuted them. The reporter only requests kernel observations;
+it adds no assumptions.
 Changes to this policy require explicit mathematical review, not regeneration
 as an automatic response to a failing gate.
 """
@@ -156,7 +158,7 @@ AXIOM_DECLARATIONS = {'Hypermath.Congruent': 'axiom Hypermath.Congruent : Hyperm
 
 TARGET_STATEMENT = 'theorem Hypermath.selfDerivation : And (Hypermath.structContinues Hypermath.ground Hypermath.ground) (And (∀ (x : Hypermath.Form), Hypermath.D x x) (And (∀ (p : Hypermath.DerivationPath), And (Hypermath.congruentPath (Hypermath.compose p Hypermath.pathGround) p) (Hypermath.congruentPath (Hypermath.compose Hypermath.pathGround p) p)) (Hypermath.Simulation (Hypermath.f2f (Hypermath.f2f Hypermath.deriver)) Hypermath.deriver)))'
 
-AUDIT_SOURCE_SHA256 = 'ee0da7052ee67a4d239a9a2cffcb07d684f5db49e07206117711aa76fb26a793'
+AUDIT_SOURCE_SHA256 = '9147815a4e8363b9e8b2130e7a3501ea3fa1a38d3a7ee07236d2226a433dfd04'
 COUNTERMODEL_SOURCE_SHA256 = 'b822d53b244418db1c3a505332b6090d9da72bc6e0fe3ce620bd9e5c5413adc7'
 LEAN_BUILTINS = frozenset({"propext", "Classical.choice", "Quot.sound"})
 
@@ -385,3 +387,75 @@ OBSERVATION_SOURCE_SHA256 = '47bc700f98d3da378ddca6600d86e9c699c4b93e86d3629a2ab
 OBSERVATION_CHECKS_SOURCE_SHA256 = 'eb358969af52b4445c81cb390a0047523e893ec2fc3577021d82d4908e824d60'
 
 FULL_MODEL_SOURCE_SHA256 = 'd5bffd8e7b9fd8714b6759e90e0ec135001a55c1c86e7de076d1bf3d6dbb969d'
+
+# Reviewed finite-action criterion and retained ordinal computation claims.
+DEFINITION_DECLARATIONS.update({
+    'Hypermath.ordinalZeroIdentityClaim':
+        'def Hypermath.ordinalZeroIdentityClaim : Prop := ∀ (x : Hypermath.Form), '
+        'Hypermath.Congruent (Hypermath.ordinalApply Hypermath.ground x) x',
+    'Hypermath.ordinalSuccAppliesClaim':
+        'def Hypermath.ordinalSuccAppliesClaim : Prop := ∀ (p x : Hypermath.Form), '
+        'Hypermath.Congruent (Hypermath.ordinalApply (Hypermath.ordinalSucc p) x) '
+        '(Hypermath.f2f (Hypermath.ordinalApply p x))',
+    'Hypermath.pathLengthArithmeticClaim':
+        'def Hypermath.pathLengthArithmeticClaim : Prop := ∀ (p q : '
+        'Hypermath.DerivationPath), Hypermath.Congruent (Hypermath.pathLength '
+        '(Hypermath.compose p q)) (Hypermath.ordinalApply (Hypermath.pathLength q) '
+        '(Hypermath.pathLength p))',
+    'Hypermath.FiniteNumeralEq':
+        'def Hypermath.FiniteNumeralEq : Nat → Nat → Prop := fun m n => Eq '
+        '(Hypermath.finiteApplyPosition m) (Hypermath.finiteApplyPosition n)',
+    'Hypermath.FiniteActionCompatible':
+        'def Hypermath.FiniteActionCompatible : Prop := ∀ (m n : Nat), '
+        'Hypermath.FiniteNumeralEq m n → ∀ (x : Hypermath.Form), Eq '
+        '(Nat.repeat Hypermath.f2f m x) (Nat.repeat Hypermath.f2f n x)',
+    'Hypermath.ExactFiniteAction':
+        'def Hypermath.ExactFiniteAction : (Hypermath.Form → Hypermath.Form → '
+        'Hypermath.Form) → Prop := fun action => ∀ (n : Nat) (x : Hypermath.Form), '
+        'Eq (action (Hypermath.finiteApplyPosition n) x) (Nat.repeat Hypermath.f2f n x)',
+    'Hypermath.hostFiniteAction':
+        'def Hypermath.hostFiniteAction : Hypermath.Form → Hypermath.Form → '
+        'Hypermath.Form := Hypermath.FiniteAction.chosenAction Hypermath.f2f Hypermath.ground',
+})
+
+PROVED_DECLARATIONS.update({
+    'Hypermath.finiteNumeralEq_action_on_finite_orbit':
+        'theorem Hypermath.finiteNumeralEq_action_on_finite_orbit : ∀ {m n : Nat}, '
+        'Hypermath.FiniteNumeralEq m n → ∀ (k : Nat), Eq (Nat.repeat Hypermath.f2f m '
+        '(Hypermath.finiteApplyPosition k)) (Nat.repeat Hypermath.f2f n '
+        '(Hypermath.finiteApplyPosition k))',
+    'Hypermath.finiteNumeralEq_add':
+        'theorem Hypermath.finiteNumeralEq_add : ∀ {m n p q : Nat}, '
+        'Hypermath.FiniteNumeralEq m n → Hypermath.FiniteNumeralEq p q → '
+        'Hypermath.FiniteNumeralEq (HAdd.hAdd m p) (HAdd.hAdd n q)',
+    'Hypermath.exactFiniteAction_implies_compatible':
+        'theorem Hypermath.exactFiniteAction_implies_compatible : ∀ {action : '
+        'Hypermath.Form → Hypermath.Form → Hypermath.Form}, '
+        'Hypermath.ExactFiniteAction action → Hypermath.FiniteActionCompatible',
+    'Hypermath.hostFiniteAction_exact':
+        'theorem Hypermath.hostFiniteAction_exact : Hypermath.FiniteActionCompatible → '
+        'Hypermath.ExactFiniteAction Hypermath.hostFiniteAction',
+    'Hypermath.finiteActionCompatible_iff_exists_exact':
+        'theorem Hypermath.finiteActionCompatible_iff_exists_exact : Iff '
+        'Hypermath.FiniteActionCompatible (Exists fun action => '
+        'Hypermath.ExactFiniteAction action)',
+})
+
+PROVED_DEPENDENCIES.update({
+    'Hypermath.finiteNumeralEq_action_on_finite_orbit':
+        ('Hypermath.Form', 'Hypermath.f2f', 'Hypermath.ground'),
+    'Hypermath.finiteNumeralEq_add':
+        ('Hypermath.Form', 'Hypermath.f2f', 'Hypermath.ground'),
+    'Hypermath.exactFiniteAction_implies_compatible':
+        ('Hypermath.Form', 'Hypermath.f2f', 'Hypermath.ground'),
+    'Hypermath.hostFiniteAction_exact':
+        ('Classical.choice', 'Hypermath.Form', 'Hypermath.f2f', 'Hypermath.ground',
+         'Quot.sound', 'propext'),
+    'Hypermath.finiteActionCompatible_iff_exists_exact':
+        ('Classical.choice', 'Hypermath.Form', 'Hypermath.f2f', 'Hypermath.ground',
+         'Quot.sound', 'propext'),
+})
+
+FINITE_ACTION_SOURCE_SHA256 = 'e58280684f5cc48a8a198e941bdfa02a5377edd54f2e56575b614d6141d74a85'
+
+ACTION_COUNTERMODEL_SOURCE_SHA256 = 'e69828ed877b31781f1c492f530939eaa016049ca032769bacc643f4382916e0'

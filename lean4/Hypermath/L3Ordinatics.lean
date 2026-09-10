@@ -190,35 +190,23 @@ theorem notGroundSpanningClaim : ¬ groundSpanningClaim := by
     ordinalApply(ordinalLimit)(x) = limit ordinal Form constructed from x. -/
 axiom ordinalApply : Form → Form → Form
 
-/-- ordinalApply(ground)(x) =~ x: zero steps = =~-identity. FORM. -/
-theorem ordinalZeroIdentity : ∀ x : Form, ordinalApply ground x =~ x := by
-  sorry
-  -- FORM: 0-step application is identity at =~.
-  -- ordinalApply(ground)(x) corresponds to compose(pathGround, x-path).
-  -- pathGroundIsIdentity (L2): compose(pathGround, p) congruentPath p.
-  -- Therefore end Form is =~-congruent to x.
+/-- The source's proposed zero-action law. It remains a named proposition rather
+    than an admitted theorem: ordinalApply has no declared computation clause. -/
+def ordinalZeroIdentityClaim : Prop :=
+  ∀ x : Form, ordinalApply ground x =~ x
 
-/-- ordinalApply(ordinalSucc(p))(x) =~ f2f(ordinalApply(p)(x)). FORM. -/
-theorem ordinalSuccApplies :
-    ∀ p x : Form,
-      ordinalApply (ordinalSucc p) x =~ f2f (ordinalApply p x) := by
-  sorry
-  -- FORM: ordinalSucc(p) = one more step beyond p (axSuccExtends).
-  -- ordinalApply at the successor = one more f2f-step beyond the p-stage.
+/-- The source's proposed successor-action law. The current logical clauses do
+    not connect ordinalSucc and ordinalApply strongly enough to derive it. -/
+def ordinalSuccAppliesClaim : Prop :=
+  ∀ p x : Form,
+    ordinalApply (ordinalSucc p) x =~ f2f (ordinalApply p x)
 
-/-- path-length is ordinal-additive over compose. FORM.
-    Discharges L2 FRAME compositionLengthAdditive_FRAME. -/
-theorem pathLengthArithmetic :
-    ∀ p q : DerivationPath,
-      pathLength (compose p q) =~ ordinalApply (pathLength q) (pathLength p) := by
-  sorry
-  -- FORM:
-  -- 1. pathLength(p) =~ f2f^n(ground) for n = |p| (ordinalApply encodes n).
-  -- 2. pathLength(q) =~ f2f^m(ground) for m = |q|.
-  -- 3. pathLength(compose(p)(q)) =~ f2f^{n+m}(ground).
-  -- 4. ordinalApply(f2f^m(ground))(f2f^n(ground)) = f2f^{n+m}(ground)
-  --    by ordinalSuccApplies iterated m times. FORM.
-  -- Discharges L2 FRAME.
+/-- The source's proposed path-length arithmetic law, including its operand order.
+    A checked full-clause model refutes this proposition, so it cannot discharge
+    the L2 FRAME without an additional bridge. -/
+def pathLengthArithmeticClaim : Prop :=
+  ∀ p q : DerivationPath,
+    pathLength (compose p q) =~ ordinalApply (pathLength q) (pathLength p)
 
 -- ============================================================================
 -- §V  Simulation-Pair-Exists Closure
@@ -348,8 +336,8 @@ theorem selfDerivation :
 -- Step 3-4:   ordinalLimit, ordinalSucc declared — FORM.
 -- Step 5-8:   axLimitNotFinite, axLimitDerives, axSuccExtends, axLimitIsLimit — FORM.
 -- Step 9-10:  finiteApplyFromGround, ordinalApply declared — FORM.
--- Step 11-13: ordinalZeroIdentity, ordinalSuccApplies, pathLengthArithmetic — FORM.
---             (step 13 discharges L2 FRAME compositionLengthAdditive_FRAME)
+-- Step 11-13: the source proposes ordinal zero, successor, and path-length laws.
+--             They remain explicit claims; a full-clause model refutes all three.
 -- Step 14:    simulationPairExists — FORM. Discharges L1 step 10.
 -- Step 15:    driverCycleIsClosed — FORM. Discharges L1 steps 21, 25.
 -- Step 16:    congruentPathInternals — FORM. Discharges L2 FRAME.

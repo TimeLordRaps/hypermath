@@ -53,6 +53,8 @@ def evaluate_gate(report, claim="self_derivation", *, require_clean=True) -> boo
                     "lean4/TraceChecks.lean", "lean4/Hypermath/Trace.lean",
                     "lean4/ObservationChecks.lean", "lean4/Hypermath/Observation.lean",
                     "lean4/FullAxiomModel.lean",
+                    "lean4/Hypermath/FiniteAction.lean",
+                    "lean4/FiniteActionCountermodel.lean",
                     "lean4/Hypermath/L0Ground.lean", "lean4/Hypermath/L1Relations.lean",
                     "lean4/Hypermath/L2Operations.lean",
                     "lean4/Hypermath/L3Ordinatics.lean",

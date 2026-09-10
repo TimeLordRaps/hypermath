@@ -7,10 +7,12 @@ import json
 import re
 
 from ._baseline import (
+    ACTION_COUNTERMODEL_SOURCE_SHA256,
     AUDIT_SOURCE_SHA256,
     AXIOM_DECLARATIONS,
     COUNTERMODEL_SOURCE_SHA256,
     DEFINITION_DECLARATIONS,
+    FINITE_ACTION_SOURCE_SHA256,
     FULL_MODEL_SOURCE_SHA256,
     LEAN_BUILTINS,
     OBSERVATION_CHECKS_SOURCE_SHA256,
@@ -30,7 +32,7 @@ DEPENDENCY_TARGETS = (
     "Hypermath.orbitStructure", "Hypermath.similarReflexive",
     "Hypermath.derivesIsDirectional", "Hypermath.dIsReflexive",
     "Hypermath.plusAndAdditionallyAreDistinct", "Hypermath.pathGroundIsIdentity",
-    "Hypermath.pathLengthArithmetic", "Hypermath.simulationPairExists",
+    "Hypermath.simulationPairExists",
     "Hypermath.driverCycleIsClosed", TARGET,
     *[name for name in PROVED_DECLARATIONS if name != "Hypermath.dIsReflexive"],
 )
@@ -84,11 +86,25 @@ CLAIMS = ("self_derivation", "source_adequacy", "recursive_arithmetic_completene
 FULL_MODEL_TARGETS = tuple("HypermathFullAxiomModel." + name for name in (
     "full_axioms_hold", "finite_numerals_injective", "boundary_probe",
 ))
+ACTION_COUNTERMODEL_TARGETS = tuple("HypermathFiniteActionCountermodel." + name for name in (
+    "full_axioms_hold", "numeral_collision", "action_disagreement",
+    "finite_action_incompatible", "no_exact_finite_action", "congruence_is_equivalence",
+    "relation_action_incompatible", "no_congruent_finite_action",
+    "ordinal_zero_identity_claim_fails", "ordinal_successor_action_claim_fails",
+    "path_length_arithmetic_claim_fails",
+))
+ACTION_COUNTERMODEL_DEPENDENCIES = {
+    name: (["Quot.sound", "propext"] if name.endswith(".full_axioms_hold") else [])
+    for name in ACTION_COUNTERMODEL_TARGETS
+}
 PROBE_TARGETS = {"countermodel": COUNTERMODEL_TARGETS, "finite_trace": TRACE_CHECK_TARGETS,
-                 "observation": OBSERVATION_TARGETS, "full_model": FULL_MODEL_TARGETS}
+                 "observation": OBSERVATION_TARGETS, "full_model": FULL_MODEL_TARGETS,
+                 "finite_action": ACTION_COUNTERMODEL_TARGETS}
 
 
 def probe_dependencies_valid(name: str, records: dict[str, list[str]]) -> bool:
+    if name == "finite_action":
+        return records == ACTION_COUNTERMODEL_DEPENDENCIES
     allowed = LEAN_BUILTINS if name in {"countermodel", "full_model"} else frozenset()
     return all(dep in allowed for deps in records.values() for dep in deps)
 
@@ -100,14 +116,21 @@ def digest(value: dict) -> str:
 
 def dependency_records(output: str, expected: tuple[str, ...]) -> dict[str, list[str]]:
     records = {}
-    pattern = r"'([^'\n]+)' (?:depends on axioms:\s*\[([^\]]*)\]|does not depend on any axioms)"
-    for match in re.finditer(pattern, output):
+    pattern = r"(?m)^'([^'\n]+)' (?:depends on axioms:\s*\[([^\]]*)\]|does not depend on any axioms)"
+    report_prefix = r"(?m)^'[^'\n]+' (?:depends on axioms:|does not depend on any axioms)"
+    matches = list(re.finditer(pattern, output))
+    if len(matches) != len(re.findall(report_prefix, output)):
+        raise ValueError("malformed dependency record")
+    for match in matches:
         name = match.group(1)
         if name in records:
             raise ValueError("duplicate dependency record")
-        deps = [] if match.group(2) is None else [
-            item.strip() for item in match.group(2).split(",") if item.strip()
-        ]
+        if match.group(2) is None:
+            deps = []
+        else:
+            deps = [item.strip() for item in match.group(2).split(",")]
+            if not deps or any(not item for item in deps):
+                raise ValueError("empty axiom dependency")
         if any(not re.fullmatch(r"[\w.]+", item) for item in deps):
             raise ValueError("malformed axiom name")
         if len(deps) != len(set(deps)):
@@ -187,4 +210,8 @@ def policy_errors(output: str, inputs: dict, assumptions: list[dict]) -> list[st
         reasons.append("observation checks differ from the reviewed probes")
     if inputs.get("lean4/FullAxiomModel.lean") != FULL_MODEL_SOURCE_SHA256:
         reasons.append("full axiom model differs from the reviewed model")
+    if inputs.get("lean4/Hypermath/FiniteAction.lean") != FINITE_ACTION_SOURCE_SHA256:
+        reasons.append("finite action criterion differs from the reviewed construction")
+    if inputs.get("lean4/FiniteActionCountermodel.lean") != ACTION_COUNTERMODEL_SOURCE_SHA256:
+        reasons.append("finite action countermodel differs from the reviewed model")
     return reasons
