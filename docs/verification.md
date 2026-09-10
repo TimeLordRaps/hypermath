@@ -64,6 +64,8 @@ parameter/axiom declarations. A new assumption, weakened target, or substituted
 reporter cannot pass by merely removing `sorry`. These declaration identities
 are a review baseline, not a consistency proof. Changing the mathematical basis
 requires reviewing that policy along with the corresponding source changes.
+The byte-bound Python package and Lean reporters use explicit line-feed endings
+so Windows checkouts and Linux-built wheels share the same source identities.
 
 ## VSTD boundary
 
