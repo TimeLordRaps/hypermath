@@ -13,7 +13,7 @@ python -u audit.py
 
 The command prints source counts, performs a verbose build, reports the transitive
 axiom dependencies of selected central declarations, checks independent finite
-countermodels, and checks constructive finite trace examples. Each subprocess
+countermodels, finite traces, observations, and a model of all logical clauses. Each subprocess
 has a 60-second timeout, output streams as
 it arrives, and a silent subprocess receives a progress observation after 40 seconds.
 Use `--timeout 90` to adjust the bound or `--lake PATH` to select the Lake executable.
@@ -44,8 +44,11 @@ The remaining 38 declarations are the translation's logical axiom clauses.
 
 The [finite-trace repair](../docs/research/FINITE_TRACES.md) subsequently replaces
 the `D` parameter with its finite congruence-preserving witness definition.
-There are now 30 source parameters, 38 logical clauses, and 20 admissions. It
-constructively proves `dIsReflexive` without changing its proposition-level API.
+It constructively proves `dIsReflexive` without changing its proposition-level API.
+The subsequent [finite arithmetic repair](../docs/research/FINITE_ARITHMETIC.md)
+defines the finite ground closure and refutes the universal ground-spanning
+claim. There are now 29 source parameters, 38 logical clauses, and 19 admissions;
+the last admission decrease is withdrawal of a refuted theorem.
 
 Missing external `ℕ`/iteration notation was replaced by Lean core `Nat` and
 `Nat.repeat`. `orbitStructure` now uses the already declared `traceLevels` axiom
@@ -76,6 +79,12 @@ These are missing-implication witnesses for the stated prefix. They are not mode
 of all later L2/L3 assumptions and do not refute every possible completion of the
 intended theory. Future changes to those axiom clauses require updating and reviewing
 the countermodel correspondence.
+
+`FullAxiomModel.lean` separately checks all 38 declared logical clauses in an
+explicit two-chain interpretation. It excludes admitted theorems and stronger
+prose glosses; its vacuous upper-bound implication and opaque path endpoints
+make the remaining specification gaps visible. `ObservationChecks.lean` checks
+that endpoint-only observations can lose path length while retained traces keep it.
 
 `Audit.lean` prints dependencies without exporting its report as library theorems.
 In particular, `Hypermath.selfDerivation` currently depends on `sorryAx` through

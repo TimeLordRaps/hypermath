@@ -3,7 +3,8 @@
 Initially captured with Lean 4.14.0 at revision db141d669491ce6b51d7fe15602c0925398f3154.
 The finite-trace repair removes D from the allowance: its reviewed definitions
 and constructive milestone statements are bound separately below. The remaining
-68 declarations retain their original meaning; consistency is not established.
+67 declarations retain their original meaning. The finite ground closure is now
+defined as well; the refuted universal ground-spanning statement is only a claim.
 The reporter only requests kernel observations; it adds no assumptions.
 Changes to this policy require explicit mathematical review, not regeneration
 as an automatic response to a failing gate.
@@ -130,7 +131,6 @@ AXIOM_DECLARATIONS = {'Hypermath.Congruent': 'axiom Hypermath.Congruent : Hyperm
                                 'Hypermath.Congruent x y → Hypermath.Similar x y',
  'Hypermath.filtrationSimCong': 'axiom Hypermath.filtrationSimCong : ∀ (x y : Hypermath.Form), '
                                 'Hypermath.Simulation x y → Hypermath.Congruent x y',
- 'Hypermath.finiteApplyFromGround': 'axiom Hypermath.finiteApplyFromGround : Hypermath.Form → Prop',
  'Hypermath.ground': 'axiom Hypermath.ground : Hypermath.Form',
  'Hypermath.ordinalApply': 'axiom Hypermath.ordinalApply : Hypermath.Form → Hypermath.Form → '
                            'Hypermath.Form',
@@ -156,7 +156,7 @@ AXIOM_DECLARATIONS = {'Hypermath.Congruent': 'axiom Hypermath.Congruent : Hyperm
 
 TARGET_STATEMENT = 'theorem Hypermath.selfDerivation : And (Hypermath.structContinues Hypermath.ground Hypermath.ground) (And (∀ (x : Hypermath.Form), Hypermath.D x x) (And (∀ (p : Hypermath.DerivationPath), And (Hypermath.congruentPath (Hypermath.compose p Hypermath.pathGround) p) (Hypermath.congruentPath (Hypermath.compose Hypermath.pathGround p) p)) (Hypermath.Simulation (Hypermath.f2f (Hypermath.f2f Hypermath.deriver)) Hypermath.deriver)))'
 
-AUDIT_SOURCE_SHA256 = '1ff961b08b043d2bad3aeda482665f08d58d2158c165d03d6ae18770852d1724'
+AUDIT_SOURCE_SHA256 = 'ee0da7052ee67a4d239a9a2cffcb07d684f5db49e07206117711aa76fb26a793'
 COUNTERMODEL_SOURCE_SHA256 = 'b822d53b244418db1c3a505332b6090d9da72bc6e0fe3ce620bd9e5c5413adc7'
 LEAN_BUILTINS = frozenset({"propext", "Classical.choice", "Quot.sound"})
 
@@ -203,3 +203,185 @@ PROVED_DECLARATIONS = {'Hypermath.selfReadLength': 'theorem Hypermath.selfReadLe
 TRACE_SOURCE_SHA256 = '82eb4b0d3cfb8a903421686eccddbbe9f9ca63abb70eb4826d4a876911b5cfac'
 
 TRACE_CHECKS_SOURCE_SHA256 = 'f7e8168384b8f56c4a07f29ea21649c91756702a7dc9cd172b0a7ffff29329b2'
+
+# Reviewed least finite closure and Form-valued observations.
+DEFINITION_DECLARATIONS.update({'Hypermath.groundSpanningClaim': 'def Hypermath.groundSpanningClaim : Prop := ∀ (y : '
+                                  'Hypermath.Form), Hypermath.D Hypermath.ground y',
+ 'Hypermath.finiteApplyPosition': 'def Hypermath.finiteApplyPosition : Nat → Hypermath.Form := fun '
+                                  'n => Nat.repeat Hypermath.f2f n Hypermath.ground',
+ 'Hypermath.finiteApplyFromGround': 'def Hypermath.finiteApplyFromGround : Hypermath.Form → Prop '
+                                    ':= fun x => Exists fun n => Eq (Hypermath.finiteApplyPosition '
+                                    'n) x',
+ 'Hypermath.finiteTraceLength': 'def Hypermath.finiteTraceLength : {x y : Hypermath.Form} → '
+                                'Hypermath.DEntry x y → Hypermath.Form := fun {x y} p => '
+                                'Hypermath.finiteApplyPosition (Hypermath.Trace.length p)'})
+
+PROVED_DECLARATIONS.update({'Hypermath.finiteApplyIffIteration': 'theorem Hypermath.finiteApplyIffIteration : ∀ (x : '
+                                      'Hypermath.Form), Iff (Hypermath.finiteApplyFromGround x) '
+                                      '(Exists fun n => Eq (Nat.repeat Hypermath.f2f n '
+                                      'Hypermath.ground) x)',
+ 'Hypermath.finiteApplyGround': 'theorem Hypermath.finiteApplyGround : '
+                                'Hypermath.finiteApplyFromGround Hypermath.ground',
+ 'Hypermath.finiteApplyPositionMember': 'theorem Hypermath.finiteApplyPositionMember : ∀ (n : '
+                                        'Nat), Hypermath.finiteApplyFromGround '
+                                        '(Hypermath.finiteApplyPosition n)',
+ 'Hypermath.finiteApplyClosed': 'theorem Hypermath.finiteApplyClosed : ∀ {x : Hypermath.Form}, '
+                                'Hypermath.finiteApplyFromGround x → '
+                                'Hypermath.finiteApplyFromGround (Hypermath.f2f x)',
+ 'Hypermath.finiteApplyMinimal': 'theorem Hypermath.finiteApplyMinimal : ∀ (P : Hypermath.Form → '
+                                 'Prop), P Hypermath.ground → (∀ (x : Hypermath.Form), P x → P '
+                                 '(Hypermath.f2f x)) → ∀ {x : Hypermath.Form}, '
+                                 'Hypermath.finiteApplyFromGround x → P x',
+ 'Hypermath.finiteApplyIterationAdd': 'theorem Hypermath.finiteApplyIterationAdd : ∀ (m n : Nat) '
+                                      '(x : Hypermath.Form), Eq (Nat.repeat Hypermath.f2f '
+                                      '(HAdd.hAdd m n) x) (Nat.repeat Hypermath.f2f n (Nat.repeat '
+                                      'Hypermath.f2f m x))',
+ 'Hypermath.finiteTraceLengthMember': 'theorem Hypermath.finiteTraceLengthMember : ∀ {x y : '
+                                      'Hypermath.Form} (p : Hypermath.DEntry x y), '
+                                      'Hypermath.finiteApplyFromGround '
+                                      '(Hypermath.finiteTraceLength p)',
+ 'Hypermath.finiteTraceLengthSelfRead': 'theorem Hypermath.finiteTraceLengthSelfRead : ∀ (x : '
+                                        'Hypermath.Form), Eq (Hypermath.finiteTraceLength '
+                                        '(Hypermath.selfRead x)) Hypermath.ground',
+ 'Hypermath.finiteTraceLengthStep': 'theorem Hypermath.finiteTraceLengthStep : ∀ (x : '
+                                    'Hypermath.Form) (h : Hypermath.Congruent (Hypermath.f2f x) '
+                                    'x), Eq (Hypermath.finiteTraceLength (Hypermath.dEntryStep x '
+                                    'h)) (Hypermath.f2f Hypermath.ground)',
+ 'Hypermath.finiteTraceLengthCompose': 'theorem Hypermath.finiteTraceLengthCompose : ∀ {x y z : '
+                                       'Hypermath.Form} (p : Hypermath.DEntry x y) (q : '
+                                       'Hypermath.DEntry y z), Eq (Hypermath.finiteTraceLength '
+                                       '(Hypermath.dEntryCompose p q)) (Nat.repeat Hypermath.f2f '
+                                       '(Hypermath.Trace.length q) (Hypermath.finiteTraceLength '
+                                       'p))',
+ 'Hypermath.finiteTraceLengthExpand': 'theorem Hypermath.finiteTraceLengthExpand : ∀ {x y : '
+                                      'Hypermath.Form} (e : Hypermath.TraceExpr Hypermath.DStep x '
+                                      'y), Eq (Hypermath.finiteTraceLength e.expand) '
+                                      '(Hypermath.finiteApplyPosition e.length)',
+ 'Hypermath.finiteTraceLengthExpandSeq': 'theorem Hypermath.finiteTraceLengthExpandSeq : ∀ {x y z '
+                                         ': Hypermath.Form} (p : Hypermath.TraceExpr '
+                                         'Hypermath.DStep x y) (q : Hypermath.TraceExpr '
+                                         'Hypermath.DStep y z), Eq (Hypermath.finiteTraceLength '
+                                         '(p.seq q).expand) (Nat.repeat Hypermath.f2f q.length '
+                                         '(Hypermath.finiteApplyPosition p.length))',
+ 'Hypermath.dEntryFromGroundFinite': 'theorem Hypermath.dEntryFromGroundFinite : ∀ {y : '
+                                     'Hypermath.Form}, Hypermath.DEntry Hypermath.ground y → '
+                                     'Hypermath.finiteApplyFromGround y',
+ 'Hypermath.finiteApplyPositionSimulation': 'theorem Hypermath.finiteApplyPositionSimulation : ∀ '
+                                            '(n : Nat), Hypermath.Simulation '
+                                            '(Hypermath.finiteApplyPosition n) '
+                                            '(Hypermath.finiteApplyPosition n)',
+ 'Hypermath.finiteApplyLimitExcluded': 'theorem Hypermath.finiteApplyLimitExcluded : Not '
+                                       '(Hypermath.finiteApplyFromGround Hypermath.ordinalLimit)',
+ 'Hypermath.ordinalLimitNotInD': 'theorem Hypermath.ordinalLimitNotInD : Not (Hypermath.D '
+                                 'Hypermath.ground Hypermath.ordinalLimit)',
+ 'Hypermath.notGroundSpanningClaim': 'theorem Hypermath.notGroundSpanningClaim : Not '
+                                     'Hypermath.groundSpanningClaim'})
+
+# Exact dependencies distinguish pure constructions from source-relative refutations.
+PROVED_DEPENDENCIES = {'Hypermath.selfReadLength': ('Hypermath.Congruent', 'Hypermath.Form', 'Hypermath.f2f'),
+ 'Hypermath.dEntryStepLength': ('Hypermath.Congruent', 'Hypermath.Form', 'Hypermath.f2f'),
+ 'Hypermath.dEntryEndpointIteration': ('Hypermath.Congruent', 'Hypermath.Form', 'Hypermath.f2f'),
+ 'Hypermath.dEntryNoSteps': ('Hypermath.Congruent', 'Hypermath.Form', 'Hypermath.f2f'),
+ 'Hypermath.dIsReflexive': ('Hypermath.Congruent', 'Hypermath.Form', 'Hypermath.f2f'),
+ 'Hypermath.dIsTransitive': ('Hypermath.Congruent', 'Hypermath.Form', 'Hypermath.f2f'),
+ 'Hypermath.reflexionTraceComposeIdentity': ('Hypermath.Congruent',
+                                             'Hypermath.Form',
+                                             'Hypermath.f2f'),
+ 'Hypermath.finiteApplyIffIteration': ('Hypermath.Form', 'Hypermath.f2f', 'Hypermath.ground'),
+ 'Hypermath.finiteApplyGround': ('Hypermath.Form', 'Hypermath.f2f', 'Hypermath.ground'),
+ 'Hypermath.finiteApplyPositionMember': ('Hypermath.Form', 'Hypermath.f2f', 'Hypermath.ground'),
+ 'Hypermath.finiteApplyClosed': ('Hypermath.Form', 'Hypermath.f2f', 'Hypermath.ground'),
+ 'Hypermath.finiteApplyMinimal': ('Hypermath.Form', 'Hypermath.f2f', 'Hypermath.ground'),
+ 'Hypermath.finiteApplyIterationAdd': ('Hypermath.Form', 'Hypermath.f2f'),
+ 'Hypermath.finiteTraceLengthMember': ('Hypermath.Congruent',
+                                       'Hypermath.Form',
+                                       'Hypermath.f2f',
+                                       'Hypermath.ground'),
+ 'Hypermath.finiteTraceLengthSelfRead': ('Hypermath.Congruent',
+                                         'Hypermath.Form',
+                                         'Hypermath.f2f',
+                                         'Hypermath.ground'),
+ 'Hypermath.finiteTraceLengthStep': ('Hypermath.Congruent',
+                                     'Hypermath.Form',
+                                     'Hypermath.f2f',
+                                     'Hypermath.ground'),
+ 'Hypermath.finiteTraceLengthCompose': ('Hypermath.Congruent',
+                                        'Hypermath.Form',
+                                        'Hypermath.f2f',
+                                        'Hypermath.ground'),
+ 'Hypermath.finiteTraceLengthExpand': ('Hypermath.Congruent',
+                                       'Hypermath.Form',
+                                       'Hypermath.f2f',
+                                       'Hypermath.ground'),
+ 'Hypermath.finiteTraceLengthExpandSeq': ('Hypermath.Congruent',
+                                          'Hypermath.Form',
+                                          'Hypermath.f2f',
+                                          'Hypermath.ground'),
+ 'Hypermath.dEntryFromGroundFinite': ('Hypermath.Congruent',
+                                      'Hypermath.Form',
+                                      'Hypermath.f2f',
+                                      'Hypermath.ground'),
+ 'Hypermath.finiteApplyPositionSimulation': ('Hypermath.Congruent',
+                                             'Hypermath.Form',
+                                             'Hypermath.HMSyntax',
+                                             'Hypermath.Semantics',
+                                             'Hypermath.Similar',
+                                             'Hypermath.Simulation',
+                                             'Hypermath.axSubstanceRequiresSemantics',
+                                             'Hypermath.axSyntaxRequiresSubstance',
+                                             'Hypermath.closeSemanticsOpaque',
+                                             'Hypermath.closeSyntaxOpaque',
+                                             'Hypermath.f2f',
+                                             'Hypermath.ground',
+                                             'Hypermath.traceLevels'),
+ 'Hypermath.finiteApplyLimitExcluded': ('Hypermath.Congruent',
+                                        'Hypermath.Form',
+                                        'Hypermath.HMSyntax',
+                                        'Hypermath.Semantics',
+                                        'Hypermath.Similar',
+                                        'Hypermath.Simulation',
+                                        'Hypermath.axLimitNotFinite',
+                                        'Hypermath.axSubstanceRequiresSemantics',
+                                        'Hypermath.axSyntaxRequiresSubstance',
+                                        'Hypermath.closeSemanticsOpaque',
+                                        'Hypermath.closeSyntaxOpaque',
+                                        'Hypermath.f2f',
+                                        'Hypermath.ground',
+                                        'Hypermath.ordinalLimit',
+                                        'Hypermath.traceLevels'),
+ 'Hypermath.ordinalLimitNotInD': ('Hypermath.Congruent',
+                                  'Hypermath.Form',
+                                  'Hypermath.HMSyntax',
+                                  'Hypermath.Semantics',
+                                  'Hypermath.Similar',
+                                  'Hypermath.Simulation',
+                                  'Hypermath.axLimitNotFinite',
+                                  'Hypermath.axSubstanceRequiresSemantics',
+                                  'Hypermath.axSyntaxRequiresSubstance',
+                                  'Hypermath.closeSemanticsOpaque',
+                                  'Hypermath.closeSyntaxOpaque',
+                                  'Hypermath.f2f',
+                                  'Hypermath.ground',
+                                  'Hypermath.ordinalLimit',
+                                  'Hypermath.traceLevels'),
+ 'Hypermath.notGroundSpanningClaim': ('Hypermath.Congruent',
+                                      'Hypermath.Form',
+                                      'Hypermath.HMSyntax',
+                                      'Hypermath.Semantics',
+                                      'Hypermath.Similar',
+                                      'Hypermath.Simulation',
+                                      'Hypermath.axLimitNotFinite',
+                                      'Hypermath.axSubstanceRequiresSemantics',
+                                      'Hypermath.axSyntaxRequiresSubstance',
+                                      'Hypermath.closeSemanticsOpaque',
+                                      'Hypermath.closeSyntaxOpaque',
+                                      'Hypermath.f2f',
+                                      'Hypermath.ground',
+                                      'Hypermath.ordinalLimit',
+                                      'Hypermath.traceLevels')}
+
+OBSERVATION_SOURCE_SHA256 = '47bc700f98d3da378ddca6600d86e9c699c4b93e86d3629a2ab3acef7b05cc71'
+
+OBSERVATION_CHECKS_SOURCE_SHA256 = 'eb358969af52b4445c81cb390a0047523e893ec2fc3577021d82d4908e824d60'
+
+FULL_MODEL_SOURCE_SHA256 = 'd5bffd8e7b9fd8714b6759e90e0ec135001a55c1c86e7de076d1bf3d6dbb969d'

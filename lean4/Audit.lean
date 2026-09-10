@@ -354,3 +354,117 @@ set_option pp.fullNames true
 #print axioms Hypermath.dEntryNoSteps
 #print axioms Hypermath.dIsTransitive
 #print axioms Hypermath.reflexionTraceComposeIdentity
+
+#eval IO.println "HYPERMATH_DECL_BEGIN:Hypermath.groundSpanningClaim"
+#print Hypermath.groundSpanningClaim
+#eval IO.println "HYPERMATH_DECL_END:Hypermath.groundSpanningClaim"
+
+#eval IO.println "HYPERMATH_DECL_BEGIN:Hypermath.finiteApplyPosition"
+#print Hypermath.finiteApplyPosition
+#eval IO.println "HYPERMATH_DECL_END:Hypermath.finiteApplyPosition"
+
+#eval IO.println "HYPERMATH_DECL_BEGIN:Hypermath.finiteTraceLength"
+#print Hypermath.finiteTraceLength
+#eval IO.println "HYPERMATH_DECL_END:Hypermath.finiteTraceLength"
+
+#eval IO.println "HYPERMATH_DECL_BEGIN:Hypermath.finiteApplyIffIteration"
+#print Hypermath.finiteApplyIffIteration
+#eval IO.println "HYPERMATH_DECL_END:Hypermath.finiteApplyIffIteration"
+
+#eval IO.println "HYPERMATH_DECL_BEGIN:Hypermath.finiteApplyGround"
+#print Hypermath.finiteApplyGround
+#eval IO.println "HYPERMATH_DECL_END:Hypermath.finiteApplyGround"
+
+#eval IO.println "HYPERMATH_DECL_BEGIN:Hypermath.finiteApplyPositionMember"
+#print Hypermath.finiteApplyPositionMember
+#eval IO.println "HYPERMATH_DECL_END:Hypermath.finiteApplyPositionMember"
+
+#eval IO.println "HYPERMATH_DECL_BEGIN:Hypermath.finiteApplyClosed"
+#print Hypermath.finiteApplyClosed
+#eval IO.println "HYPERMATH_DECL_END:Hypermath.finiteApplyClosed"
+
+#eval IO.println "HYPERMATH_DECL_BEGIN:Hypermath.finiteApplyMinimal"
+#print Hypermath.finiteApplyMinimal
+#eval IO.println "HYPERMATH_DECL_END:Hypermath.finiteApplyMinimal"
+
+#eval IO.println "HYPERMATH_DECL_BEGIN:Hypermath.finiteApplyIterationAdd"
+#print Hypermath.finiteApplyIterationAdd
+#eval IO.println "HYPERMATH_DECL_END:Hypermath.finiteApplyIterationAdd"
+
+#eval IO.println "HYPERMATH_DECL_BEGIN:Hypermath.finiteTraceLengthMember"
+#print Hypermath.finiteTraceLengthMember
+#eval IO.println "HYPERMATH_DECL_END:Hypermath.finiteTraceLengthMember"
+
+#eval IO.println "HYPERMATH_DECL_BEGIN:Hypermath.finiteTraceLengthSelfRead"
+#print Hypermath.finiteTraceLengthSelfRead
+#eval IO.println "HYPERMATH_DECL_END:Hypermath.finiteTraceLengthSelfRead"
+
+#eval IO.println "HYPERMATH_DECL_BEGIN:Hypermath.finiteTraceLengthStep"
+#print Hypermath.finiteTraceLengthStep
+#eval IO.println "HYPERMATH_DECL_END:Hypermath.finiteTraceLengthStep"
+
+#eval IO.println "HYPERMATH_DECL_BEGIN:Hypermath.finiteTraceLengthCompose"
+#print Hypermath.finiteTraceLengthCompose
+#eval IO.println "HYPERMATH_DECL_END:Hypermath.finiteTraceLengthCompose"
+
+#eval IO.println "HYPERMATH_DECL_BEGIN:Hypermath.finiteTraceLengthExpand"
+#print Hypermath.finiteTraceLengthExpand
+#eval IO.println "HYPERMATH_DECL_END:Hypermath.finiteTraceLengthExpand"
+
+#eval IO.println "HYPERMATH_DECL_BEGIN:Hypermath.finiteTraceLengthExpandSeq"
+#print Hypermath.finiteTraceLengthExpandSeq
+#eval IO.println "HYPERMATH_DECL_END:Hypermath.finiteTraceLengthExpandSeq"
+
+#eval IO.println "HYPERMATH_DECL_BEGIN:Hypermath.dEntryFromGroundFinite"
+#print Hypermath.dEntryFromGroundFinite
+#eval IO.println "HYPERMATH_DECL_END:Hypermath.dEntryFromGroundFinite"
+
+#eval IO.println "HYPERMATH_DECL_BEGIN:Hypermath.finiteApplyPositionSimulation"
+#print Hypermath.finiteApplyPositionSimulation
+#eval IO.println "HYPERMATH_DECL_END:Hypermath.finiteApplyPositionSimulation"
+
+#eval IO.println "HYPERMATH_DECL_BEGIN:Hypermath.finiteApplyLimitExcluded"
+#print Hypermath.finiteApplyLimitExcluded
+#eval IO.println "HYPERMATH_DECL_END:Hypermath.finiteApplyLimitExcluded"
+
+#eval IO.println "HYPERMATH_DECL_BEGIN:Hypermath.ordinalLimitNotInD"
+#print Hypermath.ordinalLimitNotInD
+#eval IO.println "HYPERMATH_DECL_END:Hypermath.ordinalLimitNotInD"
+
+#eval IO.println "HYPERMATH_DECL_BEGIN:Hypermath.notGroundSpanningClaim"
+#print Hypermath.notGroundSpanningClaim
+#eval IO.println "HYPERMATH_DECL_END:Hypermath.notGroundSpanningClaim"
+
+#print axioms Hypermath.finiteApplyIffIteration
+
+#print axioms Hypermath.finiteApplyGround
+
+#print axioms Hypermath.finiteApplyPositionMember
+
+#print axioms Hypermath.finiteApplyClosed
+
+#print axioms Hypermath.finiteApplyMinimal
+
+#print axioms Hypermath.finiteApplyIterationAdd
+
+#print axioms Hypermath.finiteTraceLengthMember
+
+#print axioms Hypermath.finiteTraceLengthSelfRead
+
+#print axioms Hypermath.finiteTraceLengthStep
+
+#print axioms Hypermath.finiteTraceLengthCompose
+
+#print axioms Hypermath.finiteTraceLengthExpand
+
+#print axioms Hypermath.finiteTraceLengthExpandSeq
+
+#print axioms Hypermath.dEntryFromGroundFinite
+
+#print axioms Hypermath.finiteApplyPositionSimulation
+
+#print axioms Hypermath.finiteApplyLimitExcluded
+
+#print axioms Hypermath.ordinalLimitNotInD
+
+#print axioms Hypermath.notGroundSpanningClaim

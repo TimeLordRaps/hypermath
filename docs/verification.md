@@ -19,6 +19,8 @@ an adjacent development checkout.
 | Software | Unit tests, source hashes, built and installed wheels | The exercised software contracts hold in the tested environment |
 | Lean elaboration | Fresh build and dependency output | The translation compiles; admitted proofs can still exist |
 | Finite traces | Seven parameter-relative production proofs and 28 axiom-free generic/concrete checks | Constructive self-read, composition, endpoint iteration, and recorded-step preservation; no native arithmetic interpretation yet |
+| Finite arithmetic observations | Thirteen parameter-only results and four source-relative results | Least finite closure, length interpretation and reuse preservation; universal ground-spanning is refuted |
+| Observation boundary and full model | Thirteen axiom-free observation reports and an interpretation of all 38 logical clauses | Endpoint-only length decoding can fail; declared axioms have a model relative to Lean foundations, not a full native adequacy proof |
 | Self-derivation | Target theorem, transitive assumptions, stable inputs and fresh replay | Conditional proof admissibility under disclosed Lean assumptions; unresolved while admissions remain |
 | Source adequacy | Required correspondence with native propositions and derivations | `UNKNOWN`; no checked correspondence theorem exists |
 | Recursive arithmetic completeness | Required arithmetic interpretation, self-representation, and completeness proof | `UNKNOWN`; the dependency and receipt do not discharge these obligations |
@@ -60,9 +62,10 @@ accepted as a clean pinned downstream foundation. Supplied JSON is not an
 authenticated proof: the downstream integration checks the source and reruns the
 mechanism.
 
-The package also binds the exact self-derivation statement and the 68 reviewed
-parameter/axiom declarations, the new `D` definition bodies, seven constructive
-milestone statements, and the generic trace and probe sources. A new assumption,
+The package also binds the exact self-derivation statement and the 67 reviewed
+parameter/axiom declarations, finite construction definition bodies, 24 milestone
+statements with their individually reviewed dependencies, and trace, observation,
+and model sources. A new assumption,
 weakened target or definition, or substituted reporter cannot pass by merely
 removing `sorry`. These declaration identities
 are a review baseline, not a consistency proof. Changing the mathematical basis

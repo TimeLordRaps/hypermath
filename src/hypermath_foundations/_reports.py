@@ -11,8 +11,12 @@ from ._baseline import (
     AXIOM_DECLARATIONS,
     COUNTERMODEL_SOURCE_SHA256,
     DEFINITION_DECLARATIONS,
+    FULL_MODEL_SOURCE_SHA256,
     LEAN_BUILTINS,
+    OBSERVATION_CHECKS_SOURCE_SHA256,
+    OBSERVATION_SOURCE_SHA256,
     PROVED_DECLARATIONS,
+    PROVED_DEPENDENCIES,
     TARGET_STATEMENT,
     TRACE_CHECKS_SOURCE_SHA256,
     TRACE_SOURCE_SHA256,
@@ -63,7 +67,30 @@ TRACE_CHECK_TARGETS = ('Hypermath.Trace.nil_compose',
  'Hypermath.TraceChecks.absent_edge_rejected',
  'Hypermath.TraceChecks.successor_trace_monotone',
  'Hypermath.TraceChecks.missing_return_rejected')
+OBSERVATION_TARGETS = ('Hypermath.Observation.endpoints_eq_of_step',
+ 'Hypermath.Observation.endpoint_decoder_cannot_recover_distinct_lengths',
+ 'Hypermath.Observation.no_endpoint_length_decoder',
+ 'Hypermath.ObservationChecks.observation_preserved',
+ 'Hypermath.ObservationChecks.empty_length',
+ 'Hypermath.ObservationChecks.closed_length',
+ 'Hypermath.ObservationChecks.closed_positive',
+ 'Hypermath.ObservationChecks.distinct_lengths',
+ 'Hypermath.ObservationChecks.pair_decoder_rejected',
+ 'Hypermath.ObservationChecks.universal_decoder_rejected',
+ 'Hypermath.ObservationChecks.whole_trace_retains_lengths',
+ 'Hypermath.ObservationChecks.reused_length',
+ 'Hypermath.ObservationChecks.reused_preserves_length')
 CLAIMS = ("self_derivation", "source_adequacy", "recursive_arithmetic_completeness")
+FULL_MODEL_TARGETS = tuple("HypermathFullAxiomModel." + name for name in (
+    "full_axioms_hold", "finite_numerals_injective", "boundary_probe",
+))
+PROBE_TARGETS = {"countermodel": COUNTERMODEL_TARGETS, "finite_trace": TRACE_CHECK_TARGETS,
+                 "observation": OBSERVATION_TARGETS, "full_model": FULL_MODEL_TARGETS}
+
+
+def probe_dependencies_valid(name: str, records: dict[str, list[str]]) -> bool:
+    allowed = LEAN_BUILTINS if name in {"countermodel", "full_model"} else frozenset()
+    return all(dep in allowed for deps in records.values() for dep in deps)
 
 
 def digest(value: dict) -> str:
@@ -131,7 +158,7 @@ def policy_errors(output: str, inputs: dict, assumptions: list[dict]) -> list[st
     if {k: records[k] for k in AXIOM_DECLARATIONS} != AXIOM_DECLARATIONS:
         reasons.append("kernel axiom declarations differ from the reviewed assumption policy")
     if {k: records[k] for k in DEFINITION_DECLARATIONS} != DEFINITION_DECLARATIONS:
-        reasons.append("finite D definitions differ from the reviewed semantics")
+        reasons.append("finite construction definitions differ from the reviewed semantics")
     if {k: records[k] for k in PROVED_DECLARATIONS} != PROVED_DECLARATIONS:
         reasons.append("constructive milestone statements differ from reviewed targets")
     names = [a["name"] for a in assumptions]
@@ -142,10 +169,10 @@ def policy_errors(output: str, inputs: dict, assumptions: list[dict]) -> list[st
     allowed = set(AXIOM_DECLARATIONS) | LEAN_BUILTINS | {"sorryAx"}
     if any(dep not in allowed for values in dependencies.values() for dep in values):
         reasons.append("unreviewed transitive axiom dependency")
-    constructive_allowed = LEAN_BUILTINS | {"Hypermath.Form", "Hypermath.f2f", "Hypermath.Congruent"}
-    if any(dep not in constructive_allowed for name in PROVED_DECLARATIONS
-           for dep in dependencies[name]):
-        reasons.append("constructive milestone has an admission or an extra logical assumption")
+    if (set(PROVED_DEPENDENCIES) != set(PROVED_DECLARATIONS)
+            or any(dependencies[name] != sorted(PROVED_DEPENDENCIES[name])
+                   for name in PROVED_DECLARATIONS)):
+        reasons.append("milestone dependencies differ from their individually reviewed assumptions")
     if inputs.get("lean4/Audit.lean") != AUDIT_SOURCE_SHA256:
         reasons.append("reporter source differs from reviewed reporting commands")
     if inputs.get("lean4/Countermodels.lean") != COUNTERMODEL_SOURCE_SHA256:
@@ -154,4 +181,10 @@ def policy_errors(output: str, inputs: dict, assumptions: list[dict]) -> list[st
         reasons.append("finite trace semantics differ from the reviewed construction")
     if inputs.get("lean4/TraceChecks.lean") != TRACE_CHECKS_SOURCE_SHA256:
         reasons.append("finite trace checks differ from the reviewed probes")
+    if inputs.get("lean4/Hypermath/Observation.lean") != OBSERVATION_SOURCE_SHA256:
+        reasons.append("observation semantics differ from the reviewed construction")
+    if inputs.get("lean4/ObservationChecks.lean") != OBSERVATION_CHECKS_SOURCE_SHA256:
+        reasons.append("observation checks differ from the reviewed probes")
+    if inputs.get("lean4/FullAxiomModel.lean") != FULL_MODEL_SOURCE_SHA256:
+        reasons.append("full axiom model differs from the reviewed model")
     return reasons

@@ -109,6 +109,10 @@ The [finite-trace milestone](FINITE_TRACES.md) supplies witnessed `D` entries,
 typed reuse, and preservation of their recorded edges. It does not yet represent
 those witnesses as native forms or interpret arithmetic through them. Its new
 countermodel shows why an endpoint return cannot discharge per-step preservation.
+The [finite arithmetic bridge](FINITE_ARITHMETIC.md) adds least finite closure
+and Form-valued length observations. Its refutation of universal ground-spanning
+and endpoint-decoding obstruction constrain the next native representation;
+the full arithmetic objective remains open.
 
 1. Define typed representation, expansion, and closure evidence, including how
    predicates and derivations become forms.

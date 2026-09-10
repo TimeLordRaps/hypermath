@@ -6,16 +6,16 @@ import re
 from pathlib import PurePosixPath
 
 from ._reports import (
-    COUNTERMODEL_TARGETS,
     DEPENDENCY_TARGETS,
     FORMAT,
+    PROBE_TARGETS,
     REPOSITORY,
     TARGET,
-    TRACE_CHECK_TARGETS,
     dependency_records,
     digest,
     kernel_declarations,
     policy_errors,
+    probe_dependencies_valid,
     target_is_theorem,
 )
 
@@ -51,6 +51,8 @@ def evaluate_gate(report, claim="self_derivation", *, require_clean=True) -> boo
                     "lean4/lean-toolchain", "lean4/lakefile.toml", "lean4/Audit.lean",
                     "lean4/Countermodels.lean", "lean4/Hypermath.lean",
                     "lean4/TraceChecks.lean", "lean4/Hypermath/Trace.lean",
+                    "lean4/ObservationChecks.lean", "lean4/Hypermath/Observation.lean",
+                    "lean4/FullAxiomModel.lean",
                     "lean4/Hypermath/L0Ground.lean", "lean4/Hypermath/L1Relations.lean",
                     "lean4/Hypermath/L2Operations.lean",
                     "lean4/Hypermath/L3Ordinatics.lean",
@@ -79,7 +81,7 @@ def evaluate_gate(report, claim="self_derivation", *, require_clean=True) -> boo
                 or checks["assumption_policy"]["status"] != "PASS"
                 or checks["assumption_policy"]["attempted"] is not True):
             return False
-        for name in ("lean_build", "dependency_output", "countermodel", "finite_trace"):
+        for name in ("lean_build", "dependency_output", *PROBE_TARGETS):
             item = checks[name]
             if (item["status"] != "PASS" or item["attempted"] is not True
                     or type(item["exit_code"]) is not int or item["exit_code"] != 0
@@ -120,12 +122,10 @@ def evaluate_gate(report, claim="self_derivation", *, require_clean=True) -> boo
         if any(dep.startswith("Hypermath.") and dep not in names
                for dependencies in records.values() for dep in dependencies):
             return False
-        countermodels = dependency_records(checks["countermodel"]["output"], COUNTERMODEL_TARGETS)
-        if any("sorryAx" in dependencies for dependencies in countermodels.values()):
-            return False
-        traces = dependency_records(checks["finite_trace"]["output"], TRACE_CHECK_TARGETS)
-        if any(dependencies for dependencies in traces.values()):
-            return False
+        for name, targets in PROBE_TARGETS.items():
+            records = dependency_records(checks[name]["output"], targets)
+            if not probe_dependencies_valid(name, records):
+                return False
         claims = report["claims"]
         if (claims["self_derivation"]["status"] != "PASS"
                 or not claims["self_derivation"]["reasons"]
