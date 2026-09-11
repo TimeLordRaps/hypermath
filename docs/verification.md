@@ -24,7 +24,7 @@ an adjacent development checkout.
 | Finite action | Eleven production milestone results and a six-form model of all 38 logical clauses | Finite-orbit operations descend, but preserving all standard numeral-equality queries requires injectivity; the countermodel refutes a decoder for those queries |
 | Finite ground syntax | 23 exact dependency reports for primitive-rule records, their checker, and reuse | Four-rule checker soundness uses the existing source premises; native reification of acceptance and arithmetic interpretation remain open |
 | Composed ground calculus | 26 exact dependency reports for typed derivations, complete record reconstruction, and premise checking | Soundness uses seven existing clauses; native encoding and internally derived acceptance remain open |
-| Self-derivation | Target theorem, transitive assumptions, stable inputs, fresh replay, and a full-clause separation model | Conditional proof admissibility remains unresolved; even the exact target does not imply the tested finite-action or ordinal-computation bridges |
+| Self-derivation | Exact named target, conditional assembly, stable inputs, fresh replay, and two full-clause models | One model refutes the target; another satisfies it without the arithmetic bridges. The target is unproved and strict proof admissibility fails |
 | Source adequacy | Required correspondence with native propositions and derivations | `UNKNOWN`; no checked correspondence theorem exists |
 | Recursive arithmetic completeness | Required arithmetic interpretation, self-representation, and completeness proof | `UNKNOWN`; the dependency and receipt do not discharge these obligations |
 
@@ -55,11 +55,12 @@ explicit mathematical requirement, completing an audit is a software operation;
 it is not a proof-completion verdict. A source-only inventory cannot discharge a
 proof gate.
 
-A completed native execution requires all nine process checks:
+A completed native execution requires all eleven process checks:
 `lean_build`, `dependency_output`, `countermodel`, `finite_trace`, `observation`,
-`full_model`, `finite_action`, `ground_syntax`, and `ground_derivation`. The last
-runs `lean4/GroundDerivationChecks.lean`; the preceding two run
-`lean4/FiniteActionCountermodel.lean` and `lean4/GroundSyntaxChecks.lean`.
+`full_model`, `finite_action`, `ground_syntax`, `ground_derivation`,
+`record_encoding`, and `record_machine`. The final three run
+`lean4/GroundDerivationChecks.lean`, `lean4/RecordEncodingChecks.lean`, and
+`lean4/RecordMachineChecks.lean` respectively.
 Omitting any process or supplying failed evidence
 cannot satisfy the execution or replay gate.
 
@@ -67,7 +68,7 @@ For another run, select a fresh directory with `--output`; existing evidence
 bundles are preserved rather than overwritten.
 
 The evidence binds the source coordinate, actual input hashes, toolchain,
-theorem target, declared assumptions, and observed outcomes. Input changes during
+target statement and declaration kind, declared assumptions, and observed outcomes. Input changes during
 a run invalidate the result. A dirty checkout can be inspected, but is not
 accepted as a clean pinned downstream foundation. Supplied JSON is not an
 authenticated proof: the downstream integration checks the source and reruns the
@@ -75,7 +76,7 @@ mechanism.
 
 The package also binds the exact self-derivation statement and the 67 reviewed
 parameter/axiom declarations, finite construction and retained proposal definition
-bodies, 35 proved milestone statements with their individually reviewed
+bodies, 38 proved milestone statements with their individually reviewed
 dependencies, and trace, observation, finite-action, ground-syntax, composed-calculus,
 and model sources.
 The ground-syntax reporter separately binds 23 exact dependency reports,
@@ -90,7 +91,7 @@ requires reviewing that policy along with the corresponding source changes.
 The byte-bound Python package and Lean reporters use explicit line-feed endings
 so Windows checkouts and Linux-built wheels share the same source identities.
 
-The translation currently contains 16 admissions. The zero, successor, and
+The translation currently contains 11 admissions. The zero, successor, and
 opaque path-length computation proposals are now named `Claim` definitions
 because a model of the declared clauses refutes them. The decrease records
 withdrawal of unsupported theorems, not completed proofs. The model does not
@@ -99,6 +100,16 @@ satisfies the exact current self-derivation proposition while refuting the
 finite-action criterion and all three computation claims, so self-derivation
 alone cannot certify an arithmetic interpretation. The
 conditional host-action construction does not establish native adequacy.
+
+The [cycle boundary](research/CYCLE_BOUNDARY.md) adds the converse separation:
+another full-clause model refutes the exact self-derivation target and the
+nontrivial simulation-pair claim. The admitted cycle and pair theorems have
+been withdrawn. `selfDerivation` now names its original proposition; it is
+not an available proof. Conditional assembly proves that the missing cycle
+is precisely the remaining conjunct. Integrity accepts this exact definition,
+but proof admissibility fails and the mathematical claim stays `UNKNOWN`.
+The strict gate continues to require a closed theorem, so removing admissions
+or assuming the cycle in an implication cannot turn the gate green.
 
 ## VSTD boundary
 

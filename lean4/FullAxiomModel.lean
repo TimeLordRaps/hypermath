@@ -496,6 +496,45 @@ theorem full_clauses_with_rejected_closed_record :
   ⟨full_axioms_hold, rejected_record_has_native_closure.1,
     rejected_record_has_native_closure.2.2.2⟩
 
+/-- The exact closed production self-derivation target under this model's
+    interpretation. Admitted theorems are not among FullAxioms' clauses. -/
+def selfDerivationTarget : Prop :=
+  structContinues ground ground ∧
+  (∀ x : Form, D x x) ∧
+  (∀ p : DerivationPath,
+    congruentPath (compose p pathGround) p ∧
+    congruentPath (compose pathGround p) p) ∧
+  Simulation (f2f (f2f deriver)) deriver
+
+theorem driver_cycle_claim_fails : ¬ Simulation (f2f (f2f deriver)) deriver := by
+  change ¬ ((2, false) : Form) = (0, false)
+  decide
+
+theorem nontrivial_simulation_claim_fails :
+    ¬ (∃ x y : Form, Similar x y ∧ Simulation x y ∧ ¬ (x = y)) := by
+  rintro ⟨x, y, _, same, different⟩
+  exact different same
+
+theorem self_derivation_target_fails : ¬ selfDerivationTarget := by
+  intro target
+  exact driver_cycle_claim_fails target.2.2.2
+
+/-- A single interpretation satisfies every current logical clause and
+    refutes both proposed extra claims and the exact self-derivation target.
+    This is non-entailment from those clauses, not a refutation of every
+    possible source-adequate realization or arithmetic interpretation. -/
+theorem full_clauses_without_cycle_or_nontrivial_simulation :
+    FullAxioms ∧ ¬ Simulation (f2f (f2f deriver)) deriver ∧
+    ¬ (∃ x y : Form, Similar x y ∧ Simulation x y ∧ ¬ (x = y)) ∧
+    ¬ selfDerivationTarget :=
+  ⟨full_axioms_hold, driver_cycle_claim_fails,
+    nontrivial_simulation_claim_fails, self_derivation_target_fails⟩
+
+#print axioms driver_cycle_claim_fails
+#print axioms nontrivial_simulation_claim_fails
+#print axioms self_derivation_target_fails
+#print axioms full_clauses_without_cycle_or_nontrivial_simulation
+
 #print axioms recordValue_is_interpretation
 #print axioms formulaValue_is_interpretation
 #print axioms readRecordValue_recordValue

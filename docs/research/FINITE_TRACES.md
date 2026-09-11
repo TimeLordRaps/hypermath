@@ -41,11 +41,12 @@ These seven production theorem reports depend only on the existing parameters
 `Form`, `f2f`, and `Congruent`. They do not depend on an admitted proof or a logical
 axiom clause. The subsequent [finite arithmetic repair](FINITE_ARITHMETIC.md)
 closes the finite ground predicate and refutes universal ground-spanning.
-The overall translation now has 16 admissions and 67 declared assumptions:
+The overall translation now has 11 admissions and 67 declared assumptions:
 29 source parameters and 38 logical clauses. The remaining `selfDerivation`
-components have not all been proved. The latest three admissions were withdrawn
-because a full-clause countermodel refutes the proposed ordinal computation
-laws; their statements remain named claims, not completed proofs.
+target is unproved. Admissions for ordinal computation, nontrivial simulation,
+and the deriver cycle were withdrawn after full-clause counterexamples; their
+statements remain named claims, not completed proofs. See the
+[cycle boundary](CYCLE_BOUNDARY.md) for the exact remaining conjunct.
 
 ## Reuse and preservation
 

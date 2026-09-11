@@ -254,24 +254,24 @@ theorem dIsTransitive {x y z : Form} : D x y → D y z → D x z := by
     admitted dSpansGround theorem has therefore been withdrawn. -/
 def groundSpanningClaim : Prop := ∀ y : Form, D ground y
 
-/-- D[deriver][deriver] entry exists. Schema: FORM.
-    Content at ≡ level: FRAME/L3 (discharged in L3Ordinatics). -/
+/-- The reflexive, zero-step D entry exists. It does not supply a two-step
+    simulation cycle; that separate claim remains unproved. -/
 theorem driverIsInD : D deriver deriver :=
   dIsReflexive deriver
 
-/-- deriver ≡-cycle: f2f(f2f(deriver)) ≡ deriver. FRAME/L3.
-    Discharged in L3Ordinatics.lean, theorem driverCycleIsClosed. -/
-theorem driverCycle_FRAME : f2f (f2f deriver) ≡ deriver := by
-  sorry
-  -- FRAME/L3: constructive proof requires ordinal continuation machinery.
+/-- The proposed two-step simulation cycle, retained as an unproved claim.
+    FullAxiomModel satisfies all 38 clauses and refutes this statement.
+    The former admitted driverCycle_FRAME theorem has been withdrawn. -/
+def driverCycleClaim : Prop := f2f (f2f deriver) ≡ deriver
 
 -- ============================================================================
 -- §VIII  L1 Self-Kernel
 -- P_1 = 25 steps. N_1_atomic = 2 (deriver, D). G_1 = 4.
 -- FRAME residuals:
---   step 10: simulationPairExists — FRAME/L3 (discharged in L3Ordinatics)
---   step 21: deriver ==-cycle content — FRAME/L3 (discharged in L3Ordinatics)
---   step 25: D[deriver][deriver] at ≡ level — FRAME/L3 (discharged in L3Ordinatics)
+--   step 10: simulation pairs — the weak L1 theorem remains admitted;
+--            the stronger nontrivial L3 claim is refuted in a full-clause model.
+--   step 21: deriver ==-cycle content — unproved driverCycleClaim.
+--   step 25: D[deriver][deriver] at ≡ level — conditional on driverCycleClaim.
 -- All 25 steps represented by the declarations above.
 -- ============================================================================
 

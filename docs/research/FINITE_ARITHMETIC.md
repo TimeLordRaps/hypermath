@@ -177,10 +177,11 @@ encode the unformalized native requirement that all Forms arise from the
 ground (`L0_ground.hm:49–64`), or a coherent transfinite generation mechanism.
 Neither the declarations nor the model supplies that missing correspondence.
 
-The current translation has **16 admissions and 67 declared assumptions**
-(29 source parameters and 38 logical clauses). The latest three removed
-admissions were withdrawn after these counterexamples; they were not proved.
-The audit binds 35 proved production milestone declarations, including eleven
+The current translation has **11 admissions and 67 declared assumptions**
+(29 source parameters and 38 logical clauses). Three ordinal-computation
+admissions and five later simulation/cycle admissions were withdrawn after
+counterexamples; they were not proved. See the [cycle boundary](CYCLE_BOUNDARY.md).
+The audit binds 38 proved production milestone declarations, including eleven
 finite-orbit/action results. The classical existence results disclose their Lean
 foundation dependencies; no new native axiom was added.
 

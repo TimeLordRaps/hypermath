@@ -122,4 +122,4 @@ use propositional extensionality and quotient soundness; and the combined
 full-clause statement additionally uses classical choice through the existing
 model proof. None uses an admission or a native axiom. The full-model group
 contains 26 exact reports, with source bytes and dependency sets enforced by
-the audit policy. This does not remove the foundation's 16 admission sites.
+the audit policy. This does not discharge the foundation's 11 remaining admission sites.

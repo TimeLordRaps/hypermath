@@ -84,7 +84,7 @@ propositional extensionality, and the native specialization just described.
 The audit binds the calculus and reporter bytes and rejects omitted reports,
 hidden assumptions, admissions, or failed execution. The primitive fragment's
 23 reports remain a separate group. The broader translation still has
-67 declared assumptions and 16 admissions.
+67 declared assumptions and 11 admissions.
 
 The [record encoding](RECORD_ENCODING.md) now represents these finite rule
 trees and formulas as single free ground terms, with packed numerical inputs

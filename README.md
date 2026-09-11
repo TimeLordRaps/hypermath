@@ -49,7 +49,7 @@ an equivalence relation, but prevents both exact and congruence-valued actions
 of that kind. It also shows that the proposed zero, successor, and opaque
 path-length laws do not follow from those clauses. Their statements remain
 named propositions instead of admitted theorems. The translation now has
-67 declared assumptions and 16 admissions; the audit binds 35 proved milestone
+67 declared assumptions and 11 admissions; the audit binds 38 proved milestone
 declarations. Removing those three admissions records non-entailment, not
 three completed proofs. The model additionally satisfies the exact current
 self-derivation target while those arithmetic bridges fail. This proves that
@@ -57,6 +57,14 @@ the current target is insufficient for an arithmetic interpretation; it does
 not refute a stronger target with typed reification and transfinite semantics.
 The model does not encode the stronger, unformalized native intent that all
 Forms arise from the ground.
+
+A second full-clause model refutes the two-step simulation cycle and nontrivial
+simulation-pair claim. Their admitted proofs have been withdrawn, and
+`selfDerivation` now names the unchanged, unproved proposition. Conditional
+assembly shows that its first three conjuncts reduce the remaining obligation
+exactly to the cycle. The [cycle boundary](docs/research/CYCLE_BOUNDARY.md)
+records this proof-interface change and its counterexamples. Audit integrity
+can pass for a faithfully reported definition; the strict proof gate cannot.
 
 The [finite ground-syntax checker](docs/research/GROUND_SYNTAX.md) represents
 instances of the four primitive ground rules as records built from `ground`
