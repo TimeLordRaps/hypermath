@@ -18,3 +18,4 @@ import Hypermath.GroundSyntax
 import Hypermath.GroundDerivation
 import Hypermath.RecordEncoding
 import Hypermath.RecordMachine
+import Hypermath.RuleSubstitution

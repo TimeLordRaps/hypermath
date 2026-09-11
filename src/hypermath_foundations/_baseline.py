@@ -525,7 +525,7 @@ GROUND_CODE_SOURCE_SHA256 = 'c6c6d161c336b9b6a45fcddff51f0cc07b2478e3c44c67f55d4
 RECORD_ENCODING_SOURCE_SHA256 = '1300264388fe739c2d4a0648295696f3cae284861b56286e0fac28885642f8a0'
 RECORD_ENCODING_CHECKS_SOURCE_SHA256 = '803f0ad6fcb2a05780587a1258809bda97746a8453384df5c053779024c11829'
 RECORD_MACHINE_SOURCE_SHA256 = 'ca5dfb31a584dfac8aae7641e3f752384044f26ac8c614d10951f23c5f97432b'
-RECORD_MACHINE_CHECKS_SOURCE_SHA256 = '42192309d8f39de753ccee7ae3b1845f973cfea8d44f72ccfd35a3d79e6826ae'
+RECORD_MACHINE_CHECKS_SOURCE_SHA256 = 'a5c9ed88270482d1893983076bf836fb9f7df9375e712ef1c16bc9be1d8d4fc8'
 
 # Retained claims and conditional assembly. None proves the cycle itself.
 DEFINITION_DECLARATIONS.update({
@@ -686,3 +686,5 @@ PROVED_DEPENDENCIES.update({'Hypermath.simulationEntryToDEntry_length': ('Hyperm
                                                   'Hypermath.Simulation',
                                                   'Hypermath.deriver',
                                                   'Hypermath.f2f')})
+
+RULE_SUBSTITUTION_SOURCE_SHA256 = '7e0ab21054b84b7158d67a77a8bde8c75c4edc64850e13f7fe1f978c1f3e3d07'

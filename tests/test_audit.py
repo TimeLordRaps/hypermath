@@ -104,6 +104,8 @@ def checkout(tmp_path, monkeypatch):
             project / "lean4/RecordEncodingChecks.lean").read_text(encoding="utf-8"),
         "lean4/Hypermath/RecordMachine.lean": (
             project / "lean4/Hypermath/RecordMachine.lean").read_text(encoding="utf-8"),
+        "lean4/Hypermath/RuleSubstitution.lean": (
+            project / "lean4/Hypermath/RuleSubstitution.lean").read_text(encoding="utf-8"),
         "lean4/RecordMachineChecks.lean": (
             project / "lean4/RecordMachineChecks.lean").read_text(encoding="utf-8"),
         "lean4/FullAxiomModel.lean": (project / "lean4/FullAxiomModel.lean").read_text(encoding="utf-8"),
@@ -488,6 +490,7 @@ def test_reification_dependency_policy_is_exact(checkout, monkeypatch, name, rep
                                   "lean4/Hypermath/RecordEncoding.lean",
                                   "lean4/RecordEncodingChecks.lean",
                                   "lean4/Hypermath/RecordMachine.lean",
+                                  "lean4/Hypermath/RuleSubstitution.lean",
                                   "lean4/RecordMachineChecks.lean"])
 def test_replaced_reporter_or_trace_cannot_authorize_its_own_output(checkout, path):
     root, _, _ = checkout
@@ -556,7 +559,8 @@ def test_record_encoding_requires_exact_proof_dependencies(checkout, monkeypatch
 
 
 @pytest.mark.parametrize("alteration", [
-    "missing_execution", "missing_replay", "extra_choice", "hidden_propext", "admission", "failure",
+    "missing_execution", "missing_replay", "missing_schema", "missing_call_binding",
+    "extra_choice", "hidden_propext", "admission", "failure",
 ])
 def test_record_machine_requires_exact_execution_dependencies(checkout, monkeypatch, alteration):
     root, _, run = checkout
@@ -564,10 +568,15 @@ def test_record_machine_requires_exact_execution_dependencies(checkout, monkeypa
     def altered(command, *args):
         code, output = run(command, *args)
         if command[-1] == "RecordMachineChecks.lean":
-            if alteration in {"missing_execution", "missing_replay"}:
-                target = "execute_program" if alteration == "missing_execution" else "checkTrace_iff"
+            if alteration.startswith("missing_"):
+                target = {
+                    "missing_execution": "RecordMachine.execute_program",
+                    "missing_replay": "RecordMachine.checkTrace_iff",
+                    "missing_schema": "RuleSubstitution.encodedExecute_program",
+                    "missing_call_binding": "RuleSubstitution.runCallTerm_toTerm",
+                }[alteration]
                 output = "\n".join(line for line in output.splitlines()
-                                   if f"RecordMachine.{target}'" not in line)
+                                   if f"Hypermath.{target}'" not in line)
             elif alteration == "extra_choice":
                 output = output.replace("[propext]", "[Classical.choice, propext]", 1)
             elif alteration == "hidden_propext":

@@ -106,6 +106,13 @@ contain no admissions or native assumptions. The machine still uses host
 syntax and operations; their native realization and ranked acceptance remain
 open.
 
+The [substitution executor](docs/research/RULE_SUBSTITUTION.md) makes each
+checking call's rule, indexed substitution, and exact premise stack explicit.
+Every call has a recoverable free-ground representation; executing the packed
+calls agrees with the original checker on every finite proof record. Its 47
+additional mandatory reports preserve the distinction between represented
+inputs and source-native execution or ranked acceptance.
+
 ## Ground and relations
 
 `Form` names the source's forming structure, `ground` its distinguished base,
