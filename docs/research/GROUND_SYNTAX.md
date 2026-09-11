@@ -96,8 +96,8 @@ principle, and the native specialization described above. The policy binds the
 checker and reporter source bytes. Missing dependencies, altered source,
 failed execution, or omitted replay cannot count as a successful audit.
 
-The broader translation retains 67 declared assumptions and 16 admission sites.
-Its existing 35 production milestones remain a separate audit group. The new
+The broader translation retains 67 declared assumptions and 11 admission sites.
+Its existing 38 production milestones remain a separate audit group. The new
 fragment leaves self-derivation, source adequacy, and arithmetic completeness
 unresolved. The [composed ground calculus](COMPOSED_GROUND_DERIVATIONS.md) now
 checks finite rule trees built from these primitives, the three predicate

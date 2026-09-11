@@ -129,6 +129,6 @@ listed executive closure and ground-anchoring predicates, including a malformed
 projection with a true, derivable conclusion. Closure of its representation
 therefore does not certify that its claimed inference is valid.
 
-The broader translation still has 67 declared assumptions and 16 admission
+The broader translation still has 67 declared assumptions and 11 admission
 sites. Source-adequate native self-representation, internal acceptance, arithmetic
 interpretation, transfinite coverage, and novelty remain open.

@@ -344,8 +344,8 @@ set_option pp.fullNames true
 #print axioms Hypermath.dIsReflexive
 #print axioms Hypermath.plusAndAdditionallyAreDistinct
 #print axioms Hypermath.pathGroundIsIdentity
-#print axioms Hypermath.simulationPairExists
-#print axioms Hypermath.driverCycleIsClosed
+#print axioms Hypermath.simulationPairExistsClaim
+#print axioms Hypermath.driverCycleClaim
 #print axioms Hypermath.selfDerivation
 #print axioms Hypermath.selfReadLength
 #print axioms Hypermath.dEntryStepLength
@@ -353,6 +353,30 @@ set_option pp.fullNames true
 #print axioms Hypermath.dEntryNoSteps
 #print axioms Hypermath.dIsTransitive
 #print axioms Hypermath.reflexionTraceComposeIdentity
+
+#eval IO.println "HYPERMATH_DECL_BEGIN:Hypermath.driverCycleClaim"
+#print Hypermath.driverCycleClaim
+#eval IO.println "HYPERMATH_DECL_END:Hypermath.driverCycleClaim"
+
+#eval IO.println "HYPERMATH_DECL_BEGIN:Hypermath.simulationPairExistsClaim"
+#print Hypermath.simulationPairExistsClaim
+#eval IO.println "HYPERMATH_DECL_END:Hypermath.simulationPairExistsClaim"
+
+#eval IO.println "HYPERMATH_DECL_BEGIN:Hypermath.driverInDAtSimulationOfCycle"
+#print Hypermath.driverInDAtSimulationOfCycle
+#eval IO.println "HYPERMATH_DECL_END:Hypermath.driverInDAtSimulationOfCycle"
+
+#eval IO.println "HYPERMATH_DECL_BEGIN:Hypermath.selfDerivationOfCycle"
+#print Hypermath.selfDerivationOfCycle
+#eval IO.println "HYPERMATH_DECL_END:Hypermath.selfDerivationOfCycle"
+
+#eval IO.println "HYPERMATH_DECL_BEGIN:Hypermath.selfDerivation_iff_driverCycleClaim"
+#print Hypermath.selfDerivation_iff_driverCycleClaim
+#eval IO.println "HYPERMATH_DECL_END:Hypermath.selfDerivation_iff_driverCycleClaim"
+
+#print axioms Hypermath.driverInDAtSimulationOfCycle
+#print axioms Hypermath.selfDerivationOfCycle
+#print axioms Hypermath.selfDerivation_iff_driverCycleClaim
 
 #eval IO.println "HYPERMATH_DECL_BEGIN:Hypermath.groundSpanningClaim"
 #print Hypermath.groundSpanningClaim

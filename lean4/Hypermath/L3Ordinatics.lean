@@ -209,68 +209,27 @@ def pathLengthArithmeticClaim : Prop :=
     pathLength (compose p q) =~ ordinalApply (pathLength q) (pathLength p)
 
 -- ============================================================================
--- §V  Simulation-Pair-Exists Closure
--- Discharges L1 FRAME simulationPairExists_L1 (step 10 of L1 self-kernel).
--- Witness: (ground, ordinalApply ordinalLimit ground).
+-- §V  Nontrivial Simulation-Pair Obligation
+-- The stronger pair claim does not follow from the current clauses.
+-- The separate weak L1 existence claim remains admitted.
 -- ============================================================================
 
-/-- A non-trivial ≡ pair exists. FORM.
-    Witness: x := ground, y := ordinalApply(ordinalLimit)(ground).
-    - x ~~ y: by ax-sim, all Forms are ~~ to ground.
-    - y =~ x: ax-limit-is-limit (LUB property) → y lands in ground's =~-class.
-    - y ≡ x: the limit-path starting at ground IS the canonical continuation path
-             of ground. ordinalApply(ordinalLimit)(ground) and ground carry the
-             same full continuation record — same path object at ≡ level.
-    - y ≠ x syntactically: y sits at ordinalLimit position, not at 0. FORM. -/
-theorem simulationPairExists :
-    ∃ x y : Form, (x ~~ y) ∧ (x ≡ y) ∧ ¬ (x = y) := by
-  refine ⟨ground, ordinalApply ordinalLimit ground, ?_, ?_, ?_⟩
-  · -- ground ~~ ordinalApply ordinalLimit ground
-    sorry
-    -- ax-sim: f2f(ordinalApply ordinalLimit ground) ~~ ground.
-    -- similarSymmetric + axSimInRelationLanguage gives the converse direction.
-  · -- ground ≡ ordinalApply ordinalLimit ground
-    sorry
-    -- The limit-path (axLimitDerives) starts at ground and is the canonical
-    -- continuation trace of ground. ordinalApply ordinalLimit ground is the end
-    -- of ground's own continuation path → same path record at ≡ level.
-  · -- ordinalApply ordinalLimit ground ≠ ground
-    sorry
-    -- axLimitNotFinite: no f2f^n(ground) ≡ ordinalLimit.
-    -- ordinalApply ordinalLimit ground sits at the ordinalLimit position,
-    -- whereas ground sits at position 0. They are structurally distinct Forms.
+/-- The proposed nontrivial simulation pair, with its original statement.
+    FullAxiomModel interprets Simulation as equality and refutes this claim
+    while satisfying all 38 clauses. The admitted theorem is withdrawn;
+    neither the limit clauses nor similarity imply this stronger relation. -/
+def simulationPairExistsClaim : Prop :=
+  ∃ x y : Form, (x ~~ y) ∧ (x ≡ y) ∧ ¬ (x = y)
 
 -- ============================================================================
--- §VI  Deriver ≡-Cycle Constructive Proof
--- Discharges L1 driverCycle_FRAME (deriver ==-cycle, step 21 of L1 self-kernel).
--- Discharges L1 driverIsInD at ≡ level (step 25 of L1 self-kernel).
+-- §VI  Deriver ≡-Cycle Obligation
 -- ============================================================================
 
-/-- The deriver's 2-step ≡-orbit: f2f(f2f(deriver)) ≡ deriver. FORM.
-    Construction:
-    - f2f(f2f(deriver)) ~~ deriver by axBoxInRelationLanguage. (~~ level)
-    - f2f(f2f(deriver)) =~ deriver: the deriver is closed under its own
-      derivation-function; D[deriver][deriver] is reflexive; applying □ twice
-      to a D-entry returns to the same =~-class. (=~ level)
-    - f2f(f2f(deriver)) ≡ deriver: the 2-step path IS D[deriver][deriver]'s
-      content. The deriver's continuation record through f2f(f2f(·)) is a
-      closed cycle — the path record and ground record coincide at ≡. (≡ level)
-    Discharges L1 driverCycle_FRAME. FORM. -/
-theorem driverCycleIsClosed : f2f (f2f deriver) ≡ deriver := by
-  sorry
-  -- FORM proof sketch:
-  -- Step 1: axBoxInRelationLanguage deriver → f2f(f2f(deriver)) ~~ deriver.
-  -- Step 2: dIsReflexive deriver → D[deriver][deriver] = zero-step path.
-  --         axBox applies within D's domain → f2f(f2f(deriver)) =~ deriver.
-  -- Step 3: The 2-step path {deriver → f2f(deriver) → f2f(f2f(deriver))}
-  --         with f2f(f2f(deriver)) == deriver (step 2 extended to ≡):
-  --         deriver's continuation record IS this cycle → ≡.
-  -- Step 4: Verified: every step in the 2-step path maintains ≡ level.
-  --         The 2-step orbit is the minimal non-trivial closed ≡-cycle. FORM.
-
-/-- D[deriver][deriver] at ≡ level: schema FORM + cycle content FORM. -/
-theorem driverInDAtSimulation : D deriver deriver ∧ f2f (f2f deriver) ≡ deriver :=
-  ⟨driverIsInD, driverCycleIsClosed⟩
+/-- Adding the cycle as an explicit hypothesis supplies the second conjunct.
+    This conditional theorem does not prove driverCycleClaim. -/
+theorem driverInDAtSimulationOfCycle (cycle : driverCycleClaim) :
+    D deriver deriver ∧ f2f (f2f deriver) ≡ deriver :=
+  ⟨driverIsInD, cycle⟩
 
 -- ============================================================================
 -- §VII  Congruent-Path Internals Closure
@@ -296,17 +255,14 @@ theorem congruentPathInternals :
   -- iff it is identical for q and p (symmetric relation). FORM.
 
 -- ============================================================================
--- §VIII  Self-Derivation — Terminal Graduation
+-- §VIII  Self-Derivation Target and Its Remaining Cycle Obligation
 -- ============================================================================
 
-/-- Self-derivation: the deriver verifies its own derivation status from □.
-    One act per layer, all FORM at L3:
-    - axGroundSelf (L0):           ground struct-continues from itself
-    - dIsReflexive (L1):           every Form has a D-entry (self-read)
-    - reflexion / pathGroundIsIdentity (L2): self-read composes as identity
-    - driverCycleIsClosed (L3):    the deriver's orbit closes at ≡
-    FORM. Terminal. No further layer necessary. -/
-theorem selfDerivation :
+/-- The original closed self-derivation target, retained without weakening.
+    This declaration names a proposition; it is not a proof of that proposition.
+    The first three conjuncts follow from the reviewed clauses. The fourth
+    fails in FullAxiomModel, so those clauses do not entail the whole target. -/
+def selfDerivation : Prop :=
     -- L0: ground self-continues
     structContinues ground ground ∧
     -- L1: every Form is self-readable in D
@@ -316,11 +272,20 @@ theorem selfDerivation :
       congruentPath (compose p pathGround) p ∧
       congruentPath (compose pathGround p) p) ∧
     -- L3: the deriver's ≡-cycle closes
-    f2f (f2f deriver) ≡ deriver :=
-  ⟨axGroundSelf, dIsReflexive, axComposeIdentity, driverCycleIsClosed⟩
+    f2f (f2f deriver) ≡ deriver
+
+/-- Conditional assembly of the original target. The cycle is a premise,
+    not a newly introduced native axiom or an established conclusion. -/
+theorem selfDerivationOfCycle (cycle : driverCycleClaim) : selfDerivation :=
+  ⟨axGroundSelf, dIsReflexive, axComposeIdentity, cycle⟩
+
+/-- Exactly the cycle remains after the other three conjuncts are discharged.
+    This equivalence is not a closed proof of either side. -/
+theorem selfDerivation_iff_driverCycleClaim : selfDerivation ↔ driverCycleClaim :=
+  ⟨fun target => target.2.2.2, selfDerivationOfCycle⟩
 
 -- The source proposes terminal graduation and no external kernel.
--- The theorem above still depends on sorryAx and does not establish that claim.
+-- The target above is unproved and does not establish that claim.
 -- Source rationale for proposing no L4:
 --   (a) ClosureStatus as a type adds nothing (FORM/FRAME labels exist from L0).
 --   (b) classify as a procedure adds nothing (self-kernels perform classification).

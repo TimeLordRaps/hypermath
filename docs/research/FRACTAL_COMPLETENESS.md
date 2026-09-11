@@ -176,6 +176,11 @@ finite-action criterion and all three ordinal computation claims fail. Thus the
 current self-derivation proposition is not itself an arithmetic interpretation
 theorem. A positive result needs the typed reification, transfinite-path, and
 semantic preservation premises listed below.
+The separate two-chain model now refutes that same self-derivation target.
+The [cycle boundary](CYCLE_BOUNDARY.md) proves that its remaining obligation
+is exactly the two-step simulation cycle and records the withdrawal of the
+admitted cycle and nontrivial-pair theorems. The original target is preserved
+as an unproved proposition. Neither model settles the stronger native goal.
 Fractal reuse must retain or justify the observations needed for its actual
 domain of application; neither this obstruction nor the finite-orbit result
 establishes a completeness verdict.

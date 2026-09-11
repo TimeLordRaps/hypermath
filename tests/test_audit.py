@@ -18,6 +18,7 @@ from hypermath_foundations._baseline import (
     DEFINITION_DECLARATIONS,
     PROVED_DECLARATIONS,
     PROVED_DEPENDENCIES,
+    TARGET_CLAIM,
     TARGET_STATEMENT,
 )
 from hypermath_foundations._inventory import SOURCE_PARAMETERS, lean_code
@@ -44,7 +45,8 @@ def dependency_output(*, admitted=False, kind="theorem", missing=None):
                     TARGET: TARGET_STATEMENT + " := proofBody"}
     for name, declaration in declarations.items():
         if name == TARGET:
-            declaration = declaration.replace("theorem ", kind + " ", 1)
+            declaration = (TARGET_CLAIM if kind == "def" else
+                           declaration.replace("theorem ", kind + " ", 1))
         lines.extend([f"HYPERMATH_DECL_BEGIN:{name}", declaration, f"HYPERMATH_DECL_END:{name}"])
     for name in DEPENDENCY_TARGETS:
         if name == missing:
@@ -202,6 +204,44 @@ def test_admitted_target_keeps_build_success_separate(checkout, monkeypatch):
     assert not evaluate_gate(report)
     report["claims"]["self_derivation"]["status"] = "PASS"
     report["target"]["dependencies"] = []
+    assert not evaluate_gate(report)
+
+
+def test_named_target_is_not_a_closed_proof(checkout, monkeypatch):
+    root, _, run = checkout
+    monkeypatch.setattr(audit_module, "_run_process", lambda cmd, *args:
+                        (0, dependency_output(kind="def")) if cmd[-1] == "Audit.lean"
+                        else run(cmd, *args))
+    report = run_audit(root)
+    assert report["execution"]["completed"] is True
+    assert report["checks"]["assumption_policy"]["status"] == "PASS"
+    assert report["checks"]["proof_admissibility"]["attempted"] is True
+    assert report["checks"]["proof_admissibility"]["status"] == "FAIL"
+    assert report["target"]["kind"] == "def"
+    assert report["target"]["statement"] == TARGET_CLAIM
+    assert report["claims"]["self_derivation"]["status"] == "UNKNOWN"
+    assert not evaluate_gate(report)
+    # Forging the summary cannot turn the actual definition report into proof.
+    report["target"].update(kind="theorem", statement=TARGET_STATEMENT)
+    report["checks"]["proof_admissibility"]["status"] = "PASS"
+    report["claims"]["self_derivation"]["status"] = "PASS"
+    assert not evaluate_gate(report)
+
+
+@pytest.mark.parametrize("replacement", [
+    f"def {TARGET} : Prop := True",
+    f"def {TARGET} : Prop := Hypermath.driverCycleClaim → Hypermath.driverCycleClaim",
+    f"theorem {TARGET} : Hypermath.driverCycleClaim → Hypermath.selfDerivation := proofBody",
+])
+def test_named_target_body_and_closed_shape_are_bound(checkout, monkeypatch, replacement):
+    root, _, run = checkout
+    output = dependency_output(kind="def").replace(TARGET_CLAIM, replacement)
+    monkeypatch.setattr(audit_module, "_run_process", lambda cmd, *args:
+                        (0, output) if cmd[-1] == "Audit.lean" else run(cmd, *args))
+    report = run_audit(root)
+    assert report["checks"]["assumption_policy"]["status"] == "FAIL"
+    assert report["checks"]["proof_admissibility"]["status"] == "FAIL"
+    assert report["claims"]["self_derivation"]["status"] == "UNKNOWN"
     assert not evaluate_gate(report)
 
 

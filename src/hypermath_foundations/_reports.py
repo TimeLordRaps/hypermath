@@ -28,6 +28,7 @@ from ._baseline import (
     RECORD_ENCODING_SOURCE_SHA256,
     RECORD_MACHINE_CHECKS_SOURCE_SHA256,
     RECORD_MACHINE_SOURCE_SHA256,
+    TARGET_CLAIM,
     TARGET_STATEMENT,
     TRACE_CHECKS_SOURCE_SHA256,
     TRACE_SOURCE_SHA256,
@@ -41,8 +42,8 @@ DEPENDENCY_TARGETS = (
     "Hypermath.orbitStructure", "Hypermath.similarReflexive",
     "Hypermath.derivesIsDirectional", "Hypermath.dIsReflexive",
     "Hypermath.plusAndAdditionallyAreDistinct", "Hypermath.pathGroundIsIdentity",
-    "Hypermath.simulationPairExists",
-    "Hypermath.driverCycleIsClosed", TARGET,
+    "Hypermath.simulationPairExistsClaim",
+    "Hypermath.driverCycleClaim", TARGET,
     *[name for name in PROVED_DECLARATIONS if name != "Hypermath.dIsReflexive"],
 )
 COUNTERMODEL_TARGETS = tuple("HypermathCountermodel." + name for name in (
@@ -224,6 +225,8 @@ RECORD_MACHINE_TARGETS = tuple(RECORD_MACHINE_DEPENDENCIES)
 FULL_MODEL_DEPENDENCIES = {
     **{"HypermathFullAxiomModel." + name: [] for name in (
         "same_conclusion_opposite_acceptance", "no_conclusion_only_record_checker",
+        "driver_cycle_claim_fails", "nontrivial_simulation_claim_fails",
+        "self_derivation_target_fails",
     )},
     **{"HypermathFullAxiomModel." + name: ["propext"] for name in (
         "finite_numerals_injective", "recordValue_is_interpretation",
@@ -233,6 +236,7 @@ FULL_MODEL_DEPENDENCIES = {
        for name in (
            "full_axioms_hold", "boundary_probe", "full_clauses_with_faithful_records",
            "no_preserving_record_to_formula", "full_clauses_with_rejected_closed_record",
+           "full_clauses_without_cycle_or_nontrivial_simulation",
        )},
     **{"HypermathFullAxiomModel." + name: ["Quot.sound", "propext"] for name in (
         "readRecordValue_recordValue", "readFormulaValue_formulaValue",
@@ -323,12 +327,17 @@ def dependency_records(output: str, expected: tuple[str, ...]) -> dict[str, list
     return records
 
 
-def target_is_theorem(output: str) -> bool:
+def target_declaration_kind(output: str) -> str | None:
+    """Distinguish a closed proof from a named, unproved proposition."""
     matches = re.findall(
         r"(?m)^(theorem|axiom|def|opaque)\s+Hypermath\.selfDerivation(?:\.\{[^}]*\})?\s*:",
         output,
     )
-    return matches == ["theorem"]
+    return matches[0] if len(matches) == 1 and matches[0] in {"theorem", "def"} else None
+
+
+def target_is_theorem(output: str) -> bool:
+    return target_declaration_kind(output) == "theorem"
 
 
 def kernel_declarations(output: str) -> dict[str, str]:
@@ -340,7 +349,8 @@ def kernel_declarations(output: str) -> dict[str, str]:
     if len(records) != len(pairs) or set(records) != expected:
         raise ValueError("missing, duplicate, or unexpected kernel declaration report")
     for name, declaration in records.items():
-        kind = "theorem" if name == TARGET or name in PROVED_DECLARATIONS else "axiom"
+        kind = (target_declaration_kind(output) if name == TARGET else
+                "theorem" if name in PROVED_DECLARATIONS else "axiom")
         if name in DEFINITION_DECLARATIONS:
             # Definition bodies and attributes are compared verbatim by policy_errors.
             continue
@@ -348,8 +358,11 @@ def kernel_declarations(output: str) -> dict[str, str]:
             raise ValueError("kernel declaration has the wrong name or kind")
     for name in {TARGET} | set(PROVED_DECLARATIONS):
         if " :=" not in records[name]:
-            raise ValueError("theorem report lacks a proof body")
-        records[name] = records[name].split(" :=", 1)[0]
+            raise ValueError("target or theorem report lacks a body")
+        # A proposition definition's body IS the target statement. Never
+        # discard it as though it were an irrelevant proof implementation.
+        if name != TARGET or target_is_theorem(output):
+            records[name] = records[name].split(" :=", 1)[0]
     return records
 
 
@@ -358,7 +371,7 @@ def policy_errors(output: str, inputs: dict, assumptions: list[dict]) -> list[st
     records = kernel_declarations(output)
     dependencies = dependency_records(output, DEPENDENCY_TARGETS)
     reasons = []
-    if records[TARGET] != TARGET_STATEMENT:
+    if records[TARGET] not in {TARGET_STATEMENT, TARGET_CLAIM}:
         reasons.append("selfDerivation statement differs from the reviewed target")
     if {k: records[k] for k in AXIOM_DECLARATIONS} != AXIOM_DECLARATIONS:
         reasons.append("kernel axiom declarations differ from the reviewed assumption policy")

@@ -31,7 +31,7 @@ from ._reports import (
     kernel_declarations,
     policy_errors,
     probe_dependencies_valid,
-    target_is_theorem,
+    target_declaration_kind,
 )
 
 
@@ -229,10 +229,11 @@ def run_audit(root, timeout=60, *, inventory_only=False, lake=None) -> dict:
                     break
                 if name == "dependency_output":
                     records = dependency_records(output, DEPENDENCY_TARGETS)
-                    if not target_is_theorem(output):
-                        raise ValueError("selfDerivation was not reported as a theorem")
+                    kind = target_declaration_kind(output)
+                    if kind is None:
+                        raise ValueError("selfDerivation lacks a unique theorem or definition report")
                     declarations = kernel_declarations(output)
-                    report["target"].update(kind="theorem", dependencies=records[TARGET],
+                    report["target"].update(kind=kind, dependencies=records[TARGET],
                                             statement=declarations[TARGET])
                     for assumption in assumptions:
                         assumption["kernel_declaration"] = declarations.get(assumption["name"])
@@ -262,7 +263,7 @@ def run_audit(root, timeout=60, *, inventory_only=False, lake=None) -> dict:
     report["execution"]["completed"] = inventory_only or all(
         item["status"] == "PASS" for item in report["checks"].values())
     policy = _check("Kernel assumption policy was not checked")
-    if report["target"]["kind"] == "theorem":
+    if report["target"]["kind"] in {"theorem", "def"}:
         errors = policy_errors(report["checks"]["dependency_output"]["output"], before, assumptions)
         policy.update(status="FAIL" if errors else "PASS", attempted=True,
                       reasons=errors or ["Kernel assumptions and target match the reviewed allowance"])
@@ -270,7 +271,11 @@ def run_audit(root, timeout=60, *, inventory_only=False, lake=None) -> dict:
     status, reasons = "UNKNOWN", ["Fresh successful proof reports are unavailable"]
     if report["execution"]["completed"] and not inventory_only:
         deps = report["target"]["dependencies"]
-        if "sorryAx" in deps:
+        if report["target"]["kind"] != "theorem":
+            status, reasons = "UNKNOWN", [
+                "selfDerivation names an unproved proposition, not a closed proof",
+            ]
+        elif "sorryAx" in deps:
             status, reasons = "UNKNOWN", ["selfDerivation transitively depends on sorryAx"]
         elif policy["status"] == "PASS":
             status, reasons = "PASS", [
@@ -280,10 +285,11 @@ def run_audit(root, timeout=60, *, inventory_only=False, lake=None) -> dict:
     admissibility = "UNKNOWN"
     if report["execution"]["completed"] and not inventory_only:
         admissibility = "FAIL" if (
-            "sorryAx" in report["target"]["dependencies"] or policy["status"] != "PASS"
+            report["target"]["kind"] != "theorem"
+            or "sorryAx" in report["target"]["dependencies"] or policy["status"] != "PASS"
         ) else "PASS"
     report["checks"]["proof_admissibility"] = {
-        "status": admissibility, "attempted": report["target"]["kind"] == "theorem",
+        "status": admissibility, "attempted": report["target"]["kind"] in {"theorem", "def"},
         "exit_code": None, "output": "", "reasons": list(reasons),
     }
     if not report["inputs"]["stable"]:

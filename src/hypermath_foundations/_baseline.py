@@ -158,7 +158,12 @@ AXIOM_DECLARATIONS = {'Hypermath.Congruent': 'axiom Hypermath.Congruent : Hyperm
 
 TARGET_STATEMENT = 'theorem Hypermath.selfDerivation : And (Hypermath.structContinues Hypermath.ground Hypermath.ground) (And (∀ (x : Hypermath.Form), Hypermath.D x x) (And (∀ (p : Hypermath.DerivationPath), And (Hypermath.congruentPath (Hypermath.compose p Hypermath.pathGround) p) (Hypermath.congruentPath (Hypermath.compose Hypermath.pathGround p) p)) (Hypermath.Simulation (Hypermath.f2f (Hypermath.f2f Hypermath.deriver)) Hypermath.deriver)))'
 
-AUDIT_SOURCE_SHA256 = '3363bd416af4ba6588d505b34cfd935d5d253cb1cc60c36dfc15d765fe1a0130'
+# The definition retains exactly the closed proposition above. Its successful
+# elaboration is not a proof, and the strict gate still requires a theorem.
+TARGET_CLAIM = TARGET_STATEMENT.replace(
+    'theorem Hypermath.selfDerivation : ', 'def Hypermath.selfDerivation : Prop := ', 1)
+
+AUDIT_SOURCE_SHA256 = '5d8fe43de787bf8128d577da4a0e9cc8009b101da6f3c2844c9a9410022b799e'
 COUNTERMODEL_SOURCE_SHA256 = 'b822d53b244418db1c3a505332b6090d9da72bc6e0fe3ce620bd9e5c5413adc7'
 LEAN_BUILTINS = frozenset({"propext", "Classical.choice", "Quot.sound"})
 
@@ -386,7 +391,7 @@ OBSERVATION_SOURCE_SHA256 = '528fc4fe96beeca0e4b06783652348f66c5bc273f47446230cf
 
 OBSERVATION_CHECKS_SOURCE_SHA256 = '0cb28bb33dd2711c764732d41536f331d150b27b7854f7b96580608a09d2ffcd'
 
-FULL_MODEL_SOURCE_SHA256 = '4640c5facb2d6c96a4aca11ca0f421e0be05aabe63838f78ecd9d0d50fd01bdb'
+FULL_MODEL_SOURCE_SHA256 = '7be2b16fdfb1e8032faf1660d2fe69e0525fabda5a91978b69c3432b4652cac0'
 
 # Reviewed finite-action criterion and retained ordinal computation claims.
 DEFINITION_DECLARATIONS.update({
@@ -521,3 +526,35 @@ RECORD_ENCODING_SOURCE_SHA256 = '1300264388fe739c2d4a0648295696f3cae284861b56286
 RECORD_ENCODING_CHECKS_SOURCE_SHA256 = '803f0ad6fcb2a05780587a1258809bda97746a8453384df5c053779024c11829'
 RECORD_MACHINE_SOURCE_SHA256 = 'ca5dfb31a584dfac8aae7641e3f752384044f26ac8c614d10951f23c5f97432b'
 RECORD_MACHINE_CHECKS_SOURCE_SHA256 = '42192309d8f39de753ccee7ae3b1845f973cfea8d44f72ccfd35a3d79e6826ae'
+
+# Retained claims and conditional assembly. None proves the cycle itself.
+DEFINITION_DECLARATIONS.update({
+    'Hypermath.driverCycleClaim':
+        'def Hypermath.driverCycleClaim : Prop := Hypermath.Simulation '
+        '(Hypermath.f2f (Hypermath.f2f Hypermath.deriver)) Hypermath.deriver',
+    'Hypermath.simulationPairExistsClaim':
+        'def Hypermath.simulationPairExistsClaim : Prop := Exists fun x => '
+        'Exists fun y => And (Hypermath.Similar x y) '
+        '(And (Hypermath.Simulation x y) (Not (Eq x y)))',
+})
+PROVED_DECLARATIONS.update({
+    'Hypermath.driverInDAtSimulationOfCycle':
+        'theorem Hypermath.driverInDAtSimulationOfCycle : Hypermath.driverCycleClaim → '
+        'And (Hypermath.D Hypermath.deriver Hypermath.deriver) '
+        '(Hypermath.Simulation (Hypermath.f2f (Hypermath.f2f Hypermath.deriver)) Hypermath.deriver)',
+    'Hypermath.selfDerivationOfCycle':
+        'theorem Hypermath.selfDerivationOfCycle : Hypermath.driverCycleClaim → Hypermath.selfDerivation',
+    'Hypermath.selfDerivation_iff_driverCycleClaim':
+        'theorem Hypermath.selfDerivation_iff_driverCycleClaim : '
+        'Iff Hypermath.selfDerivation Hypermath.driverCycleClaim',
+})
+PROVED_DEPENDENCIES.update({
+    'Hypermath.driverInDAtSimulationOfCycle':
+        ('Hypermath.Congruent', 'Hypermath.Form', 'Hypermath.Simulation',
+         'Hypermath.deriver', 'Hypermath.f2f'),
+    **{name: ('Hypermath.Congruent', 'Hypermath.DerivationPath', 'Hypermath.Form',
+              'Hypermath.Simulation', 'Hypermath.axComposeIdentity', 'Hypermath.axGroundSelf',
+              'Hypermath.compose', 'Hypermath.congruentPath', 'Hypermath.deriver',
+              'Hypermath.f2f', 'Hypermath.ground', 'Hypermath.pathGround', 'Hypermath.structContinues')
+       for name in ('Hypermath.selfDerivationOfCycle', 'Hypermath.selfDerivation_iff_driverCycleClaim')},
+})
