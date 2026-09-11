@@ -1,0 +1,108 @@
+name: checks
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+  workflow_call:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: hypermath-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  PYTHONUTF8: "1"
+  PYTHONUNBUFFERED: "1"
+
+jobs:
+  software:
+    name: software (${{ matrix.os }}, Python ${{ matrix.python }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            python: "3.10"
+          - os: ubuntu-latest
+            python: "3.13"
+          - os: windows-latest
+            python: "3.12"
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: ${{ matrix.python }}
+      - run: python -m pip install -e ".[dev,verification]"
+      - run: python -m pytest tests -vv -s --durations=10 --timeout=60
+      - run: python -m ruff check src tests scripts lean4/audit.py
+      - run: python -u scripts/check_reference_sources.py
+      - run: python -u scripts/check_audit_models.py
+      - run: python -m build
+      - run: python -m twine check dist/*
+      - run: python -u scripts/check_installed_wheel.py
+      - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
+        with:
+          name: distributions-${{ matrix.os }}-${{ matrix.python }}
+          path: dist/*
+          if-no-files-found: error
+
+  native-audit-integrity:
+    name: native audit integrity (build and replay)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.12"
+      - run: python -m pip install ".[verification]"
+      - run: python -u scripts/setup_lean.py
+      - name: Recompute and bind native audit evidence
+        run: >-
+          python -u scripts/check_foundation.py --output build/native-audit-integrity
+          --timeout 60
+      - name: Retain native audit-integrity evidence
+        if: always()
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
+        with:
+          name: native-audit-integrity-evidence
+          path: build/native-audit-integrity/
+          if-no-files-found: error
+          retention-days: 90
+
+  self-derivation:
+    name: self-derivation and completeness gate
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.12"
+      - run: python -m pip install ".[verification]"
+      - run: python -u scripts/setup_lean.py
+      - name: Recompute, bind evidence, and require self-derivation and completeness
+        run: >-
+          python -u scripts/check_foundation.py --require-self-derivation
+          --require-complete --timeout 60
+      - name: Retain evidence even when the mathematical gate fails
+        if: always()
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
+        with:
+          name: foundation-evidence
+          path: build/verification/
+          if-no-files-found: error
+          retention-days: 90

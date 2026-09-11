@@ -1,0 +1,10 @@
+lean4/.lake/
+__pycache__/
+*.py[cod]
+build/
+.venv/
+.pytest_cache/
+.ruff_cache/
+dist/
+*.egg-info/
+.coverage

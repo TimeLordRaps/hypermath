@@ -8,6 +8,7 @@
 -- Source: L1_relations.hm
 
 import Hypermath.L0Ground
+import Hypermath.Trace
 
 namespace Hypermath
 
@@ -60,15 +61,6 @@ theorem axDiffInRelationLanguage :
 theorem groundFixedPoint : f2f ground ~~ ground :=
   (axDiffInRelationLanguage ground).1
 
-/-- The □-orbit: {ground, f2f(ground), f2f(f2f(ground))} is a single ~~ class. FORM. -/
-theorem orbitStructure :
-    (f2f ground ~~ ground) ∧
-    (f2f (f2f ground) ~~ ground) ∧
-    (f2f (f2f ground) ~~ f2f ground) :=
-  ⟨groundFixedPoint,
-   axSimInRelationLanguage (f2f ground),
-   similarSymmetric _ _ (axSimInRelationLanguage (f2f ground))⟩
-
 /-- A non-trivial ≡ pair exists. FRAME/L3.
     Witness constructed in L3Ordinatics.lean (simulationPairExists). -/
 theorem simulationPairExists_L1 : ∃ x y : Form, (x ~~ y) ∧ (x ≡ y) := by
@@ -108,7 +100,7 @@ theorem nc4_L1 : ∃ x y : Form, (x ~~ y) ∧ x ≠ y := by
 axiom closeSyntaxOpaque :
     ∀ x : Form,
       HMSyntax x ↔
-      ∃ n : ℕ, f2f^[n] ground ~~ x
+      ∃ n : Nat, Nat.repeat f2f n ground ~~ x
 
 /-- substance closes to =~-equivalence class of x. FORM. Discharges L0 step 26. -/
 axiom closeSubstanceOpaque :
@@ -120,7 +112,7 @@ axiom closeSemanticsOpaque :
 
 /-- derives(x, y) closes to: ∃ finite n, f2f^n(x) =~ y. FORM. Discharges L0 step 28. -/
 axiom closeDerivesOpaque :
-    ∀ x y : Form, Derives x y ↔ ∃ n : ℕ, f2f^[n] x =~ y
+    ∀ x y : Form, Derives x y ↔ ∃ n : Nat, Nat.repeat f2f n x =~ y
 
 /-- discharge(c, e) closes to: Derives e c is FORM. FORM. Discharges L0 step 29. -/
 axiom closeDischargeOpaque :
@@ -172,6 +164,17 @@ axiom traceLevels :
       ((f2f x =~ x) → (f2f x ~~ x)) ∧          -- (b) =~ implies ~~
       ((f2f x ≡ x) → (f2f x =~ x))             -- (a) ≡ implies =~
 
+/-- The displayed pairwise orbit relations follow from the declared trace axiom.
+    Placed after traceLevels because ax-sim plus symmetry alone does not give
+    the third pair. This proves these pairs, not transitivity of Similar. -/
+theorem orbitStructure :
+    (f2f ground ~~ ground) ∧
+    (f2f (f2f ground) ~~ ground) ∧
+    (f2f (f2f ground) ~~ f2f ground) :=
+  ⟨groundFixedPoint,
+   axSimInRelationLanguage (f2f ground),
+   (traceLevels (f2f ground)).1⟩
+
 -- ============================================================================
 -- §VII  Deriver and Derivation Matrix
 -- N_1_atomic = 2: deriver, D.
@@ -180,43 +183,95 @@ axiom traceLevels :
 /-- The deriver: a Form whose purpose is to traverse D and produce closure
     certificates. Its ==-cycle (≡-cycle) is FRAME/L3;
     discharged in L3Ordinatics.lean. -/
-opaque deriver : Form
+axiom deriver : Form
 
-/-- The derivation matrix.
-    D[x][y] = there exists a trace-path from x to y at =~+.
-    Schema is FORM at L1. Cycle-closure content at ≡ level is FRAME/L3. -/
-opaque D : Form → Form → Prop
+/-- One apply-step admitted to D, with evidence that it preserves at least =~.
+    A ~~ step alone is insufficient. Simulation steps enter by filtrationSimCong. -/
+def DStep (x y : Form) : Prop := y = f2f x ∧ Congruent y x
+
+/-- The finite trace witness for a D-entry, with its start and end in the type.
+    This implements the =~ floor in L1_relations.hm:401–415. It does not yet
+    encode the strongest per-step relation, nondecreasing trace metadata, or
+    the separate opaque DerivationPath and its L3 limit-path interpretation. -/
+abbrev DEntry (x y : Form) := Trace DStep x y
+
+/-- D[x][y] holds precisely when a finite apply-trace preserving =~ exists.
+    The witness remains available in DEntry; D is its proposition of existence. -/
+def D (x y : Form) : Prop := Nonempty (DEntry x y)
+
+/-- The concrete zero-step self-read at x, requiring no congruence premise. -/
+def selfRead (x : Form) : DEntry x x := Trace.nil x
+
+/-- A nonempty D-entry requires actual evidence of the edge's congruence.
+    f2f remains an uninterpreted source parameter, so this is not executable. -/
+noncomputable def dEntryStep (x : Form) (h : Congruent (f2f x) x) : DEntry x (f2f x) :=
+  Trace.cons ⟨rfl, h⟩ (Trace.nil (f2f x))
+
+/-- Composition preserves every edge witness and requires matching endpoints. -/
+def dEntryCompose {x y z : Form} (p : DEntry x y) (q : DEntry y z) : DEntry x z :=
+  Trace.compose p q
+
+theorem selfReadLength (x : Form) : Trace.length (selfRead x) = 0 := rfl
+
+/-- The guarded step constructor records exactly one edge. -/
+theorem dEntryStepLength (x : Form) (h : Congruent (f2f x) x) :
+    Trace.length (dEntryStep x h) = 1 := rfl
+
+/-- A D-entry's recorded length gives its exact finite apply-iteration. -/
+theorem dEntryEndpointIteration {x y : Form} (p : DEntry x y) :
+    Nat.repeat f2f (Trace.length p) x = y := by
+  have iterate_step : ∀ (n : Nat) (a : Form),
+      Nat.repeat f2f (n + 1) a = Nat.repeat f2f n (f2f a) := by
+    intro n a
+    induction n with
+    | zero => rfl
+    | succ n ih => exact congrArg f2f ih
+  induction p with
+  | nil => rfl
+  | cons edge tail ih =>
+    rw [Trace.length, iterate_step, ← edge.1]
+    exact ih
+
+/-- Without an admissible D-step, every existing witness is a zero-step read. -/
+theorem dEntryNoSteps (noSteps : ∀ x y : Form, ¬ DStep x y)
+    {x y : Form} (p : DEntry x y) : Trace.length p = 0 ∧ x = y := by
+  cases p with
+  | nil => exact ⟨rfl, rfl⟩
+  | cons edge tail => exact False.elim (noSteps _ _ edge)
 
 /-- D[x][x] for every x: every Form has a zero-step self-read in D. FORM. -/
-theorem dIsReflexive : ∀ x : Form, D x x := by
-  sorry
-  -- FORM: zero-step path = path-ground (L2). D[x][x] := path-ground at x.
-  -- The path-ground-is-identity (L2) makes this the identity entry.
+theorem dIsReflexive : ∀ x : Form, D x x :=
+  fun x => ⟨selfRead x⟩
 
-/-- D[ground][y] for all y: ground can reach any Form via an apply-chain. FORM. -/
-theorem dSpansGround : ∀ y : Form, D ground y := by
-  sorry
-  -- FORM: ax-sim gives f2f(ground) ~~ ground. By iteration, ground derives
-  -- toward any Form in the ~~ orbit. D[ground][y] exists for all y in orbit.
+/-- D is transitive by composition of its finite trace witnesses. -/
+theorem dIsTransitive {x y z : Form} : D x y → D y z → D x z := by
+  rintro ⟨p⟩ ⟨q⟩
+  exact ⟨dEntryCompose p q⟩
 
-/-- D[deriver][deriver] entry exists. Schema: FORM.
-    Content at ≡ level: FRAME/L3 (discharged in L3Ordinatics). -/
+/-- The universal ground-spanning claim proposed in L1_relations.hm:418–425.
+    This is a proposition, not an assumed theorem. With finite D witnesses,
+    L3's limit separation refutes it in notGroundSpanningClaim. The original
+    admitted dSpansGround theorem has therefore been withdrawn. -/
+def groundSpanningClaim : Prop := ∀ y : Form, D ground y
+
+/-- The reflexive, zero-step D entry exists. It does not supply a two-step
+    simulation cycle; that separate claim remains unproved. -/
 theorem driverIsInD : D deriver deriver :=
   dIsReflexive deriver
 
-/-- deriver ≡-cycle: f2f(f2f(deriver)) ≡ deriver. FRAME/L3.
-    Discharged in L3Ordinatics.lean, theorem driverCycleIsClosed. -/
-theorem driverCycle_FRAME : f2f (f2f deriver) ≡ deriver := by
-  sorry
-  -- FRAME/L3: constructive proof requires ordinal continuation machinery.
+/-- The proposed two-step simulation cycle, retained as an unproved claim.
+    FullAxiomModel satisfies all 38 clauses and refutes this statement.
+    The former admitted driverCycle_FRAME theorem has been withdrawn. -/
+def driverCycleClaim : Prop := f2f (f2f deriver) ≡ deriver
 
 -- ============================================================================
 -- §VIII  L1 Self-Kernel
 -- P_1 = 25 steps. N_1_atomic = 2 (deriver, D). G_1 = 4.
 -- FRAME residuals:
---   step 10: simulationPairExists — FRAME/L3 (discharged in L3Ordinatics)
---   step 21: deriver ==-cycle content — FRAME/L3 (discharged in L3Ordinatics)
---   step 25: D[deriver][deriver] at ≡ level — FRAME/L3 (discharged in L3Ordinatics)
+--   step 10: simulation pairs — the weak L1 theorem remains admitted;
+--            the stronger nontrivial L3 claim is refuted in a full-clause model.
+--   step 21: deriver ==-cycle content — unproved driverCycleClaim.
+--   step 25: D[deriver][deriver] at ≡ level — conditional on driverCycleClaim.
 -- All 25 steps represented by the declarations above.
 -- ============================================================================
 

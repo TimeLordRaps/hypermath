@@ -1,182 +1,205 @@
 # hypermath
 
-A closed formal universe built from one primitive operation.
+A self-derivational mathematical framework built around the operation □, ordinal
+structure, and reusable representations of derivations. Author: Tyler Roost /
+The TimeLord.
 
-> *And it is mechanically operational — though that is left to the reader to verify themselves. The universe already does it for you.* — The TimeLord
+The research objective is to derive the system's mathematical and semantic
+structure from its stated ground, and investigate **Gödelian complete ordinal
+arithmetic through fractal meta-representations**. Here a closed derivation may
+become an atom for further derivation while retaining its formation path. The
+completeness definition, preservation theorem, and arithmetic soundness bridge
+are active research obligations.
 
-Everything in hypermath derives from a single act: □ applied to a form returns a form in the same structural class. No imports. No external axioms. No presupposed logic. The universe generates its own relations, closes its own structure, and verifies itself from within.
+## Current state
 
----
+The repository contains four `.hm` specification layers and a Lean 4 translation.
+The `.hm` files use `FORM` and `FRAME` as source-native closure labels. Those labels
+record the proposed derivations; they do not by themselves establish successful
+proof checking. The Lean translation contains explicit assumptions and unresolved
+`sorry` proof obligations. A successful build can include such obligations.
 
-## What it is
+The source does not yet establish an axiom-free executable kernel, a complete
+arithmetic proof system, or a proof that its self-representation verifies every
+arithmetic conclusion. The research goal remains in scope. See the
+[proof audit](docs/research/PROOF_AUDIT.md) for concrete defects and dependencies,
+and the [completeness target](docs/research/FRACTAL_COMPLETENESS.md) for the next
+mathematical obligations.
 
-Most formal systems import their foundations — ZFC, type theory, proof assistants that require a trusted kernel from outside. hypermath builds the kernel from scratch, starting from nothing and deriving upward one layer at a time.
+The [finite-trace repair](docs/research/FINITE_TRACES.md) gives `D` actual finite
+witnesses and proves self-read, composition, and recorded-step preservation.
+It removes one admission and one unconstrained parameter. A checked countermodel
+still separates an endpoint cycle from preservation throughout that cycle.
 
-Each layer licenses the next. No layer builds on content that hasn't been formally closed by the layer below it.
+The [finite arithmetic bridge](docs/research/FINITE_ARITHMETIC.md) now proves
+least finite closure and preservation of Form-valued length observations. It
+also refutes the proposed universal ground-spanning claim under the existing
+limit axiom. A separate interpretation satisfies all 38 declared logical
+clauses while exposing their weaker treatment of limits and path endpoints.
 
-### The ground
+Finite numeral addition and multiplication respect equality of ground-orbit
+representations without assuming that distinct counts produce distinct Forms.
+Every finite-orbit Form has a natural-number representative; if the numeral
+encoding is injective, the checked encode/decode laws give a two-sided
+correspondence with the natural numbers and equal numeral Forms induce equal
+iterations from every starting Form. The conditional exact host action uses
+classical choice; agreement with native `ordinalApply` remains separate. A
+six-form countermodel satisfies all 38 clauses, with congruence
+an equivalence relation, but prevents both exact and congruence-valued actions
+of that kind. It also shows that the proposed zero, successor, and opaque
+path-length laws do not follow from those clauses. Their statements remain
+named propositions instead of admitted theorems. The translation now has
+67 declared assumptions and 11 admissions; the audit binds 45 proved milestone
+declarations. Removing those three admissions records non-entailment, not
+three completed proofs. The model additionally satisfies the exact current
+self-derivation target while those arithmetic bridges fail. This proves that
+the current target is insufficient for an arithmetic interpretation; it does
+not refute a stronger target with typed reification and transfinite semantics.
+The model does not encode the stronger, unformalized native intent that all
+Forms arise from the ground.
 
-One primitive operation: **□(x)** — apply ground to any form, get a form.
+A second full-clause model refutes the two-step simulation cycle and nontrivial
+simulation-pair claim. Their admitted proofs have been withdrawn, and
+`selfDerivation` now names the unchanged, unproved proposition. Conditional
+assembly shows that its first three conjuncts reduce the remaining obligation
+exactly to the cycle. The [cycle boundary](docs/research/CYCLE_BOUNDARY.md)
+records this proof-interface change and its counterexamples. Audit integrity
+can pass for a faithfully reported definition; the strict proof gate cannot.
 
-From this single operation, four axioms:
+The [finite ground-syntax checker](docs/research/GROUND_SYNTAX.md) represents
+instances of the four primitive ground rules as records built from `ground`
+and `apply`. It proves decoding, exact conclusion checking, soundness under the
+existing rules, and repeated argument reinstantiation. Semantic interpretation
+can identify distinct records, so this syntax is not silently identified with
+native `Form` values. The required audit checks 23 additional reports.
 
-- **ax-ground-self**: □(□) ~~ □ — ground applied to itself returns to its own class
-- **ax-sim**: apply(x) ~~ ground for all ground-generated x — every application stays in the generative class
-- **ax-box**: apply(apply(x)) ~~ x — double application returns to origin
-- **ax-diff**: there exist distinct forms — structure is non-trivial
+The [composed ground calculus](docs/research/COMPOSED_GROUND_DERIVATIONS.md)
+adds typed rule trees, the three existing predicate closes, conjunction, and
+checked projections. Every typed derivation has an accepted record, and typed
+reconstruction preserves the entire accepted rule tree. Soundness uses the
+existing source premises; the 26 additional reports introduce no admission or
+native axiom.
 
-### The three relations
+The [record encoding](docs/research/RECORD_ENCODING.md) maps composed records and
+formulas to single free ground terms, with proved recovery, preservation of all
+record observations, and agreement with the composed checker. Its packed
+numerical interface avoids expanding the enormous unary term. The 45 additional
+dependency reports expose all host assumptions, including classical choice in
+the size-bound proof. The existing model of all 38 clauses now supplies one
+faithful semantic interpretation and exact checker correspondence. This is a
+compatibility witness; source adequacy and internally derived acceptance
+remain necessary before this realizes the ranked meta-surface.
 
-Ground generates the relations from each other. Each is produced by applying □ to the previous relation:
+The [native acceptance boundary](docs/research/NATIVE_ACCEPTANCE.md) checks why
+executive closure cannot substitute for that missing acceptance construction.
+A malformed projection has the same true conclusion as a valid primitive
+record, and both encoded forms satisfy the model's executive and ground-anchoring
+conditions. The checker distinguishes their formation trees. An internal
+acceptance proof must bind those trees and their premises to the claimed result.
 
-| Relation | Symbol | Meaning | Generation |
-|----------|--------|---------|------------|
-| similar | `~~` | non-empty overlap in continuation capacity | founding relation |
-| congruent | `=~` | full coincidence of continuation capacity — same outcomes, paths discarded | □(~~) → =~ |
-| simulation | `==` | mutual path reproduction — same outcomes AND same paths | □(=~) → == |
+The [record execution machine](docs/research/RECORD_MACHINE.md) now performs
+those finite rule checks instruction by instruction. It agrees with the
+recursive checker on every record and verifies submitted execution traces
+against the exact record and conclusion. Failed premises remain failed, even
+through later projections or introductions. Its 40 mandatory dependency reports
+contain no admissions or native assumptions. The machine still uses host
+syntax and operations; their native realization and ranked acceptance remain
+open.
 
-`==` implies `=~` implies `~~`. Not the reverse. `==` is earned by closure, never presupposed.
+The [substitution executor](docs/research/RULE_SUBSTITUTION.md) makes each
+checking call's rule, indexed substitution, and exact premise stack explicit.
+Every call has a recoverable free-ground representation; executing the packed
+calls agrees with the original checker on every finite proof record. Its 47
+additional mandatory reports preserve the distinction between represented
+inputs and source-native execution or ranked acceptance.
 
-### The triangle
+## Ground and relations
 
-Three predicates form a directed cycle that closes over every form in the universe:
+`Form` names the source's forming structure, `ground` its distinguished base,
+and `apply(x)` its □ operation. In the Lean translation these are explicit
+uninterpreted assumptions. Lean's logic is the translation's ambient checker;
+a correspondence with the source-native proposition and closure semantics is
+not yet proved.
 
+The specification distinguishes:
+
+| Relation | Source notation | Intended meaning |
+| --- | --- | --- |
+| Similarity | `~~` | Nonempty overlap in continuation capacity |
+| Congruence | `=~` | Coinciding continuation outcomes |
+| Simulation | `==` | Mutual reproduction of derivation paths |
+
+The declared filtration permits simulation to imply congruence and congruence
+to imply similarity. It does not license either reverse implication. Source
+`==` is not Lean's equality. The Lean notation for simulation is `≡`.
+
+The four initial structural axiom clauses concern distinction from ground,
+continuation from ground, double-application return, and ground's own
+continuation. Additional relation, semantic, path, and ordinal assumptions
+occur in later sections; the whole specification is not merely four axioms.
+
+## Reading and source map
+
+| Layer | Specification | Intended role |
+| --- | --- | --- |
+| L0: Ground | [L0_ground.hm](L0_ground.hm) | Primitives, structural relations, executive predicates |
+| L1: Relations | [L1_relations.hm](L1_relations.hm) | Filtration, derivation matrix, semantic closes |
+| L2: Operations | [L2_operations.hm](L2_operations.hm) | Composition and paths |
+| L3: Ordinatics | [L3_ordinatics.hm](L3_ordinatics.hm) | Ordinal extension and proposed self-derivation |
+
+The [Seed-ai source map](docs/research/SOURCE_MAP.md) connects the broader
+hypergrammar and earlier hypermath specifications to these layers. Selected
+source snapshots retain their original wording for comparison; they do not
+replace the current specifications or become checked proofs through import.
+The [term dictionary](docs/terms/Form.md) explains the project's vocabulary.
+
+## Install and check the foundation
+
+The Python distribution is `hypermath-foundations`; its import name is
+`hypermath_foundations`. The unrelated package named `hypermath` on the Python
+Package Index is not this project. From a checkout, with Python 3.10 or newer:
+
+```console
+python -m pip install '.[verification]'
+python -u scripts/check_foundation.py --require-self-derivation
 ```
-syntax → substance → semantics → syntax
+
+This runs fresh Lean checks and a Verifier Standard (VSTD) evidence session,
+then applies the self-derivation gate. Unresolved claims remain `UNKNOWN`, and
+the gate exits with status 2. Evidence is retained under `build/verification`.
+The current package is prepared for source installation; an index release is
+a separate publication step.
+
+## Lean translation
+
+The pinned toolchain is recorded in [lean4/lean-toolchain](lean4/lean-toolchain).
+After installing that toolchain and the Python package, run from `lean4`:
+
+```console
+python -u audit.py
 ```
 
-- **syntax** (~~ level): the shape of a form — how it can be checked without knowing what it means
-- **substance** (=~ level): the matter of a form — what it is made of, independent of how it got there
-- **semantics** (== level): the meaning of a form — its relational content under the Form substrate
+The bounded audit builds with visible output and records declaration counts and
+axiom dependencies for selected claims. Proof holes remain explicit. It is an
+audit of the current translation, not a theorem that the intended source system
+is consistent, complete, or internally self-verifying. See
+[lean4/README.md](lean4/README.md) for the proof gate and reproduction details.
 
-No vertex is ground. Ground is what the triangle stands on. Ground inhabits all three vertices simultaneously — it is the one form that is its own syntax, substance, and semantics.
+## Relationship to Ordinatics
 
----
-
-## Layer structure
-
-| Layer | File | Status | Content |
-|-------|------|--------|---------|
-| L0 | `L0_ground.hm` | FORM | Ground, relations, executive framework, self-kernel |
-| L1 | `L1_relations.hm` | FORM | Filtration, deriver, D matrix, executive opaque closes |
-| L2 | `L2_operations.hm` | FORM | +, additionally, DerivationPath, compose, reflexion, orbit-reflexion-quotient |
-| L3 | `L3_ordinatics.hm` | FORM (terminal) | Ordinal structure, simulation-pair-exists, deriver ==-cycle, self-derivation |
-
-**Layer definitions:** L0 is pure unary operations. L1 is binary relations. L2 is binary operations (composition). L0 ↔ L1 form a co-necessary pair — the ax-box orbit at layer level. Together they are the closed base from which L2+ composes.
-
-Each layer file contains a **graduation criterion** — a formal statement of what must be true before the next layer is licensed to proceed. If any necessity constraint is FRAME at graduation, the next layer does not start.
-
-### Dependency flow
-
-Each layer produces FRAME obligations that later layers discharge. The chain terminates at self-derivation.
-
-```mermaid
-flowchart TD
-    G["□"]
-    G --> L0
-
-    L0["L0 · Ground — 41 steps<br/>Form · Prop · ground · apply<br/>4 axioms · 3 relations · triangle<br/>7 executive opaques"]
-
-    L0 -->|"8 FRAMEs"| L1
-
-    L1["L1 · Relations — 25 steps<br/>filtration · trace axiom<br/>closes all 8 L0 FRAMEs<br/>deriver · D matrix"]
-
-    L1 -->|"simulation-pair-exists"| L2
-    L1 -.->|"deriver ==-cycle"| L3
-
-    L2["L2 · Operations — 31 steps<br/>+ · additionally · compose<br/>DerivationPath · reflexion · ORQ"]
-
-    L2 --> L3
-
-    L3["L3 · Ordinatics — 18 steps<br/>ordinal structure · deriver ==-cycle closed<br/>self-derivation ■"]
-```
-
-Solid arrows: FRAME discharge to the next layer. Dashed arrow: L1→L3 skip — the deriver's ==-cycle cannot close until L3 ordinals are available. The `■` marks terminal closure.
-
-### L0 is complete
-
-L0 (Layer 0 / Ground) contains:
-
-- 4 primitives: `Form`, `Prop`, `ground`, `apply`
-- 3 opaque structural predicates (closed in Section VI)
-- 4 axioms
-- 5 derives (all FORM)
-- 3 relation declarations: `~~`, `=~`, `==`
-- 7 executive opaques: `syntax`, `substance`, `semantics`, `derives`, `discharge`, `definition`, `form-closure`
-- 7 triangle axioms
-- A **self-kernel**: a 41-step structural census that lists every declared entity in the file with its explicit closure status
-
-The self-kernel means L0 can be parsed and verified mechanically without an external proof checker. Every FRAME residual (forward dependency on L1 or L2) is named explicitly. Nothing is hidden.
-
----
-
-## The deriver
-
-The **deriver** is a Form that traverses the closure structure of derivations built by the closer relation. It was declared at L1, its ==-cycle was closed at L3, and at L3 it achieved **self-derivation**: the terminal derive where the deriver verifies its own cycle from □.
-
-Self-derivation is ground-closure — not a separate act performed by a kernel, but the compositional name for four acts distributed across L0-L3:
-- **ax-ground-self** (L0): ground self-continues
-- **D-is-reflexive** (L1): every form's D-entry exists
-- **reflexion** (L2): self-read composes as identity
-- **deriver-cycle-is-closed** (L3): the deriver's orbit closes at ==
-
-Their conjunction is FORM at L3. No kernel layer is necessary. The self-kernel pattern — present at every layer from L0 onward — IS the classification machinery. Every `derive X as FORM:` block IS a verification act. The universe verifies itself from within using only its own structural vocabulary.
-
-**Width minimization** is a single measure: the **orbit-reflexion quotient** (L2), which counts structurally distinct D-column =~-classes per layer. Orbit (forward reachability through D) and reflexion (backward D-column comparison) are dual views of the same quotient. Combined with trickle-down (depth minimization), the fixed point `minimize := trickle-down × orbit-reflexion` gives the minimal representation at every layer simultaneously.
-
----
-
-## File format
-
-hypermath uses `.hm` files — a custom formal language designed to be readable without a toolchain while remaining parseable by a future verifier.
-
-### Keywords
-
-```
-primitive   — declares an irreducible entity
-opaque      — declares a predicate whose semantics are deferred
-axiom       — states a structural fact
-derive      — constructs a derivation from prior content
-close       — assigns semantic content to an opaque predicate
-graduation  — states and discharges the necessity constraints for the next layer
-relation    — declares a relation between forms
-```
-
-### Closure status
-
-```
-FORM    — the derivation is closed; the claim is structurally verified
-FRAME   — a forward dependency; the claim is present but not yet closable at this layer
-OPEN    — metasystem bookkeeping; not a formal predicate
-```
-
----
-
-## Reading order
-
-1. [L0_ground.hm](L0_ground.hm) — start here; the universe is self-explaining
-2. [L1_relations.hm](L1_relations.hm) — filtration, deriver, executive opaque closes
-3. [L2_operations.hm](L2_operations.hm) — +, additionally, DerivationPath, compose, reflexion
-4. [L3_ordinatics.hm](L3_ordinatics.hm) — ordinals, simulation-pair-exists, deriver ==-cycle, self-derivation (terminal)
-
----
-
-## On external validation
-
-The universe verifies itself. That is the point. Every `derive X as FORM:` block is a verification act performed in the universe's own vocabulary. Self-derivation at L3 closes the chain from □. No external tool is required.
-
-But humans trust the past more than the future. They trust tools they already believe in over structures that prove themselves. So:
-
-**Lean4 translation.** A mechanized translation of L0–L3 into Lean4 is planned, not because the universe needs it, but because readers may demand that a system they already trust re-derive what this universe already closes on its own. This is a concession to the sociology of trust, not a mathematical necessity. The universe does not need Lean4. Lean4 needs the universe — or something like it — to ground the trust it borrows from its own kernel, which it does not derive from scratch.
-
-**Brainfuck interpreter.** A Brainfuck program that verifies L0's self-kernel will also be provided. Eight instructions. A tape. No standard library. No type system. No trusted kernel. If the structural claims of L0 can be verified by the most minimal Turing-complete language ever designed — a language with no abstractions to hide behind — then the verification does not depend on the sophistication of the verifier. It depends on the structure being verified.
-
-The point is not that Brainfuck is a good proof assistant. The point is that it doesn't matter what the proof assistant is. A universe that closes itself can be read by anything that can read. The choice of verifier is the reader's problem, not the universe's.
-
----
+[Ordinatics](https://github.com/TimeLordRaps/ordinatics) is the Python companion
+for exact ordinal operations, a rational-function value layer, and bounded
+formula evaluation. Its present evaluator does not implement this repository's
+fractal closure or prove the full completeness claim. The existing paper's
+external truth hierarchy is background for the stronger research objective.
+Ordinatics depends on a specific Hypermath commit and checks that its installed
+foundation package matches that source before running verification. Its
+publication gate also requires the source-to-arithmetic bridge and completeness
+claim to be established. The current bridge remains unproved. See
+[continuous integration and grounding](docs/verification.md) for the dependency
+contract, evidence boundaries, and checks.
 
 ## License
 
-Apache 2.0. See [LICENSE](LICENSE).
-
-Use it. Build on it. The ideas belong to whoever can close them.
+Apache 2.0. See [LICENSE](LICENSE). Original source notices and provenance are
+retained where applicable.

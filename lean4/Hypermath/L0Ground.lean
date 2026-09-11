@@ -9,7 +9,10 @@
 --   FORM derives:  `theorem … := by sorry`  — mechanical proofs pending
 --   FRAME items:   `theorem … := by sorry`  + `-- FRAME/LN` comment
 --   Axioms of the system: `axiom`
---   Primitives:           `opaque`
+--   Uninterpreted source primitives: `axiom` (parameters, not proved laws).
+-- Lean `opaque` without a body requests an Inhabited default; it does not
+-- declare an abstract parameter. Source FORM labels are not proof completion:
+-- declarations containing `sorry` remain admitted proof obligations.
 --
 -- P_0 = 41.  N_0_atomic = 4.  G_0 (NCs for graduation) = 4.
 -- Source: L0_ground.hm
@@ -22,17 +25,19 @@ namespace Hypermath
 -- ============================================================================
 
 /-- The base type. Every entity in hypermath is a Form. -/
-opaque Form : Type
+axiom Form : Type
 
 -- Note: Prop is Lean4's built-in `Prop : Sort 0`.
--- In .hm: `primitive Prop :: Type` — satisfied here by Lean4's Prop.
+-- The .hm `primitive Prop :: Type` is represented by Lean's built-in Prop.
+-- This is an unproved translation choice: adequacy with the source-native
+-- discharge semantics remains open.
 
 /-- The irreducible generative base. Written □ in .hm notation. -/
-opaque ground : Form
+axiom ground : Form
 
 /-- The sole operation. `f2f` (form-to-form) is `apply` in .hm.
     Renamed to avoid conflict with Lean4's `apply` tactic. -/
-opaque f2f : Form → Form
+axiom f2f : Form → Form
 
 -- ============================================================================
 -- §II  Opaque Structural Predicates (pre-relational)
@@ -41,15 +46,15 @@ opaque f2f : Form → Form
 
 /-- `structContinues x y`: x was generated from the same base as y.
     Semantic close (§VI): `structContinues x ground ↔ x ~~ ground` -/
-opaque structContinues : Form → Form → Prop
+axiom structContinues : Form → Form → Prop
 
 /-- `structDistinct x y`: x and y are not mutually simulating.
     Semantic close (§VI): `structDistinct x y ↔ ¬ (x ≡ y)` -/
-opaque structDistinct : Form → Form → Prop
+axiom structDistinct : Form → Form → Prop
 
 /-- `structOrbits x y`: f2f(f2f(y)) is in the structural orbit of x.
     Semantic close (§VI): `structOrbits (f2f (f2f x)) x ↔ f2f (f2f x) ~~ x` -/
-opaque structOrbits : Form → Form → Prop
+axiom structOrbits : Form → Form → Prop
 
 -- ============================================================================
 -- §III  Axioms
@@ -105,16 +110,16 @@ theorem orbitHasReturn :
 
 /-- **Similar** (~~): non-empty overlap in continuation capacity.
     The founding relation. Generated structurally from structContinues. -/
-opaque Similar : Form → Form → Prop
+axiom Similar : Form → Form → Prop
 
 /-- **Congruent** (=~): full coincidence of continuation capacity.
     Same outcomes; paths discarded. Generated from ~~ by □. -/
-opaque Congruent : Form → Form → Prop
+axiom Congruent : Form → Form → Prop
 
 /-- **Simulation** (==, written ≡ in Lean4): mutual path reproduction.
     Same outcomes AND same paths. Generated from =~ by □.
     Notation `≡` used to avoid conflict with Lean4's `==` (BEq). -/
-opaque Simulation : Form → Form → Prop
+axiom Simulation : Form → Form → Prop
 
 -- Notation (scoped to Hypermath namespace)
 scoped notation:50 a " ~~ " b => Similar a b
@@ -174,25 +179,25 @@ theorem nc4_L0 :
 -- ============================================================================
 
 /-- `HMSyntax x`: x has a structural shape inspectable at ~~ level. -/
-opaque HMSyntax : Form → Prop
+axiom HMSyntax : Form → Prop
 
 /-- `Substance x`: x carries derivable matter — middle vertex of the triangle. -/
-opaque Substance : Form → Prop
+axiom Substance : Form → Prop
 
 /-- `Semantics x`: x carries meaning derived from its Form membership. -/
-opaque Semantics : Form → Prop
+axiom Semantics : Form → Prop
 
 /-- `Derives x y`: x is in the derivation-approach of y. Directional. -/
-opaque Derives : Form → Form → Prop
+axiom Derives : Form → Form → Prop
 
 /-- `Discharge c e`: evidence e satisfies criterion c. -/
-opaque Discharge : Form → Form → Prop
+axiom Discharge : Form → Form → Prop
 
 /-- `Definition n f`: name n precisely denotes form f. -/
-opaque Definition : Form → Form → Prop
+axiom Definition : Form → Form → Prop
 
 /-- `FormClosure x`: the syntax-substance-semantics triangle completes for x. -/
-opaque FormClosure : Form → Prop
+axiom FormClosure : Form → Prop
 
 -- Triangle axioms
 axiom axSyntaxRequiresSubstance    : ∀ x : Form, HMSyntax x  → Substance x

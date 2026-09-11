@@ -1,0 +1,27 @@
+# Reference digests bind original bytes, including historical line endings.
+references/seed-ai/** -text
+# The trusted Lean reporters have byte-bound policy identities on every platform.
+lean4/Audit.lean text eol=lf
+lean4/Countermodels.lean text eol=lf
+lean4/TraceChecks.lean text eol=lf
+lean4/Hypermath/Trace.lean text eol=lf
+lean4/Hypermath/Observation.lean text eol=lf
+lean4/ObservationChecks.lean text eol=lf
+lean4/FullAxiomModel.lean text eol=lf
+lean4/Hypermath/FiniteAction.lean text eol=lf
+lean4/FiniteActionCountermodel.lean text eol=lf
+lean4/Hypermath/GroundSyntax.lean text eol=lf
+lean4/GroundSyntaxChecks.lean text eol=lf
+lean4/Hypermath/GroundDerivation.lean text eol=lf
+lean4/GroundDerivationChecks.lean text eol=lf
+lean4/Hypermath/GroundCode.lean text eol=lf
+lean4/Hypermath/RecordEncoding.lean text eol=lf
+lean4/RecordEncodingChecks.lean text eol=lf
+lean4/Hypermath/RecordMachine.lean text eol=lf
+lean4/RecordMachineChecks.lean text eol=lf
+lean4/lake-manifest.json text eol=lf
+# Installed foundation bytes must match the pinned checkout on every platform.
+src/hypermath_foundations/*.py text eol=lf
+# Wheel metadata embeds these files verbatim; keep its payload portable too.
+README.md text eol=lf
+LICENSE text eol=lf

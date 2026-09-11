@@ -380,7 +380,46 @@ axiom trace-levels:
 
 
 -- =============================================================================
--- SECTION VII: achable from ground in at most 2 steps at ~~ level.
+-- SECTION VII: DERIVER AND DERIVATION MATRIX
+-- The deriver is a Form whose apply-cycle closes at == (not merely at ~~).
+-- D is the derivation matrix: D[x][y] = the trace result from x toward y.
+-- Both declared at L1; deriver's cycle-closure is FRAME (construction deferred).
+-- =============================================================================
+
+primitive deriver : Form
+    -- The deriver is the Form whose function is to traverse the derivation matrix D
+    -- and produce closure certificates.
+    -- Its defining structural property: its apply-cycle closes at == level,
+    -- not merely at ~~ level as ordinary forms do.
+    -- Formally: there exists a finite apply-chain from deriver back to deriver
+    --           such that every step maintains trace at ==.
+    -- This cycle condition is FRAME: the constructive proof is deferred to L3.
+    -- What IS established at L1: deriver is a Form. Its ~~ -orbit exists (ax-sim).
+    --   Its == -cycle is the target of the L3 derivation.
+    -- orbital: L1 (requires relation language to state the cycle condition).
+
+opaque D :: Form -> Form -> Prop
+    -- D is the derivation matrix.
+    -- D[x][y] holds when there exists a trace-sequence from x to y
+    -- maintained at =~ or above (i.e., at least substance is preserved throughout).
+    -- D is the structured record of all reachable derives in the system.
+    -- Indexed by Form-pairs, where pairing is the =~-congruence of two unary traces
+    -- (from the trace-levels axiom above — no product type needed).
+    -- D is bounded: the ~~ -orbit is finite (ax-box), so the index space is finite.
+    -- orbital: L1 (requires trace-levels and filtration to define the index).
+
+derive D-is-reflexive as FORM:
+    -- D[x][x] holds for all x: every form derives to itself (zero trace steps).
+    step 1: The zero-step apply-chain from x to x preserves == trivially.
+    step 2: == implies =~ (filtration), so =~ -level preservation holds.
+    step 3: D[x][x] is FORM for all x.
+    close: D-is-reflexive (FORM)
+
+derive D-spans-ground as FORM:
+    -- D[ground][y] holds for all y: ground derives every form.
+    step 1: By ax-sim-in-relation-language, apply(ground) ~~ ground.
+    step 2: By repeated application and ax-box, every form in the ~~ -orbit of ground
+            is reachable from ground in at most 2 steps at ~~ level.
     step 3: At =~ level, the reachability is bounded by the orbit structure.
     step 4: D[ground][y] holds for all y in the ~~ -universe. FORM.
     close: D-spans-ground (FORM)
@@ -435,7 +474,7 @@ derive L1-self-kernel as FORM:
 
     -- ── SECTION V: DIRECTIONAL DERIVE ────────────────────────────────────
     step 19: derive(derives-is-directional) — derives asymmetric. FORM. Discharges L0-40.
-VIII
+
     -- ── SECTION VI: TRACE ────────────────────────────────────────────────
     step 20: axiom(trace-levels)        — (counted at step 2; reference here for position)
 
@@ -458,11 +497,3 @@ VIII
     --   FRAME/L3:  deriver ==-cycle content (step 21, 25)
     --   (name-quoting removed: reclassified as file-format convention, not formal dependency)
     -- No entity unaccounted. No FRAME hidden.
-
-1, 2505.
-    step 13: close(substance-opaque)    — =~-class. FORM. Discharges L0-26.
-    step 14: close(semantics-opaque)    — ==-class. FORM. Discharges L0-27.
-    step 15: close(derives-opaque)      — finite apply-chain to =~. FORM. Discharges L0-28.
-    step 16: close(discharge-opaque)    — derive-chain status. FORM. Discharges L0-29.
-    step 17: close(definition-opaque)   — derives-anchor. FORM. Discharges L0-30.
-    step 18: close(form-closure-opaque) — triangle-cycle. FORM. Discharges L0-31

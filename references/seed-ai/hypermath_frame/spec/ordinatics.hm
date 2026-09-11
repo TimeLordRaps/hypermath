@@ -1,0 +1,505 @@
+-- hypermath ordinatics.hm
+-- Ordinatic arithmetic: the arithmetic system native to the □-system.
+-- Four stratified type levels, each strictly extending the previous.
+-- Status: FORM for levels 0-2; FRONTIER for level 3 (Hyperordinal).
+
+import "axioms.hm"
+
+-- ================================================================
+-- § 0. W as a □-Derived Global Function
+-- ================================================================
+-- W is the canonical finite-representative map: W(α) gives the finite complex
+-- value(s) in ℂ_fin that characterize the ~-class of the form α.
+--
+-- GLOBAL STRUCTURAL CLAIM (FORM at ~, from ax-sim alone):
+--   W : Forms → ~-classes(ℂ_fin) is a FUNCTION.
+--   "Function" = total (defined for all forms) + single-valued (one ~-class per form).
+--
+--   Derivation from ax-sim universally — no sub-classification required:
+--     (i) Total: ax-sim states □(x) ~ □ for ALL x.
+--         Every form α is in the ~-class of □.
+--         The ~-class is non-empty and □-grounded.
+--         Therefore W(α) is defined for every α ∈ Forms. □
+--     (ii) Single-valued at ~-class level: ~ is an equivalence relation.
+--         Each form belongs to exactly one ~-equivalence class.
+--         W names the canonical ℂ_fin representative of that unique ~-class.
+--         Therefore W(α) names one determinate ~-class for every α. □
+--
+--   This is GLOBAL — derived once from □-axioms alone.
+--   It is the structural ground of every W-claim anywhere in hypermath.
+--   FORM at ~.
+--
+-- VALUE-LEVEL STRUCTURE (varies by form sub-type; legitimate sub-class analysis):
+--   The ~-class W(α) varies in =-level cardinality depending on form type:
+--     (a) Singleton at =-level — unique =-value forced by the form's derivation:
+--         W(Σnᵏ)   = −B_{k+1}/(k+1)  [power-sum recurrence uniquely determines value]
+         -- (formerly: Bernoulli recurrence; see nomenclature.hm § 4)
+--         W(ω^r)   = (−½)^r ∈ ℚ̄     [algebraic uniqueness in ℂ for rational r]
+--         W_int(z) = z for z ∈ ℤ_ord  [identity: trivially forced unique value]
+--         These are VALUE-LEVEL computations — specific outputs of W for specific
+--         form sub-types. Not structural properties of W as a function.
+--     (b) ≡-class at =-level — multiple =-paths, same ≡-image:
+--         Hyperordinal forms with distinct ordinal paths but identical ≡-images.
+--         W_hyperordinal = W_complordinal at ≡ level; =-paths live in the path component.
+--         (See hyperordinal.hm §4: W collapses = path distinction; it is ≡-level only.)
+--   This variation is VALUE-LEVEL. It depends on each form's specific derivation structure.
+--   It is NOT a structural property of W as a function — W is a function globally and
+--   always. What varies is the =-level cardinality of the output ~-class.
+--
+-- TERMINATED DISTINCTION — W-ubiquity / W-singularity:
+--   Previously §0 introduced "W-ubiquity" (W is total) and "W-singularity" (W is
+--   singleton, proved per sub-class). This distinction is dissolved:
+--   Both reduce to the global W-function claim above (total + single-valued at ~-class level).
+--   "W-singularity proved per sub-class" was an anti-pattern: it treated a VALUE-LEVEL
+--   fact (the =-cardinality of specific W-outputs) as a structural property requiring
+--   sub-class proofs. The structural claim admits one derivation from □-axioms universally.
+--   Former uses of "W-singularity" in zeta.hm, surordinal_ext.hm, w_density.hm
+--   have been renamed to "W-determined" (value-level: uniqueness of W-output forced by
+--   the specific form's functional equation or recurrence). OF-82 CLOSED.
+--
+-- FALSE CLAIM — W-uniqueness (corrected out, archived):
+--   The claim "W is single-valued for ALL Forms globally" is FALSE at = level for
+--   Hyperordinal. ax-box returns by ~ (similarity), not by = (equality); W reflects this.
+--   W-uniqueness was a ghost claim. It is not present anywhere in hypermath (corrected).
+--
+-- OPEN FRAME — OF-78: W_int / W_power unification.
+--   W_int (identity on ℤ_ord) and W_power (spiral on ω-power class) must be
+--   unified into a single W. Until that frame closes, the two W-maps are
+--   operationally disjoint and W-function is stated as a structural fact, with the
+--   two specific W-maps as value-level instances of it.
+--
+-- OF-82 CLOSED: W-naming audit complete.
+--   "W-singularity" renamed to "W-determined" across all three files.
+--   "W-determined" = value-level: W-output for a specific form sub-type is uniquely
+--   forced by its functional equation or recurrence. No structural implication about
+--   W as a function (that is the global W-function claim above).
+
+-- ================================================================
+-- § 0.1 The W-Dual — Hyperinversion of the W-Triad
+-- ================================================================
+-- The three W-forms (W-function, W-determined, W-anchor) are a FORWARD slice:
+--   Forms → ℂ_fin, each at a different relation depth.
+-- Their hyperinverses (the W-dual triad) are the BACKWARD slice:
+--   ℂ_fin → Forms, each at the same relation depth.
+--
+-- Hyperinversion is NOT classical set-theoretic inversion.
+-- W is not globally injective; W^□ satisfies only the □-dual conditions:
+--   W^□ ∘ W ~ id_{Forms}      (round-trip back to Forms is ~-similar to identity)
+--   W ∘ W^□ ~ id_{ℂ_fin}      (round-trip back to ℂ_fin is ~-similar to identity)
+-- These follow from ax-box (□(□(x)) ~ x) — the round-trip returns by ~, not =.
+--
+-- THE SYMMETRY: ax-sim (□(x) ~ □) generates the forward direction.
+--               ax-box (□(□(x)) ~ x) generates the backward direction.
+--               They are each other's termformers at ~ level.
+--
+-- ────────────────────────────────────────────────────────────────
+-- FORWARD TRIAD (W-maps: Forms → ℂ_fin)
+-- ────────────────────────────────────────────────────────────────
+--
+--  W-function  [relation: ~]  [termformer: ax-sim]
+--    W : Forms → ~-classes(ℂ_fin), total + single-valued at ~-class level.
+--    Derivation: ax-sim → every form is in a non-empty ~-class → W(α) defined for all α.
+--    Status: FORM at ~.
+--
+--  W-determined  [relation: ≡]  [termformer: functional equation of the sub-type]
+--    For sub-type S with internal constraint F_S:
+--    W(α) is uniquely forced to a specific value w ∈ ℂ_fin for any α ∈ S.
+--    Not a structural property of W as a function — a VALUE-LEVEL claim per sub-type.
+--    Termformer: the specific F_S (power-sum recurrence for power sums;
+--    boundary functional equation for Class T; algebraic identity for ℤ_ord).
+--    Status: FORM at ≡ per sub-type.
+--
+--  W-anchor  [relation: =]  [termformer: ax-box + ordinate-sum-integral bridge (ordinate-sum-integral bridge)]
+--    W(ω) = −½ exactly. The primordial = claim.
+--    ax-box provides the return path: □(□(ω)) ~ ω, which under the ordinate-sum-integral bridge
+--    (formerly: Abel-Plana formula; see nomenclature.hm § 4)
+--    regularization extracts −½ as the unique finite representative of the ax-box loop.
+--    Generates: the equiangular spiral, all power-sum coefficients as corollaries,
+--    all W-determined values for power sums, all zeta-values at negative integers.
+--    Status: FORM at =.
+--
+-- ────────────────────────────────────────────────────────────────
+-- BACKWARD TRIAD (W^□-maps: ℂ_fin → Forms)
+-- ────────────────────────────────────────────────────────────────
+--
+--  W-fiber  [relation: ~]  [termformer: ax-box]
+--    W-fiber(w) := { α ∈ Forms : W(α) = w }
+--    The ~-equivalence class of all forms sharing the same ~-class representative w.
+--    Well-defined by W-function (W is total; every w ∈ W(Forms) has a non-empty fiber).
+--    Round-trip: W(any α ∈ W-fiber(w)) = w. FORM.
+--                W-fiber(W(α)) ∋ α. FORM (α is in its own ~-class fiber).
+--    Termformer: ax-box — □(□(x)) ~ x names the return path through the ~-class.
+--    W-fiber is NOT a single form. It is a ~-class in Forms.
+--    Status: FORM at ~.
+--
+--  W-lift  [relation: ≡]  [termformer: inverse functional equation of the sub-type]
+--    W-lift_S(w) := the unique α ∈ S such that F_S(α) and W(α) = w.
+--    Runs W-determined in reverse: given w ∈ ℂ_fin and sub-type S,
+--    recover the unique ordinatic form α ∈ S with W-value w.
+--    Termformer: F_S⁻¹ — the functional equation inverted for α.
+--    Status varies by sub-type:
+--      Power sums (power-sum recurrence): FORM at ≡ (recurrence is invertible for ordinate forms).
+--      Power-rational class: FORM at = (W-injectivity proven in surordinal_metric.hm §3
+--        via spiral argument — d_W(α,β)=0 iff W(α)=W(β), injective on this class).
+--      Class T (stone_weierstrass): FRAME at = (inverse function recovery for general
+--        Class T is open; closure requires = level of w_density.hm).
+--      ℤ_ord: FORM at = (W_int is the identity; W-lift = id, trivially invertible).
+--
+--  W-genesis  [relation: =]  [termformer: W-anchor uniqueness]
+--    W-genesis(−½) = ω.
+--    Given the anchor value −½ ∈ ℂ_fin, recover the UNIQUE primordial ordinatic form ω
+--    such that W(ω) = −½ as a ground-level ordinal (not a finite integer, not a
+--    Complordinal power, not a finite combination — the irreducible generator).
+--    Termformer: W-anchor uniqueness — ω is the irreducible generator of the spiral
+--    and of the power-sum coefficient cascade; no smaller □-derived form has W-value −½.
+--    FRAME at =: depends on OF-78 (W_int / W_power unification into a single W).
+--    Until OF-78 closes, the claim "no other form has W-value −½" requires the
+--    unified W-map to confirm there is no ℤ_ord form with that value (W_int(z) = z ≠ −½
+--    for all z ∈ ℤ, so this part is already FORM; the gap is the ω^r class for r ∈ ℚ
+--    where (−½)^r = −½ only at r = 1 by algebraic uniqueness — which is FORM).
+--    Status: FORM at = (pending notation, of-78 naming only).
+--
+-- ────────────────────────────────────────────────────────────────
+-- REFLECTED TERMFORMER TABLE (the ax-sim / ax-box symmetry)
+-- ────────────────────────────────────────────────────────────────
+--
+--  Forward        | Termformer              | Backward     | Termformer
+--  ───────────────|─────────────────────────|──────────────|──────────────────────────
+--  W-function (~) | ax-sim                  | W-fiber      | ax-box
+--  W-determined(≡)| functional equation F_S | W-lift       | F_S inverted
+--  W-anchor (=)   | ax-box + ordinate-sum-integral bridge           | W-genesis    | W-anchor uniqueness
+--
+--  ax-sim generates the forward map.
+--  ax-box generates the backward map.
+--  ax-sim and ax-box are each other's termformers at the ~ level.
+--  This is the hyperinversion symmetry encoded directly in the □-axioms.
+
+-- ================================================================
+-- § 1. Four-Level Type Hierarchy
+-- ================================================================
+
+-- LEVEL 0 — Ordinal (limit-power basis form)
+-- The standard limit-power basis form ordinals.
+-- (formerly: Cantor Normal Form / CNF; see nomenclature.hm § 4)
+-- Exponents of ω must themselves be ordinals (≥ 0). No reciprocals.
+-- Non-commutativity of addition is native at limit ordinates.
+-- W : Ordinal → ℤ (maps infinite ordinals to finite integers)
+
+type Ordinal:
+    -- Limit-power basis form (limit-power basis form): ω^(a_n)·c_n + ... + ω^(a_0)·c_0
+    -- a_n > ... > a_0 ≥ 0, all a_i ∈ Ordinal, all c_i ∈ Nat+
+    -- Examples: 0, 1, ω, ω+1, ω·2, ω², ω^ω, ε₀
+    prop non_commutative_addition:
+        -- 1 + ω = ω ≠ ω + 1  (at = level)
+        not_equal(add(1, omega), add(omega, 1))
+    prop no_reciprocal:
+        -- ω^(−1) is not representable; undefined in this type.
+
+-- LEVEL 1 — Subreal
+-- Forms derived from Ordinal by extending the exponent domain from ℕ/ℤ to ℚ̄
+-- (the algebraic closure of ℚ). No surreal-field total-order structure is imported.
+-- (formerly: Conway total-order; see nomenclature.hm § 4)
+-- A form at this level IS its W-image: every Subreal form is defined as the
+-- unique form F ∈ Forms such that W(F) = (−½)^r for some r ∈ ℚ̄.
+-- Form existence = W-preimage existence; uniqueness from W-injectivity (surordinal_metric.hm §3).
+--
+-- "Subreal" encodes the structural fact: W(Subreal) ⊂ ℚ̄ ⊂ ℂ — the algebraic
+-- sub-closure of ℂ. This is strictly below (sub) the transcendental full-ℂ layer.
+-- The ordinals (Level 0) are the "metareal" ground: □-derived forms that are
+-- structurally prior to and generative of the real number system. "Subreal" names
+-- the extensions of that ground into the algebraic rational-exponential structure.
+--
+-- ω^(−1) = 1/ω: a positive infinitesimal (W-image = −2).
+-- ω^(1/2): form with W-image (−½)^(1/2) = i/√2 ∈ ℂ\ℝ (algebraic, even denominator).
+-- ω^(1/3): form with W-image (−½)^(1/3) ∈ ℝ_alg\ℚ (algebraic, odd denominator).
+-- COST: addition becomes commutative when extended to the full algebraic closure.
+-- Non-commutativity of ordinal addition is preserved at the Ordinal sub-type level only.
+
+type Subreal extends Ordinal:
+    -- All ordinals are Subreals. Not all Subreals are ordinals.
+    -- Additional elements: negative ordinals, fractional powers, infinitesimals.
+    -- W : Subreal → ℚ̄  (algebraic closure of ℚ; corrected from old "ℚ_surordinal" FRAME).
+    prop commutative_addition:
+        equal(add(a, b), add(b, a))   -- surreals ARE commutative
+        -- NOTE: this overrides the non-commutativity of Ordinal.
+        --       The ordinal non-commutativity is recovered only at
+        --       the Ordinal sub-type level. Generic Surordinal is commutative.
+    prop algebraic_closure:
+        -- Subreals form a proper-class algebraically-closed division ring.
+        -- Every non-zero Subreal form has a multiplicative inverse (W-image in ℚ̄\{0}).
+        -- ω * (1/ω) ≡ 1: W(ω)·W(ω^(−1)) = (−½)·(−2) = 1 = W(1). ✓ (FORM ≡)
+        -- NOTE: no total ordering imported. The properly-ordered class-field structure of No
+        -- (formerly: No (Conway); see nomenclature.hm § 4) is NOT presupposed. Algebraic structure only.
+
+definition W_subreal:
+    -- W : Subreal → ℚ̄
+    --
+    -- CORRECT DEFINITION (FORM at ≡; FORM at = for integer exponents):
+    --   W(ω^r) = (−½)^r  for r ∈ ℚ  [principal value for even-denominator roots]
+    --   Codomain: ℚ̄ = algebraic closure of ℚ in ℂ.
+    --
+    --   Note: ℚ̄ ⊂ ℂ. The W-codomain is the ALGEBRAIC sub-closure of ℂ, not all of ℂ.
+    --   Transcendental values (e, π, ln2, ...) are NOT in the Subreal W-image.
+    --   They appear only at Level 2 (Complordinal) via exp_surcomp and Ln_surcomp.
+    --
+    -- Special cases:
+    --   r ∈ ℤ:              W(ω^r) = (−½)^r ∈ ℤ[½] ⊂ ℚ      (FORM at =)
+    --   r ∈ ℚ, q-odd denom: W(ω^r) ∈ ℝ_alg \ ℚ              (FORM at ≡, 𝔸-plane real)
+    --   r ∈ ℚ, q-even denom: W(ω^r) ∈ ℂ_alg \ ℝ             (FORM at ≡, 𝔸-plane complex)
+    --   All cases: W(ω^r) ∈ ℚ̄   ✓
+    --
+    -- RETRACTION NOTE: Prior claim "W(ω^(−1)) = 0" was wrong.
+    --   Correct: W(ω^(−1)) = (−½)^(−1) = −2. W(ω)·W(ω^(−1)) = (−½)·(−2) = 1 = W(1). ✓
+    --
+    status: FORM_PARTIAL
+    -- FORM at = for integer exponents. FORM at ≡ for rational exponents.
+    -- The = gap for rational r: requires surordinal_metric.hm completeness (cl(Γ) = S, done by
+    -- real-power extension in surordinal_realext.hm). No total order on No is imported.
+    closure_criterion: surordinal_realext.hm extends Forms to ω^ρ for ρ ∈ ℝ,
+                       making S = {(−½)^ρ : ρ ∈ ℝ} ∪ {0} closed in ℂ → = closure.
+
+-- LEVEL 2 — Complordinal
+-- Subreals extended by i with i² = −1 (at = level), plus transcendental forms.
+-- ω^(ι·t) is defined for any t ∈ Subreal via: ω^(ι·t) = exp_surcomp(ι·t·Ln_surcomp(ω))
+-- where Ln_surcomp(ω): Complordinal form with W-image = ln(−½) = −ln2 + iπ.
+-- The "ordinate circle": {ω^(ι·t) : t ∈ [0, 2π_surreal)} — unit magnitude rotation.
+-- Torsion points: ω^(ι·2π·p/q) for p/q ∈ ℚ — the n-th ordinatic roots of unity.
+-- "Divisibility of degrees": the exponent class includes all rationals via surreal ℚ.
+-- W : Complordinal → ℂ_fin (maps to finite complex numbers)
+
+type Complordinal extends Surordinal:
+    -- Surordinal + ι with ι² = −1 at the = level.
+    -- IMPORTANT: This is NOT the same as Ch51's ordinatic ι, which has ι² ≡ −1 (≡, not =).
+    -- Complordinal ι is the commutative complex extension.
+    -- Ch51 ι is the non-commutative ordinatic imaginary — a different object.
+    -- They are ~ equivalent (same continuation capacity structure) but ≢ congruent.
+    prop i_squared:
+        equal(mul(i_unit, i_unit), neg(1))   -- = level, commutative
+    prop commutative:
+        -- Complordinal inherits commutativity from Surordinal.
+        equal(mul(a, b), mul(b, a))   -- complex multiplication is commutative
+
+definition W_complordinal:
+    -- W : Complordinal → ℂ_fin
+    --
+    -- CORRECTED (was FRAME; now FORM at ≡ level, FRAME at = level):
+    --
+    -- Derivation in stdlib/exp_surcomp.hm.
+    -- Key result: W(ω^(i·t)) is NOT a point on the classical unit circle.
+    -- W(ω^(i·t)) = exp(−t(π + i·ln2)) — an equiangular SPIRAL in ℂ.
+    --
+    -- The W-image of {ω^(i·t) : t ∈ ℝ} is:
+    --   {e^(−tπ) · e^(−it·ln2) : t ∈ ℝ}   (equiangular spiral, constant π/ln2)
+    -- anchored entirely by W(ω) = −½.
+    --
+    -- W(ln_surcomp(ω)) = −ln(2) + iπ  [FORM at =, exp_surcomp.hm § 3]
+    -- W(ω^(i·p/q)) = exp(−(p/q)(π + i·ln2)) for p/q ∈ ℚ  [FORM at ≡, § 4]
+    --
+    -- Previous claim "W(e^(ι·2πk/n)) = e^(2πik/n)" WAS INCORRECT:
+    -- the classical roots of unity arise only from normalized base ω̃ (F1 closure needed).
+    --
+    status: FORM_PARTIAL
+    -- FORM at ≡: W-coherence holds; spiral structure derived.
+    -- FRAME at =: Surordinal metric and W-density theorem (formerly: Stone-Weierstrass; see nomenclature.hm § 4) needed for = closure.
+    closure_criterion_complete: exp_surcomp.hm (this file) establishes ≡ closure.
+    remaining_frame: = closure requires Surordinal metric (sub-frame in exp_surcomp.hm § 1)
+                     and ordinatic W-density theorem (W-global-anchor, exp_surcomp.hm § 6).
+    new_open_frame: W-global-anchor — all W-values determined by W(ω) = −½ (FRAME → F9).
+
+-- LEVEL 3 — Hyperordinal (FRONTIER — no named analog exists)
+-- This is the structure that has ALL THREE:
+--   (1) Negative and fractional exponents of ω (from Subreal)
+--   (2) Imaginary exponents of ω (from Complordinal)
+--   (3) Non-commutative addition at limit ordinates (from Ordinal — PRESERVED)
+--
+-- No[i] (Complordinal) loses (3): it is a commutative proper-class field.
+-- Ordinal preserves (3) but lacks (1) and (2).
+-- Hyperordinal is the structure where the filtration (~, ≡, =) grades the commutativity:
+--   a + b ~ b + a            (similar — shared continuations)
+--   a + b ≢ b + a            (at ≡ level, when one arg is a limit ordinate)
+--   a + b ≠ b + a            (at = level, for limit-ordinate non-commutativity cases)
+--
+-- In other words: Hyperordinal is a Complordinal with ≡-graded non-commutativity.
+-- Addition is not a single operation — it's stratified: ~-addition, ≡-addition, =-addition.
+-- This is the "hypersurreal" the user is pointing at.
+-- It does not yet have a formal definition. It is a FRONTIER construction.
+
+type Hyperordinal:
+    status: FRONTIER
+    description: Complordinal + ≡-graded non-commutative addition at limit ordinates.
+    prop non_commutativity_grading:
+        -- a + b ~ b + a            (always, by ~-similarity)
+        similar(add(a, b), add(b, a))
+        -- a + b ≢ b + a            (when a or b is a limit ordinate, at ≡ level)
+        -- a + b ≠ b + a            (when a or b is a limit ordinate, at = level)
+        [when a or b is limit_ordinate]:
+            not congruent(add(a, b), add(b, a))
+            not equal(add(a, b), add(b, a))
+    prop imaginary_unit:
+        -- Hyperordinal ι satisfies ι² ≡ −1 (congruence, not equality).
+        -- This is the Ch51 ordinatic ι, not the classical i.
+        congruent(mul(iota, iota), neg(1))
+        not_equal(mul(iota, iota), neg(1))   -- = fails; ≡ holds
+    frontier_reason:
+        -- No existing named mathematical structure satisfies all three properties.
+        -- Surreal-field construction (No): have (1),(2) but not (3) [commutative].
+        -- (formerly: Conway surreals; see nomenclature.hm § 4)
+        -- Quaternions: non-commutative multiplication, but finite-dimensional over ℝ,
+        --              not proper-class, and non-commutativity is in multiplication not addition.
+        -- Non-commutative ordered fields: exist in some formulations but not at proper-class size
+        --                                 with ordinal structure preserved.
+        -- This is a candidate for a new mathematical construction.
+    closure_criterion:
+        Define Hyperordinal explicitly as a quotient structure:
+        Hyperordinal = Complordinal / (≡-equivalence on limit-ordinate sums)
+        where the quotient preserves the non-commutative ≡-class structure
+        rather than collapsing it to equality. Prove this quotient is well-defined
+        (i.e., the ≡-equivalence classes have coherent addition and multiplication).
+
+-- ================================================================
+-- § 2. The W Operator Per Level
+-- ================================================================
+
+-- W unifies the level-specific wrap operations:
+--
+--   Level 0  W : Ordinal    → ℤ
+--   Level 1  W : Subreal     → ℚ̄               (FORM at ≡; = after surordinal_realext.hm)
+--   Level 2  W : Complordinal → ℂ_fin             (FORM at ≡)
+--   Level 3  W : Hyperordinal → ≡-class of ℂ_fin  (FRONTIER)
+--
+-- At Level 3, W does not return a single value — it returns an ≡-class.
+-- The ≡-class of a complex number is the set of all complex numbers with
+-- identical continuation capacity under the Hyperordinal graded-power series (graded-power series; formerly: Dirichlet; see nomenclature.hm § 4) extension.
+-- Whether this ≡-class is always a singleton (which would recover the classical
+-- single-value W) is the Hyperordinal analog of the ζ conjugate-symmetry conjecture. (FRONTIER)
+-- (formerly: Riemann Hypothesis; see nomenclature.hm § 4)
+
+-- ================================================================
+-- § 3. Non-Commutativity is Information, Not Error
+-- ================================================================
+
+-- The traditional number systems (ℕ, ℤ, ℚ, ℝ, ℂ, No, No[i]) are all commutative
+-- in addition. Ordinals are not. This is treated as a "defect" in classical presentations:
+-- "ordinals are like numbers but addition doesn't commute." Hypermath inverts this:
+-- the non-commutativity IS the structure. It is the ≡-level distinction between
+-- "before the limit" and "after the limit" — the signature of the limit ordinal itself.
+--
+-- Collapsing non-commutativity to get a field (surreal extension) LOSES this information.
+-- The Hyperordinal level preserves it. Every limit ordinal leaves a ≡-level fingerprint
+-- in every sum that crosses it. This fingerprint is the content of the "imaginary direction"
+-- in Ch51: ι is PRECISELY the direction in which the commutativity fails at ≡ level.
+--
+-- derive: ι = generator_of(non_commutativity_at_≡_level) — FORM (Ch51 derivation).
+
+-- ================================================================
+-- § 4. Integer Ordinate (ℤ_ord) and the Whole Number Subtype (ℕ_ord)
+-- ================================================================
+-- Status: FORM at = for ℕ_ord; FORM at = for ℤ_ord.
+--
+-- ARCHITECTURAL NOTE: Two W maps coexist in this hierarchy:
+--   W_power : {ω^ρ : ρ ∈ ℝ} → ℂ_fin,  W_power(ω^ρ) = (−½)^ρ  [the spiral]
+--   W_int   : ℤ_ord              → ℤ,   W_int(n) = n           [identity extension]
+--
+-- W_int and W_power are DISJOINT in domain: W_power applies to infinite forms (ω-powers);
+-- W_int applies to finite integer forms. The unification into a single W defined for all
+-- Forms is an open frame (see TIME.md). Until it closes, ℤ_ord operates under W_int.
+
+-- ℕ_ord — natural numbers as finite ordinals.
+-- Already present at Level 0 (Ordinal). Renamed here for type-system clarity.
+-- W_int(n) = n for all n ∈ ℕ_ord. The identity map. FORM at = trivially.
+type NatOrd extends Ordinal:
+    -- Exactly the finite ordinals: {0, 1, 2, 3, ...}.
+    -- zero  : NatOrd  — the form 0 (ground in CNF)
+    -- succ  : NatOrd → NatOrd  — successor; succ(n) = n + 1
+    -- add   : NatOrd × NatOrd → NatOrd  — commutative (finite ordinals commute)
+    -- mul   : NatOrd × NatOrd → NatOrd  — commutative
+    -- The finite ordinals form an initial segment of the Ordinal type.
+    -- Every NatOrd form n satisfies W_int(n) = n: identity under W_int.
+    prop W_int_identity:
+        equal(W_int(n), n)   -- FORM at = (identity; no derivation required)
+
+-- ℤ_ord — integers as W_int-graded forms.
+-- Extension of ℕ_ord by a formal negation map neg : ℕ_ord+ → ℤ_neg.
+-- Defines a new class ℤ_neg = {neg(n) : n ∈ ℕ_ord, n > 0} disjoint from ℕ_ord.
+-- ℤ_ord = ℕ_ord ∪ ℤ_neg.
+type IntOrd extends NatOrd:
+    -- Additional generators:
+    --   neg   : NatOrd+ → IntOrd  — unary negation; neg(n) is the additive inverse of n
+    -- New axioms:
+    prop negation_inverse:
+        equal(add(neg(n), n), zero)   -- neg(n) + n = 0; FORM at = (definition of neg)
+    prop W_int_negation:
+        equal(W_int(neg(n)), neg_z(n))  -- W_int maps neg(n) to −n ∈ ℤ; FORM at =
+        -- neg_z is classical integer negation on the W-image side.
+    prop subtraction_total:
+        -- sub is total: sub(a, b) = add(a, neg(b)) for all a,b ∈ IntOrd.
+        equal(sub(a, b), add(a, neg(b)))
+    prop mul_closed:
+        -- mul extends to IntOrd: neg(a)·neg(b) = a·b; neg(a)·b = neg(a·b).
+        equal(mul(neg(a), neg(b)), mul(a, b))
+        equal(mul(neg(a), b),      neg(mul(a, b)))
+
+-- W-map for IntOrd (W_int):
+--   W_int(0)      = 0
+--   W_int(n)      = n    for n ∈ ℕ_ord+        (identity on positive naturals)
+--   W_int(neg(n)) = −n   for n ∈ ℕ_ord+        (negation of positive naturals)
+-- This is the classical INTEGER IDENTITY map, extended to □-form notation.
+-- FORM at =: the map is explicitly constructed from the defining axiom; no gap.
+definition W_int:
+    status: FORM
+    -- The identity extension is closed: W_int(a + b) = W_int(a) + W_int(b) for all a,b ∈ ℤ_ord.
+    -- Derived from negation_inverse + W_int_identity + W_int_negation.
+    -- No ω-power machinery needed. W_int is algebraically closed on ℤ_ord.
+
+-- Boolean subdomain of ℤ_ord:
+--   B_□ = {zero, one} ⊂ NatOrd ⊂ IntOrd
+--   W_int(zero) = 0; W_int(one) = 1.
+--   B_□ is the primitive boolean domain for sat_core.hm.
+--   See § 5 (sat_core.hm) for full SAT formalization.
+definition B_bool:
+    zero_b :: NatOrd    -- the FRAME form (W = 0)
+    one_b  :: NatOrd    -- the FORM form  (W = 1)
+    equal(W_int(zero_b), 0)
+    equal(W_int(one_b),  1)
+    -- These are just the familiar 0 and 1 in NatOrd; no new forms required.
+    status: FORM
+    -- B_□ is the smallest sub-semiring of NatOrd: {0, 1} closed under min/max = AND/OR.
+
+-- Open frame: W_nat / W_power unification.
+-- W_int and W_power must eventually be unified into a single W : Forms → ℂ_fin
+-- such that W|_NatOrd = W_int (identity) and W|_{ω^ρ} = W_power (spiral).
+-- Current status: FRAME — the two maps are consistent at ω^0 = 1 (both give 1),
+-- but no spanning W has been constructed. Scaffolded at TIME.md OF-78.
+-- Closure criterion: define W as the unique ordinatic analytic function extending
+-- W_power through the ω-spiral and matching W_int on finite forms via ax-box
+-- (□(□(n)) ~ n for finite n, and the W-image chain (−½)^n stabilizes near 1 for n→0).
+
+-- ================================================================
+-- § 5. Real and Rational Subtypes (via W-preimage)
+-- ================================================================
+-- These types are DEFINED by their W-image set; no new form generators are required.
+-- The forms already exist in the Ordinal/Subreal/Complordinal hierarchy.
+
+-- ℚ_ord — rational ordinate forms.
+-- ℚ_ord = W_power^{-1}(ℚ) = {ω^r : r ∈ ℚ} ∪ ℤ_ord  (union via W_int consistency)
+-- W is ℚ-valued on rational-exponent ω-powers AND on all integers.
+-- FORM at ≡ (rational W-values from W_power definition in Subreal Level 1).
+definition Q_ord:
+    status: FORM_PARTIAL (≡)
+    closure_criterion: W_int / W_power unification (OF-78) for full = closure.
+
+-- ℝ_ord — real ordinate forms.
+-- ℝ_ord = W_power^{-1}(ℝ ∩ ℂ_fin) = real-subline of the W-spiral.
+-- From surordinal_realext.hm §3: W(ω^ρ) ∈ ℝ iff sin(ρπ) = 0 iff ρ ∈ ℤ.
+-- Therefore: ℝ_ord ∩ {ω-power class} = {ω^n : n ∈ ℤ} — a DISCRETE set via W_power.
+-- CRITICAL: the full real line ℝ (as a continuous type) requires a DIFFERENT representation:
+--   ℝ_ord_full = W_complordinal^{-1}(ℝ) = the fixed-point set of complex conjugation
+--              on Complordinal forms = {f ∈ Complordinal : W(f) = conj(W(f))}.
+-- This gives the FULL real line ℝ at ≡ level (W_complordinal is FORM at ≡).
+-- FORM at ≡; = closure follows from W_complordinal = closure in surordinal_realext.hm §8.
+definition R_ord:
+    status: FORM_PARTIAL (≡)
+    note: "ℝ_ord is NOT the ω-power spiral. It is the conjugation-fixed-set of Complordinal."
+    -- The spiral S = {W(ω^ρ) : ρ ∈ ℝ} ⊂ ℂ is distinct from ℝ.
+    -- S ∩ ℝ is discrete ({(−½)^n : n ∈ ℤ}) while ℝ_ord_full is continuous.
+    closure_criterion: explicit surjection from Complordinal-conj-fixed-forms to ℝ at =.

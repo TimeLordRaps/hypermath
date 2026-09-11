@@ -1,5 +1,5 @@
 -- Hypermath
--- A closed formal universe built from one primitive operation (□).
+-- A proposed self-derivational universe built around the operation □.
 --
 -- L0  Ground      — Form, ground, f2f, three relations
 -- L1  Relations   — ~~, =~, ≡ derived properties; deriver; D matrix
@@ -12,3 +12,10 @@ import Hypermath.L0Ground
 import Hypermath.L1Relations
 import Hypermath.L2Operations
 import Hypermath.L3Ordinatics
+import Hypermath.Observation
+import Hypermath.FiniteAction
+import Hypermath.GroundSyntax
+import Hypermath.GroundDerivation
+import Hypermath.RecordEncoding
+import Hypermath.RecordMachine
+import Hypermath.RuleSubstitution

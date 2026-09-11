@@ -1,0 +1,273 @@
+-- hypermath links.hm
+-- Named non-sequential connections between forms across any layer.
+-- The ordinal_reflection operation: the unifying primitive beneath
+-- commutativity, subtraction, and the wrap operation W.
+--
+-- Presupposes:
+--   link axioms.hm -> ground   [□ primitive]
+--   link axioms.hm -> similar  [~~ relation]
+--   link axioms.hm -> congruent [=~ relation]
+--   link axioms.hm -> simulation [== relation]
+--   link axioms.hm -> ax-box   [two applications return to ~~-class]
+--   link axioms.hm -> definitive-expansion [+ operator]
+--   link axioms.hm -> additionally-is-commutative
+--   link casting.hm -> cast-totality
+--   link casting.hm -> form-status-from-casting
+--   link casting.hm -> conditionality-is-a-gate
+--   link casting.hm -> ordinatic-ordering
+--   link casting.hm -> ordinal_reflection          [Form -> Form -> Relation]
+--   link casting.hm -> ordinal_reflection-is-symmetric
+--
+-- Note: "link" appears in the presupposes header as the formal replacement
+-- for bulk "presupposes: file" imports. Each named dependency is exact.
+-- The kernel uses these link declarations to trace step-level provenance.
+--
+-- Status: FORM for link definition, Möbius validity, ordinal_reflection,
+--         commutativity derived from ordinal_reflection.
+--         FRAME for W-as-ordinal_reflection (requires subtraction.hm).
+
+-- ================================================================
+-- § 1. Etymology — Why "link"
+-- ================================================================
+--
+-- link (n.) — Old English hlence: a ring in a chain.
+-- A ring is not the chain. It is the connector between two parts
+-- of the chain that are not adjacent to each other.
+-- A link names where continuation resumes when the next step
+-- is not the immediately following form.
+--
+-- Three connectivity forms now exist in hypermath_form:
+--
+--   +            inter-layer, sequential, ordered.
+--                A's end joins to B's beginning. Adjacent layers only.
+--                b expands a from a's end. Non-commutative.
+--
+--   additionally intra-layer, unordered, co-present.
+--                Two forms at the same derivation level.
+--                Commutative: order of statement does not affect closure.
+--
+--   link         any-layer, named, non-sequential.
+--                Names a path of continuation between two forms
+--                that are not adjacent in the derivation chain.
+--                A ring in the chain: it connects without being
+--                either form it connects.
+--
+-- The vocabulary DAG is a link structure:
+--   "unfair" link-> "fair" (via un- inversion)
+--   "fair" link-> Proto-Germanic *fagraz (via etymological chain)
+--   The layers of characterization ARE a link graph.
+-- Without links, encoding the DAG would require flattening all
+-- layers into one file — a RULE 8 violation.
+
+-- ================================================================
+-- § 2. Link as a Form
+-- ================================================================
+
+-- A link L is a form with three components:
+--   source      — the form L departs from
+--   target      — the form L arrives at
+--   direction   — forward (source -> target) or return (target -> source)
+--
+-- link :: Form -> Form -> Direction -> Form
+--
+-- direction is a two-valued form:
+--   forward-direction: the link traversed from source to target
+--   return-direction:  the link traversed from target to source
+--
+-- These are not Boolean. They are orientation labels derived from
+-- the Möbius structure defined in § 3.
+
+-- ================================================================
+-- § 3. Möbius Validity — The One-Sided Constraint
+-- ================================================================
+--
+-- Etymology of "Möbius":
+--   Named for August Möbius, who described the one-sided surface.
+--   "One-sided" is the structural content: a surface with one side
+--   is a surface where inside and outside are the same surface,
+--   experienced from different orientations.
+--   In a two-sided surface, orientation is fixed at each point.
+--   In a Möbius surface, orientation flips continuously as you traverse.
+--   One traversal: return to starting position, orientation flipped.
+--   Two traversals: return to starting position, orientation restored.
+--   This is ax-box at the topological level: □(□(x)) ~~ x.
+--
+-- A link L is Möbius-valid if these four conditions hold:
+
+derive möbius-validity as FORM:
+    -- Definitions:
+    -- traverse-forward(L, A):  follow L from source A to target B.
+    -- traverse-return(L, B):   follow L from target B back toward A.
+    --                          Returns A' (possibly different orientation from A).
+
+    step 1: FORWARD CHANGES POSITION.
+            traverse-forward(L, A) -> B
+            where B != A at the == level.
+            A link that returns to the exact == starting point on the
+            forward traversal is not a link — it is a no-op.
+            Condition: traverse-forward(L, A) =~-or-above A is not required.
+            It is only required that the forward traversal moves.
+
+    step 2: RETURN REACHES ~~ BUT NOT ==.
+            traverse-return(L, B) -> A'
+            where A' ~~ A  additionally  not(A' == A).
+            One full Möbius traversal returns to the ~~-class of origin
+            but with flipped orientation: the path was taken, structure changed,
+            similarity preserved, identity not restored.
+            This is the Möbius condition directly: one loop, one orientation flip.
+
+    step 3: TWO TRAVERSALS RESTORE ~~ CLASS (ax-box at link level).
+            traverse-forward(traverse-return(L, traverse-forward(L, A)), L)
+            ~~ A.
+            Two full traversals return to the ~~-class of A.
+            This is ax-box instanced at the link level.
+            The link structure inherits the closure property of □.
+
+    step 4: FORWARD AND RETURN ARE DISTINCT (non-commutativity preserved).
+            traverse-forward(L, A) !=~~ traverse-return(L, A).
+            The forward and return paths are not similar to each other.
+            They take different routes through the same surface.
+            If they were similar, the link would be two-sided (ring structure)
+            and commutativity would be the default rather than the earned case.
+
+    close: relation(=~)
+    -- Möbius-validity is fully derived from ax-box and the one-sided surface structure.
+    -- FORM at =~: all continuation futures of a Möbius-valid link are determined.
+
+-- ================================================================
+-- § 4. ordinal_reflection — Imported from casting.hm
+-- ================================================================
+--
+-- ordinal_reflection :: Form -> Form -> Relation
+-- Defined in casting.hm § 6 (link casting.hm -> ordinal_reflection).
+--
+-- ordinal_reflection(A, A') measures the ordinal distance between
+-- the starting form A and the return form A' after one full cycle.
+-- It is defined on Forms directly — not on Links.
+-- Links.hm applies it by supplying the specific Form pairs that
+-- arise from link traversals: A (start) and A' (return after traverse).
+--
+-- Why it belongs in casting.hm and not here:
+-- casting.hm is the layer that closes on: what □ does to Forms
+-- and how far the return lands. ordinal_reflection is intrinsic
+-- to the cast operation — it measures the cast's return residue.
+-- links.hm is the layer that introduces the Link type and uses
+-- ordinal_reflection to define what makes a Link valid (Möbius).
+-- The + boundary between casting.hm and links.hm is load-bearing:
+-- Möbius validity depends on ordinal_reflection being FORM first.
+-- Co-presence (additionally) of ordinal_reflection and Möbius validity
+-- in the same layer would remove that ordering guarantee — the layer
+-- would have no closed end to expand from.
+
+-- ================================================================
+-- § 5. Commutativity Derived from ordinal_reflection
+-- ================================================================
+--
+-- Commutativity is not presupposed from classical algebra.
+-- It is the specific case where ordinal_reflection returns ==.
+
+derive commutativity-from-ordinal_reflection as FORM:
+    step 1: two link traversals are commutative iff
+            traverse-forward(L1, A) followed by traverse-forward(L2, B)
+            returns to the exact == starting position A.
+    step 2: the return form after both traversals is A'.
+            ordinal_reflection(A, A') measures the ordinal distance.
+            (ordinal_reflection :: Form -> Form -> Relation, casting.hm § 6)
+    step 3: ordinal_reflection(A, A') closes at ==
+            iff A' is at the same ordinal position as A by the same path.
+            Zero ordinal distance = same position, same path = commutativity.
+    step 4: therefore: L1 and L2 are commutative
+            iff ordinal_reflection(A, traverse-return-form(L1,L2,A)) closes at ==.
+    step 5: additionally is already commutative (axioms.hm additionally-is-commutative).
+            Confirming: for any A, additionally co-presence returns the same A.
+            ordinal_reflection(A, A) == ==  (zero distance, same position). HOLDS.
+    step 6: + is non-commutative (axioms.hm definitive-expansion).
+            Confirming: A = quanta_1, L1 = link to ordinal_limit.
+            traverse-forward(L1, quanta_1) -> ordinal_limit (absorbed).
+            traverse-forward(L2, ordinal_limit) -> ordinal_limit + quanta_1.
+            ordinal_reflection(quanta_1, ordinal_limit + quanta_1) closes at ~~.
+            Different ordinal positions. Non-commutative. HOLDS.
+    close: relation(==)
+    -- Commutativity is derived. FORM at ==.
+    -- Non-commutativity is the default (Möbius). Commutativity is the earned case.
+
+-- ================================================================
+-- § 6. ordinal_reflection Unifies Three Derived Concepts
+-- ================================================================
+--
+-- ordinal_reflection is not one operation among many.
+-- It is the single operation from which three major derived concepts
+-- in the system follow as specific evaluation contexts.
+
+-- (A) SUBTRACTION as ordinal_reflection-as-distance
+--
+-- α ⊖ β is the ordinal distance measured by ordinal_reflection(β, α):
+-- the Form β and the Form α, asking: how far apart are they ordinally?
+-- The gap is the value of the subtraction.
+-- This is partial (cond(β <= α, ...)) because ordinal_reflection
+-- only returns a meaningful gap-form when β has not passed α.
+-- FRAME: subtraction.hm writes the full derive block with existence proof.
+
+-- (B) COMMUTATIVITY as ordinal_reflection closing at ==
+-- Already derived in § 5 above. FORM.
+
+-- (C) W (the wrap operation) as ordinal_reflection at the ω boundary
+--
+-- W maps transfinite ordinal forms to their canonical finite representatives.
+-- A Möbius traversal through ordinal_limit (ω) and back:
+--   traverse-forward(link-to-ω, A) reaches the limit form.
+--   traverse-return(link-from-ω, ω) — the return traversal through the limit.
+--   The ordinal_reflection of this traversal collapses to the canonical
+--   finite form in the ~~-class of the starting form.
+--
+-- This is why W(1 + 2 + 3 + ...) = -1/12:
+--   The triangular ordimate T(ω) is the target of traverse-forward.
+--   The return traversal through ω produces the finite form in ~~-class.
+--   ordinal_reflection measures zero ordinal distance at the ~~ level
+--   between T(ω) and -1/12 (they are in the same ~~-class).
+--   -1/12 is the canonical finite representative because it is the
+--   unique finite form whose ~~-class intersects T(ω)'s ~~-class
+--   under the Möbius return through ordinal_limit.
+--
+-- W is ordinal_reflection evaluated at the ordinal_limit boundary.
+-- FRAME: full derivation requires subtraction.hm to close the
+--        finite-layer existence proof first, then ordinatic-wrap.hm
+--        applies ordinal_reflection at the limit.
+
+-- ================================================================
+-- § 7. Forward-Link Declaration Syntax
+-- ================================================================
+--
+-- forward-link [name] -> [file].[form-name]
+--
+-- A forward-link names a dependency on a form that is not yet FORM.
+-- The target may be FRAME (exists, has structure, has not yet closed).
+-- The ordinal_reflection of any forward-link pair is ~~ at most
+-- until the target achieves FORM (ordinal_reflection-is-unconditional, step 4).
+--
+-- Forward-links are required to be named explicitly.
+-- An unlabeled dependency on a FRAME target is a hidden forward-link —
+-- it carries the FRAME status invisibly into downstream derivations.
+-- Naming it makes the provisional status visible to the kernel.
+--
+-- Forward-links in this file:
+--   forward-link subtraction-context -> subtraction.hm.ordinatic-subtraction
+--   forward-link wrap-context        -> ordinatic-wrap.hm.W-as-ordinal_reflection
+--
+-- These are provisional ~~. They promote when their targets close.
+
+-- ================================================================
+-- § 8. Updated presupposes Syntax
+-- ================================================================
+--
+-- All prior .hm files use bulk "presupposes: file" headers.
+-- The links.hm format replaces this with named link declarations
+-- (shown in the file header above).
+-- The kernel, when implemented, will use named link declarations
+-- for step-level provenance tracing.
+-- Bulk presupposes declarations in prior files remain valid —
+-- they are ~~-level dependencies (the content is similar to named links
+-- but the exact step-level targets are not yet specified).
+-- When the kernel is written, bulk presupposes will be promoted
+-- to named link declarations as each file is reviewed.
+-- FRAME: bulk-to-named migration for axioms.hm, casting.hm, verify.hm.
