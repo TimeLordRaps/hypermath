@@ -284,6 +284,82 @@ theorem selfDerivationOfCycle (cycle : driverCycleClaim) : selfDerivation :=
 theorem selfDerivation_iff_driverCycleClaim : selfDerivation ↔ driverCycleClaim :=
   ⟨fun target => target.2.2.2, selfDerivationOfCycle⟩
 
+-- Explicit source-cycle certificates and the finite-successor boundary.
+
+/-- A native apply edge retaining simulation at that edge, not only its endpoints
+after two applications. Its source requirement is L1 section VII. -/
+def SimulationStep (x y : Form) : Prop := y = f2f x ∧ Simulation y x
+
+abbrev SimulationEntry (x y : Form) := Trace SimulationStep x y
+
+def simulationEntryToDEntry {x y : Form} (path : SimulationEntry x y) : DEntry x y :=
+  Trace.map id (fun {a b} edge => ⟨edge.1, filtrationSimCong b a edge.2⟩) path
+
+theorem simulationEntryToDEntry_length {x y : Form} (path : SimulationEntry x y) :
+    Trace.length (simulationEntryToDEntry path) = Trace.length path :=
+  Trace.length_map id (fun {a b} edge => ⟨edge.1, filtrationSimCong b a edge.2⟩) path
+
+/-- This typed certificate retains the two actual edges and endpoint closure.
+It is stronger than the original selfDerivation proposition; no inhabitant is
+postulated. The equality below counts edges, not ordinal or semantic value. -/
+structure DriverCycleWitness where
+  path : SimulationEntry deriver (f2f (f2f deriver))
+  length_two : Trace.length path = 2
+  closes : driverCycleClaim
+
+noncomputable def driverCycleWitnessOfSteps
+    (first : Simulation (f2f deriver) deriver)
+    (second : Simulation (f2f (f2f deriver)) (f2f deriver))
+    (closes : driverCycleClaim) : DriverCycleWitness :=
+  ⟨Trace.cons ⟨rfl, first⟩ (Trace.cons ⟨rfl, second⟩ (Trace.nil _)), rfl, closes⟩
+
+theorem driverCycleWitness_exists_of_steps
+    (first : Simulation (f2f deriver) deriver)
+    (second : Simulation (f2f (f2f deriver)) (f2f deriver))
+    (closes : driverCycleClaim) : Nonempty DriverCycleWitness :=
+  ⟨driverCycleWitnessOfSteps first second closes⟩
+
+theorem selfDerivationOfWitness (witness : DriverCycleWitness) : selfDerivation :=
+  selfDerivationOfCycle witness.closes
+
+theorem witness_has_two_D_steps (witness : DriverCycleWitness) :
+    ∃ path : DEntry deriver (f2f (f2f deriver)), Trace.length path = 2 :=
+  ⟨simulationEntryToDEntry witness.path,
+   (simulationEntryToDEntry_length witness.path).trans witness.length_two⟩
+
+/-- The exact finite successor equation stated in L3 section II. This is an
+explicit proposed correspondence law, not an extra native axiom. -/
+def FiniteSuccessorAgreement : Prop :=
+  ∀ n : Nat, ordinalSucc (finiteApplyPosition n) = finiteApplyPosition (n + 1)
+
+theorem no_simulation_step_at_finite_of_successor_agreement
+    (agreement : FiniteSuccessorAgreement) {x : Form} (finite : finiteApplyFromGround x) :
+    ¬ Simulation (f2f x) x := by
+  obtain ⟨n, rfl⟩ := finite
+  have agreement_at : ordinalSucc (finiteApplyPosition n) = f2f (finiteApplyPosition n) :=
+    agreement n
+  rw [← agreement_at]
+  exact (axSuccExtends (finiteApplyPosition n)).2
+
+theorem simulation_trace_from_finite_is_empty
+    (agreement : FiniteSuccessorAgreement) {x y : Form}
+    (finite : finiteApplyFromGround x) (path : SimulationEntry x y) :
+    Trace.length path = 0 := by
+  cases path with
+  | nil => rfl
+  | cons edge tail =>
+      have step : Simulation (f2f x) x := edge.1 ▸ edge.2
+      exact False.elim (no_simulation_step_at_finite_of_successor_agreement agreement finite step)
+
+theorem no_driver_cycle_witness_at_finite_successor
+    (agreement : FiniteSuccessorAgreement) (finite : finiteApplyFromGround deriver) :
+    ¬ Nonempty DriverCycleWitness := by
+  rintro ⟨witness⟩
+  have zero := simulation_trace_from_finite_is_empty agreement finite witness.path
+  have impossible : (2 : Nat) = 0 := witness.length_two.symm.trans zero
+  exact Nat.noConfusion impossible
+
+
 -- The source proposes terminal graduation and no external kernel.
 -- The target above is unproved and does not establish that claim.
 -- Source rationale for proposing no L4:

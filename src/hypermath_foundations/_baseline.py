@@ -163,7 +163,7 @@ TARGET_STATEMENT = 'theorem Hypermath.selfDerivation : And (Hypermath.structCont
 TARGET_CLAIM = TARGET_STATEMENT.replace(
     'theorem Hypermath.selfDerivation : ', 'def Hypermath.selfDerivation : Prop := ', 1)
 
-AUDIT_SOURCE_SHA256 = '5d8fe43de787bf8128d577da4a0e9cc8009b101da6f3c2844c9a9410022b799e'
+AUDIT_SOURCE_SHA256 = '925bf454d9477999c0d03c2b25695ea87ce5a9d2684d3c838553b4aabe5ee0ff'
 COUNTERMODEL_SOURCE_SHA256 = 'b822d53b244418db1c3a505332b6090d9da72bc6e0fe3ce620bd9e5c5413adc7'
 LEAN_BUILTINS = frozenset({"propext", "Classical.choice", "Quot.sound"})
 
@@ -510,7 +510,7 @@ PROVED_DEPENDENCIES.update({
 
 FINITE_ACTION_SOURCE_SHA256 = 'e5f5a0ef525088b1bf87f0669c7e0fecb6ab9a4e5fcda432a13825f8d96e609c'
 
-ACTION_COUNTERMODEL_SOURCE_SHA256 = '063d90e0624efc28e7c088a9b9b132ec5ababec734b6cc787b2b413b986b4936'
+ACTION_COUNTERMODEL_SOURCE_SHA256 = '57ac0d78c7ae9b258145ed77c855aff18201aed2dafb913d4d3f584412b7ba71'
 
 # Reviewed finite syntax of L0 Section I and instances of exactly the four
 # Section III rules. This checker does not assert semantic Form injectivity.
@@ -558,3 +558,131 @@ PROVED_DEPENDENCIES.update({
               'Hypermath.f2f', 'Hypermath.ground', 'Hypermath.pathGround', 'Hypermath.structContinues')
        for name in ('Hypermath.selfDerivationOfCycle', 'Hypermath.selfDerivation_iff_driverCycleClaim')},
 })
+
+# Source-cycle witnesses: exact edges, length, and the explicit successor premise.
+DEFINITION_DECLARATIONS.update({'Hypermath.SimulationStep': 'def Hypermath.SimulationStep : Hypermath.Form → Hypermath.Form → '
+                             'Prop := fun x y => And (Eq y (Hypermath.f2f x)) '
+                             '(Hypermath.Simulation y x)',
+ 'Hypermath.SimulationEntry': '@[reducible] def Hypermath.SimulationEntry : Hypermath.Form → '
+                              'Hypermath.Form → Type := fun x y => Hypermath.Trace '
+                              'Hypermath.SimulationStep x y',
+ 'Hypermath.simulationEntryToDEntry': 'def Hypermath.simulationEntryToDEntry : {x y : '
+                                      'Hypermath.Form} → Hypermath.SimulationEntry x y → '
+                                      'Hypermath.DEntry x y := fun {x y} path => '
+                                      'Hypermath.Trace.map id '
+                                      '(@Hypermath.simulationEntryToDEntry.proof_1) path',
+ 'Hypermath.DriverCycleWitness': 'structure Hypermath.DriverCycleWitness : Type number of '
+                                 'parameters: 0 constructor: Hypermath.DriverCycleWitness.mk : '
+                                 '(path : Hypermath.SimulationEntry Hypermath.deriver '
+                                 '(Hypermath.f2f (Hypermath.f2f Hypermath.deriver))) → Eq '
+                                 '(Hypermath.Trace.length path) 2 → Hypermath.driverCycleClaim → '
+                                 'Hypermath.DriverCycleWitness fields: path : '
+                                 'Hypermath.SimulationEntry Hypermath.deriver (Hypermath.f2f '
+                                 '(Hypermath.f2f Hypermath.deriver)) length_two : Eq '
+                                 '(Hypermath.Trace.length self.path) 2 closes : '
+                                 'Hypermath.driverCycleClaim',
+ 'Hypermath.driverCycleWitnessOfSteps': 'def Hypermath.driverCycleWitnessOfSteps : '
+                                        'Hypermath.Simulation (Hypermath.f2f Hypermath.deriver) '
+                                        'Hypermath.deriver → Hypermath.Simulation (Hypermath.f2f '
+                                        '(Hypermath.f2f Hypermath.deriver)) (Hypermath.f2f '
+                                        'Hypermath.deriver) → Hypermath.driverCycleClaim → '
+                                        'Hypermath.DriverCycleWitness := fun first second closes '
+                                        '=> { path := Hypermath.Trace.cons ⋯ (Hypermath.Trace.cons '
+                                        '⋯ (Hypermath.Trace.nil (Hypermath.f2f (Hypermath.f2f '
+                                        'Hypermath.deriver)))), length_two := ⋯, closes := closes '
+                                        '}',
+ 'Hypermath.FiniteSuccessorAgreement': 'def Hypermath.FiniteSuccessorAgreement : Prop := ∀ (n : '
+                                       'Nat), Eq (Hypermath.ordinalSucc '
+                                       '(Hypermath.finiteApplyPosition n)) '
+                                       '(Hypermath.finiteApplyPosition (HAdd.hAdd n 1))'})
+PROVED_DECLARATIONS.update({'Hypermath.simulationEntryToDEntry_length': 'theorem Hypermath.simulationEntryToDEntry_length : ∀ '
+                                             '{x y : Hypermath.Form} (path : '
+                                             'Hypermath.SimulationEntry x y), Eq '
+                                             '(Hypermath.Trace.length '
+                                             '(Hypermath.simulationEntryToDEntry path)) '
+                                             '(Hypermath.Trace.length path)',
+ 'Hypermath.selfDerivationOfWitness': 'theorem Hypermath.selfDerivationOfWitness : '
+                                      'Hypermath.DriverCycleWitness → Hypermath.selfDerivation',
+ 'Hypermath.witness_has_two_D_steps': 'theorem Hypermath.witness_has_two_D_steps : '
+                                      'Hypermath.DriverCycleWitness → Exists fun path => Eq '
+                                      '(Hypermath.Trace.length path) 2',
+ 'Hypermath.no_simulation_step_at_finite_of_successor_agreement': 'theorem '
+                                                                  'Hypermath.no_simulation_step_at_finite_of_successor_agreement '
+                                                                  ': '
+                                                                  'Hypermath.FiniteSuccessorAgreement '
+                                                                  '→ ∀ {x : Hypermath.Form}, '
+                                                                  'Hypermath.finiteApplyFromGround '
+                                                                  'x → Not (Hypermath.Simulation '
+                                                                  '(Hypermath.f2f x) x)',
+ 'Hypermath.simulation_trace_from_finite_is_empty': 'theorem '
+                                                    'Hypermath.simulation_trace_from_finite_is_empty '
+                                                    ': Hypermath.FiniteSuccessorAgreement → ∀ {x y '
+                                                    ': Hypermath.Form}, '
+                                                    'Hypermath.finiteApplyFromGround x → ∀ (path : '
+                                                    'Hypermath.SimulationEntry x y), Eq '
+                                                    '(Hypermath.Trace.length path) 0',
+ 'Hypermath.no_driver_cycle_witness_at_finite_successor': 'theorem '
+                                                          'Hypermath.no_driver_cycle_witness_at_finite_successor '
+                                                          ': Hypermath.FiniteSuccessorAgreement → '
+                                                          'Hypermath.finiteApplyFromGround '
+                                                          'Hypermath.deriver → Not (Nonempty '
+                                                          'Hypermath.DriverCycleWitness)',
+ 'Hypermath.driverCycleWitness_exists_of_steps': 'theorem '
+                                                 'Hypermath.driverCycleWitness_exists_of_steps : '
+                                                 'Hypermath.Simulation (Hypermath.f2f '
+                                                 'Hypermath.deriver) Hypermath.deriver → '
+                                                 'Hypermath.Simulation (Hypermath.f2f '
+                                                 '(Hypermath.f2f Hypermath.deriver)) '
+                                                 '(Hypermath.f2f Hypermath.deriver) → '
+                                                 'Hypermath.driverCycleClaim → Nonempty '
+                                                 'Hypermath.DriverCycleWitness'})
+PROVED_DEPENDENCIES.update({'Hypermath.simulationEntryToDEntry_length': ('Hypermath.Congruent',
+                                              'Hypermath.Form',
+                                              'Hypermath.Simulation',
+                                              'Hypermath.f2f',
+                                              'Hypermath.filtrationSimCong'),
+ 'Hypermath.selfDerivationOfWitness': ('Hypermath.Congruent',
+                                       'Hypermath.DerivationPath',
+                                       'Hypermath.Form',
+                                       'Hypermath.Simulation',
+                                       'Hypermath.axComposeIdentity',
+                                       'Hypermath.axGroundSelf',
+                                       'Hypermath.compose',
+                                       'Hypermath.congruentPath',
+                                       'Hypermath.deriver',
+                                       'Hypermath.f2f',
+                                       'Hypermath.ground',
+                                       'Hypermath.pathGround',
+                                       'Hypermath.structContinues'),
+ 'Hypermath.witness_has_two_D_steps': ('Hypermath.Congruent',
+                                       'Hypermath.Form',
+                                       'Hypermath.Simulation',
+                                       'Hypermath.deriver',
+                                       'Hypermath.f2f',
+                                       'Hypermath.filtrationSimCong'),
+ 'Hypermath.no_simulation_step_at_finite_of_successor_agreement': ('Hypermath.Derives',
+                                                                   'Hypermath.Form',
+                                                                   'Hypermath.Simulation',
+                                                                   'Hypermath.axSuccExtends',
+                                                                   'Hypermath.f2f',
+                                                                   'Hypermath.ground',
+                                                                   'Hypermath.ordinalSucc'),
+ 'Hypermath.simulation_trace_from_finite_is_empty': ('Hypermath.Derives',
+                                                     'Hypermath.Form',
+                                                     'Hypermath.Simulation',
+                                                     'Hypermath.axSuccExtends',
+                                                     'Hypermath.f2f',
+                                                     'Hypermath.ground',
+                                                     'Hypermath.ordinalSucc'),
+ 'Hypermath.no_driver_cycle_witness_at_finite_successor': ('Hypermath.Derives',
+                                                           'Hypermath.Form',
+                                                           'Hypermath.Simulation',
+                                                           'Hypermath.axSuccExtends',
+                                                           'Hypermath.deriver',
+                                                           'Hypermath.f2f',
+                                                           'Hypermath.ground',
+                                                           'Hypermath.ordinalSucc'),
+ 'Hypermath.driverCycleWitness_exists_of_steps': ('Hypermath.Form',
+                                                  'Hypermath.Simulation',
+                                                  'Hypermath.deriver',
+                                                  'Hypermath.f2f')})

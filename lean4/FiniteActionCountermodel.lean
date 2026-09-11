@@ -409,4 +409,33 @@ theorem no_semantic_primitive_record_decoder :
 #print axioms numeral_equality_observation_fails
 #print axioms no_numeral_equality_decoder
 
+
+theorem no_preserving_step : ∀ x y : Form, ¬ DStep x y := by
+  intro x y edge
+  rcases edge with ⟨rfl, congruent⟩
+  cases x <;> simp [Congruent, congruenceClass, f2f] at congruent
+
+theorem every_D_entry_is_empty {x y : Form} (path : DEntry x y) :
+    Hypermath.Trace.length path = 0 := by
+  cases path with
+  | nil => rfl
+  | cons edge tail => exact False.elim (no_preserving_step _ _ edge)
+
+theorem no_nonzero_D_entry : ∀ x y : Form,
+    ¬ ∃ path : DEntry x y, 0 < Hypermath.Trace.length path := by
+  intro x y
+  rintro ⟨path, positive⟩
+  rw [every_D_entry_is_empty path] at positive
+  exact Nat.lt_irrefl 0 positive
+
+theorem full_clauses_and_target_without_nonzero_D :
+    FullAxioms ∧ selfDerivationTarget ∧
+      (∀ x y : Form, ¬ ∃ path : DEntry x y, 0 < Hypermath.Trace.length path) :=
+  ⟨full_axioms_hold, self_derivation_target_holds, no_nonzero_D_entry⟩
+
+#print axioms no_preserving_step
+#print axioms every_D_entry_is_empty
+#print axioms no_nonzero_D_entry
+#print axioms full_clauses_and_target_without_nonzero_D
+
 end HypermathFiniteActionCountermodel

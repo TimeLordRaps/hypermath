@@ -258,12 +258,16 @@ ACTION_COUNTERMODEL_TARGETS = tuple("HypermathFiniteActionCountermodel." + name 
     "numeral_equality_observation_fails", "no_numeral_equality_decoder",
     "primitive_records_collide", "primitive_conclusions_differ",
     "no_semantic_primitive_record_decoder",
+    "no_preserving_step", "every_D_entry_is_empty", "no_nonzero_D_entry",
+    "full_clauses_and_target_without_nonzero_D",
 ))
 ACTION_COUNTERMODEL_DEPENDENCIES = {
     name: (
         ["Quot.sound", "propext"]
-        if name.endswith((".full_axioms_hold", ".self_derivation_without_arithmetic_bridge"))
-        else ["propext"] if name.endswith(".self_derivation_target_holds") else []
+        if name.endswith((".full_axioms_hold", ".self_derivation_without_arithmetic_bridge",
+                          ".full_clauses_and_target_without_nonzero_D"))
+        else ["propext"] if name.endswith((".self_derivation_target_holds", ".no_preserving_step",
+                                           ".every_D_entry_is_empty", ".no_nonzero_D_entry")) else []
     )
     for name in ACTION_COUNTERMODEL_TARGETS
 }

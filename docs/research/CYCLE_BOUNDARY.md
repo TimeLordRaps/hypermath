@@ -67,8 +67,12 @@ This changes the Lean proof interface: a consumer can no longer use the target
 as an available proof. Five admission sites were withdrawn, leaving 11. Their
 removal records unsupported claims, not five newly proved results. The native
 assumption inventory remains 67 declarations: 29 parameters and 38 clauses.
-The audit now binds 38 production milestones, including the three conditional
-assembly and equivalence results.
+The audit now binds 45 production milestones, including the three conditional
+assembly/equivalence results and seven results about explicit cycle witnesses.
+The [cycle-witness account](CYCLE_WITNESSES.md) shows why endpoint closure
+does not supply a nonzero preserving path and states the finite-successor
+obstruction. It preserves this original target separately from the stronger
+source-cycle certificate.
 
 The audit accepts the exact proposition definition as an integrity observation,
 while retaining `self_derivation=UNKNOWN` and `proof_admissibility=FAIL`.

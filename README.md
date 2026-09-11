@@ -49,7 +49,7 @@ an equivalence relation, but prevents both exact and congruence-valued actions
 of that kind. It also shows that the proposed zero, successor, and opaque
 path-length laws do not follow from those clauses. Their statements remain
 named propositions instead of admitted theorems. The translation now has
-67 declared assumptions and 11 admissions; the audit binds 38 proved milestone
+67 declared assumptions and 11 admissions; the audit binds 45 proved milestone
 declarations. Removing those three admissions records non-entailment, not
 three completed proofs. The model additionally satisfies the exact current
 self-derivation target while those arithmetic bridges fail. This proves that
