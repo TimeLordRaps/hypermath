@@ -28,6 +28,7 @@ from ._baseline import (
     RECORD_ENCODING_SOURCE_SHA256,
     RECORD_MACHINE_CHECKS_SOURCE_SHA256,
     RECORD_MACHINE_SOURCE_SHA256,
+    RULE_SUBSTITUTION_SOURCE_SHA256,
     TARGET_CLAIM,
     TARGET_STATEMENT,
     TRACE_CHECKS_SOURCE_SHA256,
@@ -221,6 +222,54 @@ RECORD_MACHINE_DEPENDENCIES = {
         "packed_example_accepted", "packed_wrong_sort_rejected", "empty_packed_input_rejected",
     )},
 }
+RECORD_MACHINE_DEPENDENCIES.update({'Hypermath.RuleSubstitution.step_agrees': ['Quot.sound', 'propext'],
+ 'Hypermath.RuleSubstitution.execute_agrees': ['Quot.sound', 'propext'],
+ 'Hypermath.RuleSubstitution.execute_program': ['Quot.sound', 'propext'],
+ 'Hypermath.RuleSubstitution.check_agrees': ['Quot.sound', 'propext'],
+ 'Hypermath.RuleSubstitution.check_sound': ['Quot.sound', 'propext'],
+ 'Hypermath.RuleSubstitution.check_quote': ['Quot.sound', 'propext'],
+ 'Hypermath.RuleSubstitution.readList_listTree': ['Quot.sound', 'propext'],
+ 'Hypermath.RuleSubstitution.readRule_index': [],
+ 'Hypermath.RuleSubstitution.readApplication_tree': ['Quot.sound', 'propext'],
+ 'Hypermath.RuleSubstitution.decode_code': ['Quot.sound', 'propext'],
+ 'Hypermath.RuleSubstitution.decode_toTerm': ['Quot.sound', 'propext'],
+ 'Hypermath.RuleSubstitution.toTerm_injective': ['Quot.sound', 'propext'],
+ 'Hypermath.RuleSubstitution.runNumber_code': ['Quot.sound', 'propext'],
+ 'Hypermath.RuleSubstitution.runTerm_toTerm': ['Quot.sound', 'propext'],
+ 'Hypermath.RuleSubstitution.formula_code_rejected': ['Quot.sound', 'propext'],
+ 'Hypermath.RuleSubstitution.record_code_rejected': ['Quot.sound', 'propext'],
+ 'Hypermath.RuleSubstitution.no_rule_only_instantiation': [],
+ 'Hypermath.RuleSubstitution.readState_stateTree': ['Quot.sound', 'propext'],
+ 'Hypermath.RuleSubstitution.readCall_tree': ['Quot.sound', 'propext'],
+ 'Hypermath.RuleSubstitution.decodeCall_code': ['Quot.sound', 'propext'],
+ 'Hypermath.RuleSubstitution.decodeCall_toTerm': ['Quot.sound', 'propext'],
+ 'Hypermath.RuleSubstitution.call_toTerm_injective': ['Quot.sound', 'propext'],
+ 'Hypermath.RuleSubstitution.runCallNumber_code': ['Quot.sound', 'propext'],
+ 'Hypermath.RuleSubstitution.runCallTerm_toTerm': ['Quot.sound', 'propext'],
+ 'Hypermath.RuleSubstitution.encodedStep_agrees': ['Quot.sound', 'propext'],
+ 'Hypermath.RuleSubstitution.encodedExecute_agrees': ['Quot.sound', 'propext'],
+ 'Hypermath.RuleSubstitution.encodedExecute_program': ['Quot.sound', 'propext'],
+ 'Hypermath.RuleSubstitution.encodedCheck_agrees': ['Quot.sound', 'propext'],
+ 'Hypermath.RuleSubstitution.encodedCheck_sound': ['Quot.sound', 'propext'],
+ 'Hypermath.RuleSubstitution.encodedCheck_quote': ['Quot.sound', 'propext'],
+ 'Hypermath.RuleSubstitutionChecks.missing_substitution_rejected': [],
+ 'Hypermath.RuleSubstitutionChecks.surplus_substitution_rejected': [],
+ 'Hypermath.RuleSubstitutionChecks.wrong_substitution_sort_rejected': [],
+ 'Hypermath.RuleSubstitutionChecks.unused_formula_argument_rejected': [],
+ 'Hypermath.RuleSubstitutionChecks.unbound_term_variable_rejected': [],
+ 'Hypermath.RuleSubstitutionChecks.unbound_formula_variable_rejected': [],
+ 'Hypermath.RuleSubstitutionChecks.substituted_rule_checks_premise': [],
+ 'Hypermath.RuleSubstitutionChecks.join_premise_order_matters': [],
+ 'Hypermath.RuleSubstitutionChecks.untouched_stack_is_retained': [],
+ 'Hypermath.RuleSubstitutionChecks.poisoned_input_remains_failed': [],
+ 'Hypermath.RuleSubstitutionChecks.unknown_rule_rejected': [],
+ 'Hypermath.RuleSubstitutionChecks.malformed_state_rejected': [],
+ 'Hypermath.RuleSubstitutionChecks.failed_and_empty_state_distinct': [],
+ 'Hypermath.RuleSubstitutionChecks.encoded_call_checks_retained_premise': ['Quot.sound', 'propext'],
+ 'Hypermath.RuleSubstitutionChecks.distinct_premises_have_distinct_call_terms': ['Quot.sound',
+                                                                                 'propext'],
+ 'Hypermath.RuleSubstitutionChecks.encoded_hidden_failure_rejected': ['Quot.sound', 'propext'],
+ 'Hypermath.RuleSubstitutionChecks.encoded_example_accepted': ['Quot.sound', 'propext']})
 RECORD_MACHINE_TARGETS = tuple(RECORD_MACHINE_DEPENDENCIES)
 FULL_MODEL_DEPENDENCIES = {
     **{"HypermathFullAxiomModel." + name: [] for name in (
@@ -431,4 +480,6 @@ def policy_errors(output: str, inputs: dict, assumptions: list[dict]) -> list[st
         reasons.append("record execution machine differs from the reviewed construction")
     if inputs.get("lean4/RecordMachineChecks.lean") != RECORD_MACHINE_CHECKS_SOURCE_SHA256:
         reasons.append("record machine checks differ from the reviewed probes")
+    if inputs.get("lean4/Hypermath/RuleSubstitution.lean") != RULE_SUBSTITUTION_SOURCE_SHA256:
+        reasons.append("rule substitution and retained calls differ from the reviewed construction")
     return reasons

@@ -101,6 +101,13 @@ submitted traces are checked transition by transition against the exact record
 and claim. This resolves the choice of a concrete finite computation to
 represent. It does not yet supply its native simulation or ranked acceptance.
 
+The [substitution executor](RULE_SUBSTITUTION.md) now supplies a concrete finite
+refinement of the retained form kernel's rule-and-substitution description.
+Each encoded checking call retains the rule, its term and formula substitutions,
+and the exact premise stack. Executing those represented calls agrees with the
+whole-record checker. The parser, recursive control, equality checks, and rule
+table still need their source-native execution and acceptance account.
+
 For the ranked self-closing target, that execution must itself yield a
 derivation of the acceptance claim at the next rank. Repeating the same rule
 must represent that acceptance derivation while preserving the needed

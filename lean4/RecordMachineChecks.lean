@@ -1,4 +1,5 @@
 import Hypermath.RecordMachine
+import Hypermath.RuleSubstitution
 
 namespace Hypermath.RecordMachineChecks
 
@@ -101,6 +102,97 @@ end Hypermath.RecordMachineChecks
 
 #eval Hypermath.RecordMachineChecks.main
 
+namespace Hypermath.RuleSubstitutionChecks
+
+open GroundSyntax GroundDerivation RuleSubstitution
+
+def groundClaim : Formula := .structural (.continues .ground .ground)
+def otherClaim : Formula := .structural (.distinct (.apply .ground) .ground)
+
+theorem missing_substitution_rejected :
+    (Application.mk .diff ⟨[], []⟩).run (some []) = none := rfl
+
+theorem surplus_substitution_rejected :
+    (Application.mk .diff ⟨[.ground, .ground], []⟩).run (some []) = none := rfl
+
+theorem wrong_substitution_sort_rejected :
+    (Application.mk .diff ⟨[], [groundClaim]⟩).run (some []) = none := rfl
+
+theorem unused_formula_argument_rejected :
+    (Application.mk .groundSelf ⟨[], [groundClaim]⟩).run (some []) = none := rfl
+
+theorem unbound_term_variable_rejected :
+    (TermPattern.variable 1).instantiate ⟨[.ground], []⟩ = none := rfl
+
+theorem unbound_formula_variable_rejected :
+    (FormulaPattern.variable 1).instantiate ⟨[], [groundClaim]⟩ = none := rfl
+
+theorem substituted_rule_checks_premise :
+    (Application.mk .closeContinues ⟨[.ground], []⟩).run (some [otherClaim]) = none := rfl
+
+theorem join_premise_order_matters :
+    (Application.mk .join ⟨[], [groundClaim, otherClaim]⟩).run
+      (some [otherClaim, groundClaim]) = some [.both groundClaim otherClaim] ∧
+    (Application.mk .join ⟨[], [groundClaim, otherClaim]⟩).run
+      (some [groundClaim, otherClaim]) = none := by
+  exact ⟨rfl, rfl⟩
+
+theorem untouched_stack_is_retained :
+    (Application.mk .projectLeft ⟨[], [groundClaim, otherClaim]⟩).run
+      (some [.both groundClaim otherClaim, otherClaim]) = some [groundClaim, otherClaim] := rfl
+
+theorem poisoned_input_remains_failed :
+    (Application.mk .groundSelf ⟨[], []⟩).run none = none := rfl
+
+theorem unknown_rule_rejected : readRule 10 = none := rfl
+
+theorem malformed_state_rejected : readState (.fork (.fork .leaf .leaf) .leaf) = none := rfl
+
+theorem failed_and_empty_state_distinct : stateTree none ≠ stateTree (some []) := by
+  intro equality
+  cases equality
+
+def correctCall : Call :=
+  ⟨⟨.projectLeft, ⟨[], [groundClaim, otherClaim]⟩⟩, some [.both groundClaim otherClaim]⟩
+def forgedCall : Call :=
+  ⟨⟨.projectLeft, ⟨[], [groundClaim, otherClaim]⟩⟩, some [groundClaim]⟩
+
+theorem encoded_call_checks_retained_premise :
+    runCallNumber correctCall.code = some [groundClaim] ∧
+    runCallNumber forgedCall.code = none := by
+  simp only [runCallNumber_code]
+  exact ⟨rfl, rfl⟩
+
+theorem distinct_premises_have_distinct_call_terms : correctCall.toTerm ≠ forgedCall.toTerm := by
+  intro equality
+  have same := call_toTerm_injective equality
+  cases same
+
+theorem encoded_hidden_failure_rejected :
+    encodedCheck RecordMachineChecks.hiddenFailure groundClaim = false := by
+  rw [encodedCheck_agrees]
+  rfl
+
+theorem encoded_example_accepted :
+    encodedCheck RecordMachineChecks.exampleRecord RecordMachineChecks.exampleRecord.conclusion = true := by
+  rw [encodedCheck_agrees]
+  rfl
+
+def main : IO Unit := do
+  let accepted := encodedCheck RecordMachineChecks.exampleRecord
+    RecordMachineChecks.exampleRecord.conclusion
+  let rejected := encodedCheck RecordMachineChecks.hiddenFailure groundClaim
+  let first := runCallNumber correctCall.code
+  let second := runCallNumber forgedCall.code
+  if !accepted || rejected || first != some [groundClaim] || second != none then
+    throw (IO.userError "schema substitution and retained-call execution probe failed")
+  IO.println "schema execution: encoded proof accepted; hidden failure and forged premise rejected"
+  IO.println s!"retained correct-call representation: {correctCall.tree.size} prefix bits"
+
+end Hypermath.RuleSubstitutionChecks
+
+#eval Hypermath.RuleSubstitutionChecks.main
+
 #print axioms Hypermath.RecordMachine.step_failed
 #print axioms Hypermath.RecordMachine.execute_failed
 #print axioms Hypermath.RecordMachine.execute_append
@@ -141,3 +233,51 @@ end Hypermath.RecordMachineChecks
 #print axioms Hypermath.RecordMachineChecks.packed_example_accepted
 #print axioms Hypermath.RecordMachineChecks.packed_wrong_sort_rejected
 #print axioms Hypermath.RecordMachineChecks.empty_packed_input_rejected
+
+#print axioms Hypermath.RuleSubstitution.step_agrees
+#print axioms Hypermath.RuleSubstitution.execute_agrees
+#print axioms Hypermath.RuleSubstitution.execute_program
+#print axioms Hypermath.RuleSubstitution.check_agrees
+#print axioms Hypermath.RuleSubstitution.check_sound
+#print axioms Hypermath.RuleSubstitution.check_quote
+#print axioms Hypermath.RuleSubstitution.readList_listTree
+#print axioms Hypermath.RuleSubstitution.readRule_index
+#print axioms Hypermath.RuleSubstitution.readApplication_tree
+#print axioms Hypermath.RuleSubstitution.decode_code
+#print axioms Hypermath.RuleSubstitution.decode_toTerm
+#print axioms Hypermath.RuleSubstitution.toTerm_injective
+#print axioms Hypermath.RuleSubstitution.runNumber_code
+#print axioms Hypermath.RuleSubstitution.runTerm_toTerm
+#print axioms Hypermath.RuleSubstitution.formula_code_rejected
+#print axioms Hypermath.RuleSubstitution.record_code_rejected
+#print axioms Hypermath.RuleSubstitution.no_rule_only_instantiation
+#print axioms Hypermath.RuleSubstitution.readState_stateTree
+#print axioms Hypermath.RuleSubstitution.readCall_tree
+#print axioms Hypermath.RuleSubstitution.decodeCall_code
+#print axioms Hypermath.RuleSubstitution.decodeCall_toTerm
+#print axioms Hypermath.RuleSubstitution.call_toTerm_injective
+#print axioms Hypermath.RuleSubstitution.runCallNumber_code
+#print axioms Hypermath.RuleSubstitution.runCallTerm_toTerm
+#print axioms Hypermath.RuleSubstitution.encodedStep_agrees
+#print axioms Hypermath.RuleSubstitution.encodedExecute_agrees
+#print axioms Hypermath.RuleSubstitution.encodedExecute_program
+#print axioms Hypermath.RuleSubstitution.encodedCheck_agrees
+#print axioms Hypermath.RuleSubstitution.encodedCheck_sound
+#print axioms Hypermath.RuleSubstitution.encodedCheck_quote
+#print axioms Hypermath.RuleSubstitutionChecks.missing_substitution_rejected
+#print axioms Hypermath.RuleSubstitutionChecks.surplus_substitution_rejected
+#print axioms Hypermath.RuleSubstitutionChecks.wrong_substitution_sort_rejected
+#print axioms Hypermath.RuleSubstitutionChecks.unused_formula_argument_rejected
+#print axioms Hypermath.RuleSubstitutionChecks.unbound_term_variable_rejected
+#print axioms Hypermath.RuleSubstitutionChecks.unbound_formula_variable_rejected
+#print axioms Hypermath.RuleSubstitutionChecks.substituted_rule_checks_premise
+#print axioms Hypermath.RuleSubstitutionChecks.join_premise_order_matters
+#print axioms Hypermath.RuleSubstitutionChecks.untouched_stack_is_retained
+#print axioms Hypermath.RuleSubstitutionChecks.poisoned_input_remains_failed
+#print axioms Hypermath.RuleSubstitutionChecks.unknown_rule_rejected
+#print axioms Hypermath.RuleSubstitutionChecks.malformed_state_rejected
+#print axioms Hypermath.RuleSubstitutionChecks.failed_and_empty_state_distinct
+#print axioms Hypermath.RuleSubstitutionChecks.encoded_call_checks_retained_premise
+#print axioms Hypermath.RuleSubstitutionChecks.distinct_premises_have_distinct_call_terms
+#print axioms Hypermath.RuleSubstitutionChecks.encoded_hidden_failure_rejected
+#print axioms Hypermath.RuleSubstitutionChecks.encoded_example_accepted
