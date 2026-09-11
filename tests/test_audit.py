@@ -386,6 +386,14 @@ def test_legacy_tool_failure_precedes_remaining_admissions(checkout, monkeypatch
                            "def Hypermath.finiteApplyFromGround : Hypermath.Form → Prop := fun _ => True"),
     lambda out: out.replace(PROVED_DECLARATIONS["Hypermath.notGroundSpanningClaim"],
                            "theorem Hypermath.notGroundSpanningClaim : Hypermath.groundSpanningClaim"),
+    lambda out: out.replace(DEFINITION_DECLARATIONS["Hypermath.DriverCycleWitness"],
+                           DEFINITION_DECLARATIONS["Hypermath.DriverCycleWitness"].replace(
+                               "Eq (Hypermath.Trace.length path) 2", "Eq (Hypermath.Trace.length path) 0")),
+    lambda out: out.replace(DEFINITION_DECLARATIONS["Hypermath.SimulationStep"],
+                           DEFINITION_DECLARATIONS["Hypermath.SimulationStep"].replace(
+                               "Hypermath.Simulation y x", "Hypermath.Congruent y x")),
+    lambda out: out.replace(DEFINITION_DECLARATIONS["Hypermath.FiniteSuccessorAgreement"],
+                           "def Hypermath.FiniteSuccessorAgreement : Prop := True"),
     lambda out: out.replace("'Hypermath.dIsReflexive' depends on axioms: [Hypermath.Congruent, Hypermath.Form, Hypermath.f2f]",
                            "'Hypermath.dIsReflexive' depends on axioms: [sorryAx, Hypermath.Form]"),
     lambda out: out.replace("'Hypermath.dIsReflexive' depends on axioms: [Hypermath.Congruent, Hypermath.Form, Hypermath.f2f]",
@@ -678,6 +686,8 @@ def test_full_models_cover_exact_reviewed_logical_clause_types(relative_path):
     ),
     lambda out: out + "\n'HypermathFiniteActionCountermodel.full_axioms_hold' "
     "depends on axioms: [sorryAx",
+    lambda out: out.replace("'HypermathFiniteActionCountermodel.no_nonzero_D_entry' "
+                           "depends on axioms: [propext]", ""),
 ])
 def test_finite_action_model_requires_exact_dependency_surface(checkout, monkeypatch, alter):
     root, _, run = checkout

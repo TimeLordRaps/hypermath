@@ -600,3 +600,64 @@ set_option pp.fullNames true
 #print Hypermath.finiteNumeralEqualityExact_iff_injective
 #eval IO.println "HYPERMATH_DECL_END:Hypermath.finiteNumeralEqualityExact_iff_injective"
 #print axioms Hypermath.finiteNumeralEqualityExact_iff_injective
+
+-- Exact source-cycle certificate and finite-successor correspondence.
+
+#eval IO.println "HYPERMATH_DECL_BEGIN:Hypermath.SimulationStep"
+#print Hypermath.SimulationStep
+#eval IO.println "HYPERMATH_DECL_END:Hypermath.SimulationStep"
+
+#eval IO.println "HYPERMATH_DECL_BEGIN:Hypermath.SimulationEntry"
+#print Hypermath.SimulationEntry
+#eval IO.println "HYPERMATH_DECL_END:Hypermath.SimulationEntry"
+
+#eval IO.println "HYPERMATH_DECL_BEGIN:Hypermath.simulationEntryToDEntry"
+#print Hypermath.simulationEntryToDEntry
+#eval IO.println "HYPERMATH_DECL_END:Hypermath.simulationEntryToDEntry"
+
+#eval IO.println "HYPERMATH_DECL_BEGIN:Hypermath.DriverCycleWitness"
+#print Hypermath.DriverCycleWitness
+#eval IO.println "HYPERMATH_DECL_END:Hypermath.DriverCycleWitness"
+
+#eval IO.println "HYPERMATH_DECL_BEGIN:Hypermath.driverCycleWitnessOfSteps"
+#print Hypermath.driverCycleWitnessOfSteps
+#eval IO.println "HYPERMATH_DECL_END:Hypermath.driverCycleWitnessOfSteps"
+
+#eval IO.println "HYPERMATH_DECL_BEGIN:Hypermath.FiniteSuccessorAgreement"
+#print Hypermath.FiniteSuccessorAgreement
+#eval IO.println "HYPERMATH_DECL_END:Hypermath.FiniteSuccessorAgreement"
+
+#eval IO.println "HYPERMATH_DECL_BEGIN:Hypermath.simulationEntryToDEntry_length"
+#print Hypermath.simulationEntryToDEntry_length
+#eval IO.println "HYPERMATH_DECL_END:Hypermath.simulationEntryToDEntry_length"
+#print axioms Hypermath.simulationEntryToDEntry_length
+
+#eval IO.println "HYPERMATH_DECL_BEGIN:Hypermath.selfDerivationOfWitness"
+#print Hypermath.selfDerivationOfWitness
+#eval IO.println "HYPERMATH_DECL_END:Hypermath.selfDerivationOfWitness"
+#print axioms Hypermath.selfDerivationOfWitness
+
+#eval IO.println "HYPERMATH_DECL_BEGIN:Hypermath.witness_has_two_D_steps"
+#print Hypermath.witness_has_two_D_steps
+#eval IO.println "HYPERMATH_DECL_END:Hypermath.witness_has_two_D_steps"
+#print axioms Hypermath.witness_has_two_D_steps
+
+#eval IO.println "HYPERMATH_DECL_BEGIN:Hypermath.no_simulation_step_at_finite_of_successor_agreement"
+#print Hypermath.no_simulation_step_at_finite_of_successor_agreement
+#eval IO.println "HYPERMATH_DECL_END:Hypermath.no_simulation_step_at_finite_of_successor_agreement"
+#print axioms Hypermath.no_simulation_step_at_finite_of_successor_agreement
+
+#eval IO.println "HYPERMATH_DECL_BEGIN:Hypermath.simulation_trace_from_finite_is_empty"
+#print Hypermath.simulation_trace_from_finite_is_empty
+#eval IO.println "HYPERMATH_DECL_END:Hypermath.simulation_trace_from_finite_is_empty"
+#print axioms Hypermath.simulation_trace_from_finite_is_empty
+
+#eval IO.println "HYPERMATH_DECL_BEGIN:Hypermath.no_driver_cycle_witness_at_finite_successor"
+#print Hypermath.no_driver_cycle_witness_at_finite_successor
+#eval IO.println "HYPERMATH_DECL_END:Hypermath.no_driver_cycle_witness_at_finite_successor"
+#print axioms Hypermath.no_driver_cycle_witness_at_finite_successor
+
+#eval IO.println "HYPERMATH_DECL_BEGIN:Hypermath.driverCycleWitness_exists_of_steps"
+#print Hypermath.driverCycleWitness_exists_of_steps
+#eval IO.println "HYPERMATH_DECL_END:Hypermath.driverCycleWitness_exists_of_steps"
+#print axioms Hypermath.driverCycleWitness_exists_of_steps
