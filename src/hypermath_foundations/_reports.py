@@ -10,6 +10,7 @@ from ._baseline import (
     ACTION_COUNTERMODEL_SOURCE_SHA256,
     AUDIT_SOURCE_SHA256,
     AXIOM_DECLARATIONS,
+    CONTEXTUAL_COMPOSITION_SOURCE_SHA256,
     COUNTERMODEL_SOURCE_SHA256,
     DEFINITION_DECLARATIONS,
     FINITE_ACTION_SOURCE_SHA256,
@@ -19,20 +20,31 @@ from ._baseline import (
     GROUND_DERIVATION_SOURCE_SHA256,
     GROUND_SYNTAX_CHECKS_SOURCE_SHA256,
     GROUND_SYNTAX_SOURCE_SHA256,
+    LAYERED_DERIVATION_CHECKS_SOURCE_SHA256,
+    LAYERED_DERIVATION_SOURCE_SHA256,
     LEAN_BUILTINS,
     OBSERVATION_CHECKS_SOURCE_SHA256,
     OBSERVATION_SOURCE_SHA256,
+    OPERATIONAL_CORRESPONDENCE_SOURCE_SHA256,
+    PATH_LAYERS_SOURCE_SHA256,
+    PATH_TRANSPORT_SOURCE_SHA256,
     PROVED_DECLARATIONS,
     PROVED_DEPENDENCIES,
     RECORD_ENCODING_CHECKS_SOURCE_SHA256,
     RECORD_ENCODING_SOURCE_SHA256,
     RECORD_MACHINE_CHECKS_SOURCE_SHA256,
     RECORD_MACHINE_SOURCE_SHA256,
+    RETAINED_EXECUTION_SOURCE_SHA256,
     RULE_SUBSTITUTION_SOURCE_SHA256,
+    SEQUENTIAL_SOURCE_SHA256,
+    SURFACE_BRIDGE_SOURCE_SHA256,
     TARGET_CLAIM,
     TARGET_STATEMENT,
+    TERMINAL_RETENTION_SOURCE_SHA256,
     TRACE_CHECKS_SOURCE_SHA256,
     TRACE_SOURCE_SHA256,
+    TRANSPORT_COUNTERMODEL_SOURCE_SHA256,
+    UNARY_FORMATION_SOURCE_SHA256,
 )
 
 FORMAT = "hypermath-audit-1"
@@ -272,6 +284,46 @@ RECORD_MACHINE_DEPENDENCIES.update({'Hypermath.RuleSubstitution.step_agrees': ['
  'Hypermath.RuleSubstitutionChecks.encoded_example_accepted': ['Quot.sound', 'propext']})
 RECORD_MACHINE_TARGETS = tuple(RECORD_MACHINE_DEPENDENCIES)
 FULL_MODEL_DEPENDENCIES = {
+    "Hypermath.TerminalRetention.run_fixed": [],
+    "Hypermath.TerminalRetention.merged_fixed_states": [],
+    "Hypermath.TerminalRetention.finished_record": ["propext"],
+    "Hypermath.TerminalRetention.finished_fixed": ["propext"],
+    "Hypermath.TerminalRetention.finished_check": ["propext"],
+    "HypermathFullAxiomModel.primitive_run_value": ["propext"],
+    "HypermathFullAxiomModel.same_chain_orbits_meet": ["propext"],
+    "HypermathFullAxiomModel.same_chain_terminal_records_equal": ["propext"],
+    "HypermathFullAxiomModel.no_primitive_frame_checker": ["propext"],
+    "HypermathFullAxiomModel.full_clauses_without_primitive_frame_checker": [
+        "Classical.choice", "Quot.sound", "propext",
+    ],
+    "HypermathFullAxiomModel.terminal_witnesses_accepted": [],
+    **{"Hypermath.UnaryFormation." + name: [] for name in (
+        "eval_ignores_an_input", "identity_collapses_relation", "no_term_identity",
+        "pair_recovery_collapses", "no_term_pair_encoder", "natural_add_not_a_term",
+        "singleton_term_identity", "universal_relation_term_identity",
+    )},
+    "HypermathFullAxiomModel.no_fixed_term_identity": [],
+    "HypermathFullAxiomModel.no_fixed_term_pair_encoder": [],
+    "HypermathFullAxiomModel.full_clauses_without_fixed_term_composition": [
+        "Classical.choice", "Quot.sound", "propext",
+    ],
+    **{"Hypermath.Sequential." + name: [] for name in (
+        "unit_commutes", "uniform_separation_double_negates_unit", "no_uniform_separation",
+        "no_source_operation", "program_composition_executes", "program_noncommutative",
+        "program_order_changes_result",
+        "naturalSequencing", "natural_commutative",
+    )},
+    **{"Hypermath.Sequential." + name: ["propext"] for name in (
+        "program_identity", "program_associative", "distinct_nonempty_programs_commute",
+        "program_uniform_separation_fails",
+        "programSequencing", "program_not_commutative", "natural_no_inverses",
+        "programLength", "program_length_preserves_composition",
+        "program_length_forgets_order", "program_length_not_faithful",
+    )},
+    "HypermathFullAxiomModel.no_coherent_source_sequence": [],
+    "HypermathFullAxiomModel.full_clauses_without_coherent_source_sequence": [
+        "Classical.choice", "Quot.sound", "propext",
+    ],
     **{"HypermathFullAxiomModel." + name: [] for name in (
         "same_conclusion_opposite_acceptance", "no_conclusion_only_record_checker",
         "driver_cycle_claim_fails", "nontrivial_simulation_claim_fails",
@@ -320,13 +372,232 @@ ACTION_COUNTERMODEL_DEPENDENCIES = {
     )
     for name in ACTION_COUNTERMODEL_TARGETS
 }
+# Reviewed exact dependencies of the finite layer-preservation construction.
+LAYERED_DERIVATION_DEPENDENCIES = {'Hypermath.LayeredDerivation.Expression.run_sound': ['Quot.sound', 'propext'],
+ 'Hypermath.LayeredDerivation.checkGroundTerm_groundTerm': ['Quot.sound', 'propext'],
+ 'Hypermath.LayeredDerivation.check_iff': ['Quot.sound', 'propext'],
+ 'Hypermath.LayeredDerivation.check_iterateLift': ['Quot.sound', 'propext'],
+ 'Hypermath.LayeredDerivation.check_lift': ['Quot.sound', 'propext'],
+ 'Hypermath.LayeredDerivation.check_seq': ['Quot.sound', 'propext'],
+ 'Hypermath.LayeredDerivation.check_sound': ['Quot.sound', 'propext'],
+ 'Hypermath.LayeredDerivation.combine_associative': ['Quot.sound', 'propext'],
+ 'Hypermath.LayeredDerivation.combine_left_identity': [],
+ 'Hypermath.LayeredDerivation.combine_right_identity': ['Quot.sound', 'propext'],
+ 'Hypermath.LayeredDerivation.composition_lift_preserves': ['Quot.sound', 'propext'],
+ 'Hypermath.LayeredDerivation.decode_encode': ['Quot.sound', 'propext'],
+ 'Hypermath.LayeredDerivation.encode_injective': ['Quot.sound', 'propext'],
+ 'Hypermath.LayeredDerivation.liftMap': ['Quot.sound', 'propext'],
+ 'Hypermath.LayeredDerivation.lift_injective': ['Quot.sound', 'propext'],
+ 'Hypermath.LayeredDerivation.lift_preserves_composition': ['Quot.sound', 'propext'],
+ 'Hypermath.LayeredDerivation.lift_reflects_expansion': ['Quot.sound', 'propext'],
+ 'Hypermath.LayeredDerivation.lowerAtom_lift': ['Quot.sound', 'propext'],
+ 'Hypermath.LayeredDerivation.observe_groundTerm': ['Quot.sound', 'propext'],
+ 'Hypermath.LayeredDerivation.observe_iterateLift': ['Quot.sound', 'propext'],
+ 'Hypermath.LayeredDerivation.readExpression_tree': ['Quot.sound', 'propext'],
+ 'Hypermath.LayeredDerivation.readGroundTerm_groundTerm': ['Quot.sound', 'propext'],
+ 'Hypermath.LayeredDerivation.readPayload_payload': ['Quot.sound', 'propext'],
+ 'Hypermath.LayeredDerivation.recoverThrough_iterateLift': ['Quot.sound', 'propext'],
+ 'Hypermath.LayeredDerivation.sequencing': ['Quot.sound', 'propext'],
+ 'Hypermath.LayeredDerivation.unfold_iterateLift': ['Quot.sound', 'propext'],
+ 'Hypermath.LayeredDerivation.unfold_lift': ['Quot.sound', 'propext'],
+ 'Hypermath.LayeredDerivation.unfold_seq': [],
+ 'Hypermath.LayeredDerivation.unfold_sound': ['Quot.sound', 'propext'],
+ 'Hypermath.LayeredDerivation.unfolded_claims_sound': ['Quot.sound', 'propext'],
+ 'Hypermath.LayeredDerivation.valid_lift': ['Quot.sound', 'propext'],
+ 'Hypermath.LayeredDerivation.valid_seq': [],
+ 'Hypermath.LayeredDerivation.wrong_layer_rejected': ['propext'],
+ 'Hypermath.LayeredDerivationChecks.arbitrary_lifts_accepted': ['Quot.sound', 'propext'],
+ 'Hypermath.LayeredDerivationChecks.arbitrary_lifts_reject_invalid': ['Quot.sound', 'propext'],
+ 'Hypermath.LayeredDerivationChecks.composed_accepted': [],
+ 'Hypermath.LayeredDerivationChecks.grouping_retained': [],
+ 'Hypermath.LayeredDerivationChecks.invalid_base_rejected': [],
+ 'Hypermath.LayeredDerivationChecks.invalid_composition_rejected': [],
+ 'Hypermath.LayeredDerivationChecks.layer_boundary_preserves_expansion': ['Quot.sound', 'propext'],
+ 'Hypermath.LayeredDerivationChecks.layer_boundary_retained': [],
+ 'Hypermath.LayeredDerivationChecks.lost_repetition_rejected': [],
+ 'Hypermath.LayeredDerivationChecks.malformed_atom_rejected': ['propext'],
+ 'Hypermath.LayeredDerivationChecks.reversed_claims_rejected': [],
+ 'Hypermath.LayeredDerivationChecks.wrong_layer_atom_rejected': []}
+# Reviewed context construction and adversarial premise/trace checks. These
+# dependencies permit no native assumptions, choice axiom, or admissions.
+LAYERED_DERIVATION_DEPENDENCIES.update({
+    'Hypermath.ContextualComposition.joint_state': ['Quot.sound', 'propext'],
+    'Hypermath.ContextualComposition.trace_append': ['propext'],
+    'Hypermath.ContextualComposition.join_history': ['propext'],
+    'Hypermath.ContextualComposition.join_call_runs': ['Quot.sound', 'propext'],
+    'Hypermath.ContextualComposition.checked_context': ['Quot.sound', 'propext'],
+    'Hypermath.ContextualComposition.check_compose': ['propext'],
+    'Hypermath.ContextualComposition.base_check': ['propext'],
+    'Hypermath.ContextualComposition.lifted_check': ['Quot.sound', 'propext'],
+    'Hypermath.ContextualComposition.lifted_recovery': ['Quot.sound', 'propext'],
+    'Hypermath.ContextualComposition.lifted_history': ['Quot.sound', 'propext'],
+    'Hypermath.ContextualComposition.joined_trace_check': ['propext'],
+    'Hypermath.LayeredDerivationChecks.isolated_trace_splice_rejected': [],
+    'Hypermath.LayeredDerivationChecks.contextual_trace_accepted': [],
+    'Hypermath.LayeredDerivationChecks.asserted_context_can_execute': ['Quot.sound', 'propext'],
+    'Hypermath.LayeredDerivationChecks.unsupported_premise_rejected': ['Quot.sound', 'propext'],
+    'Hypermath.LayeredDerivationChecks.invalid_join_lifts_rejected': ['Quot.sound', 'propext'],
+    'Hypermath.LayeredDerivationChecks.joined_claim_order_checked': [],
+})
+LAYERED_DERIVATION_DEPENDENCIES.update({
+    'Hypermath.OperationalCorrespondence.run_append': ['propext'],
+    'Hypermath.OperationalCorrespondence.run_decodes': [],
+    'Hypermath.OperationalCorrespondence.run_encoded': [],
+    'Hypermath.OperationalCorrespondence.lift_compose': [],
+    'Hypermath.OperationalCorrespondence.lift_run_decodes': [],
+    'Hypermath.OperationalCorrespondence.run_lift_commutes': [],
+    'Hypermath.OperationalCorrespondence.run_frame': ['propext'],
+    'Hypermath.OperationalCorrespondence.accept_run_initial': ['propext'],
+    'Hypermath.OperationalCorrespondence.represented_run': ['propext'],
+    'Hypermath.OperationalCorrespondence.represented_check': ['propext'],
+    'Hypermath.OperationalCorrespondence.represented_composition_check': ['propext'],
+    'Hypermath.LayeredDerivationChecks.canonical_step_check_passes': [],
+    'Hypermath.LayeredDerivationChecks.canonical_check_does_not_iterate': [],
+    'Hypermath.LayeredDerivationChecks.alias_step_not_closed': [],
+    'Hypermath.LayeredDerivationChecks.canonical_lift_check_passes': [],
+    'Hypermath.LayeredDerivationChecks.reached_alias_lift_loses_information': [],
+    'Hypermath.LayeredDerivationChecks.direct_step_corresponds': [],
+    'Hypermath.LayeredDerivationChecks.tampered_endpoint_rejected': [],
+})
+LAYERED_DERIVATION_DEPENDENCIES.update({'Hypermath.RetainedExecution.readInstruction_instructionTree': ['Quot.sound', 'propext'],
+ 'Hypermath.RetainedExecution.readFrame_frameTree': ['Quot.sound', 'propext'],
+ 'Hypermath.RetainedExecution.frameTree_injective': ['Quot.sound', 'propext'],
+ 'Hypermath.RetainedExecution.readPayload_payload': ['Quot.sound', 'propext'],
+ 'Hypermath.RetainedExecution.decode_encode': ['Quot.sound', 'propext'],
+ 'Hypermath.RetainedExecution.wrong_layer_rejected': ['propext'],
+ 'Hypermath.RetainedExecution.record_only_protocol_rejected': ['propext'],
+ 'Hypermath.RetainedExecution.accepted_combine': ['propext'],
+ 'Hypermath.RetainedExecution.lowerAtom_lift': ['Quot.sound', 'propext'],
+ 'Hypermath.RetainedExecution.inspect_lift': ['Quot.sound', 'propext'],
+ 'Hypermath.RetainedExecution.check_lift': ['Quot.sound', 'propext'],
+ 'Hypermath.RetainedExecution.inspect_seq': [],
+ 'Hypermath.RetainedExecution.check_seq': ['propext'],
+ 'Hypermath.RetainedExecution.lift_preserves_composition': ['Quot.sound', 'propext'],
+ 'Hypermath.RetainedExecution.recoverThrough_iterateLift': ['Quot.sound', 'propext'],
+ 'Hypermath.RetainedExecution.inspect_iterateLift': ['Quot.sound', 'propext'],
+ 'Hypermath.RetainedExecution.check_iterateLift': ['Quot.sound', 'propext'],
+ 'Hypermath.RetainedExecution.composition_lift_preserves': ['Quot.sound', 'propext'],
+ 'Hypermath.RetainedExecution.submitted_frame_recovered': ['Quot.sound', 'propext'],
+ 'Hypermath.RetainedExecution.submitted_frame_check': ['Quot.sound', 'propext'],
+ 'Hypermath.RetainedExecution.finished_frame_check': ['Quot.sound', 'propext'],
+ 'Hypermath.RetainedExecution.accepted_frame_sound': ['propext'],
+ 'Hypermath.RetainedExecution.checked_surface_sound': ['Quot.sound', 'propext'],
+ 'Hypermath.RetainedExecution.sequencing': ['Quot.sound', 'propext'],
+ 'Hypermath.RetainedExecution.liftMap': ['Quot.sound', 'propext'],
+ 'Hypermath.RetainedExecution.Checks.erased_record_still_valid': [],
+ 'Hypermath.RetainedExecution.Checks.erased_frame_rejected': [],
+ 'Hypermath.RetainedExecution.Checks.wrong_state_rejected': [],
+ 'Hypermath.RetainedExecution.Checks.incomplete_frame_rejected': [],
+ 'Hypermath.RetainedExecution.Checks.erased_history_retained': ['Quot.sound', 'propext'],
+ 'Hypermath.RetainedExecution.Checks.erased_history_rejected': ['Quot.sound', 'propext'],
+ 'Hypermath.RetainedExecution.Checks.composed_frames_retained': ['Quot.sound', 'propext'],
+ 'Hypermath.RetainedExecution.Checks.composed_frames_accepted': ['Quot.sound', 'propext'],
+ 'Hypermath.RetainedExecution.Checks.erased_composition_rejected': ['Quot.sound', 'propext'],
+ 'Hypermath.RetainedExecution.Checks.repeated_frames_retained': ['Quot.sound', 'propext'],
+ 'Hypermath.RetainedExecution.Checks.encoded_erasure_still_decodes': ['Quot.sound', 'propext']})
+LAYERED_DERIVATION_DEPENDENCIES.update({'Hypermath.PathLayers.expand_identity': [],
+ 'Hypermath.PathLayers.expand_compose': [],
+ 'Hypermath.PathLayers.lowerAtom_lift': [],
+ 'Hypermath.PathLayers.expand_lift': [],
+ 'Hypermath.PathLayers.recoverThrough_iterateLift': ['propext'],
+ 'Hypermath.PathLayers.expand_iterateLift': [],
+ 'Hypermath.PathLayers.composition_lift_preserves': ['propext'],
+ 'Hypermath.PathLayers.composed_edges_preserved': ['propext'],
+ 'Hypermath.PathLayers.composed_length_preserved': ['propext'],
+ 'Hypermath.PathLayers.expand_promote': [],
+ 'Hypermath.PathLayers.nonempty_iff_base': [],
+ 'Hypermath.PathLayers.no_steps_remains_empty': [],
+ 'Hypermath.PathLayers.native_reachability_iff': ['Hypermath.Congruent', 'Hypermath.Form', 'Hypermath.f2f'],
+ 'Hypermath.PathLayers.native_endpoint_preserved': ['Hypermath.Congruent', 'Hypermath.Form', 'Hypermath.f2f'],
+ 'Hypermath.PathLayers.native_composition_lift_preserves': ['Hypermath.Congruent',
+                                                            'Hypermath.Form',
+                                                            'Hypermath.f2f',
+                                                            'propext'],
+ 'Hypermath.PathLayers.native_without_steps': ['Hypermath.Congruent', 'Hypermath.Form', 'Hypermath.f2f'],
+ 'Hypermath.PathLayers.cycle_witness_length_preserved': ['Hypermath.Congruent',
+                                                         'Hypermath.Form',
+                                                         'Hypermath.Simulation',
+                                                         'Hypermath.deriver',
+                                                         'Hypermath.f2f',
+                                                         'Hypermath.filtrationSimCong'],
+ 'Hypermath.PathLayers.recoverCycle_reifyCycle': ['Hypermath.Form',
+                                                  'Hypermath.Simulation',
+                                                  'Hypermath.deriver',
+                                                  'Hypermath.f2f',
+                                                  'propext'],
+ 'Hypermath.PathLayers.cycle_surface_iff_witness': ['Hypermath.Form',
+                                                    'Hypermath.Simulation',
+                                                    'Hypermath.deriver',
+                                                    'Hypermath.f2f'],
+ 'Hypermath.PathLayers.loopSequencing': ['propext'],
+ 'Hypermath.PathLayers.loopLiftMap': ['propext'],
+ 'Hypermath.PathLayers.reifyCycle': ['Hypermath.Form',
+                                     'Hypermath.Simulation',
+                                     'Hypermath.deriver',
+                                     'Hypermath.f2f'],
+ 'Hypermath.PathLayers.recoverCycle': ['Hypermath.Form',
+                                       'Hypermath.Simulation',
+                                       'Hypermath.deriver',
+                                       'Hypermath.f2f'],
+ 'Hypermath.PathLayers.Checks.two_steps_retained': ['propext'],
+ 'Hypermath.PathLayers.Checks.nested_paths_recovered': ['propext'],
+ 'Hypermath.PathLayers.Checks.grouping_remains_distinct': [],
+ 'Hypermath.PathLayers.Checks.grouping_has_same_path': []})
+LAYERED_DERIVATION_DEPENDENCIES.update({'Hypermath.PathTransport.Alignment.starts': [],
+ 'Hypermath.PathTransport.Alignment.ends': [],
+ 'Hypermath.PathTransport.Alignment.length_eq': [],
+ 'Hypermath.PathTransport.Alignment.compose': [],
+ 'Hypermath.PathTransport.reproduce_compose': [],
+ 'Hypermath.PathTransport.composed_length': [],
+ 'Hypermath.PathTransport.composed_endpoint_related': [],
+ 'Hypermath.PathTransport.composed_edges': [],
+ 'Hypermath.PathTransport.raise_retains_certificate': [],
+ 'Hypermath.PathTransport.raise_recovers_surface': ['propext'],
+ 'Hypermath.PathTransport.raise_preserves_path': [],
+ 'Hypermath.PathTransport.native_law_iff_transfer': ['Hypermath.Congruent',
+                                                     'Hypermath.Form',
+                                                     'Hypermath.Simulation',
+                                                     'Hypermath.f2f'],
+ 'Hypermath.PathTransport.Reproduction.append': [],
+ 'Hypermath.PathTransport.reproduce': [],
+ 'Hypermath.PathTransport.composeAcross': [],
+ 'Hypermath.PathTransport.atLayer': [],
+ 'Hypermath.PathTransport.raise': [],
+ 'Hypermath.PathTransport.nativeTransfer': ['Hypermath.Congruent',
+                                            'Hypermath.Form',
+                                            'Hypermath.Simulation',
+                                            'Hypermath.f2f'],
+ 'Hypermath.PathTransport.Checks.reproduced_copy_changes_endpoint': [],
+ 'Hypermath.PathTransport.Checks.original_and_copy_retained': [],
+ 'Hypermath.PathTransport.Checks.path_preserves_component': [],
+ 'Hypermath.PathTransport.Checks.related_without_connector': [],
+ 'Hypermath.PathTransport.Checks.relation_alone_insufficient': []})
+LAYERED_DERIVATION_DEPENDENCIES.update({'HypermathTransportCountermodel.simulation_is_equivalence': [],
+ 'HypermathTransportCountermodel.forming_preserves_not_limit': ['propext'],
+ 'HypermathTransportCountermodel.finite_position_not_limit': ['propext'],
+ 'HypermathTransportCountermodel.simulation_limit_iff': ['propext'],
+ 'HypermathTransportCountermodel.full_axioms_hold': ['propext'],
+ 'HypermathTransportCountermodel.self_derivation_holds': [],
+ 'HypermathTransportCountermodel.cycle_has_two_steps': [],
+ 'HypermathTransportCountermodel.related_starts_are_ground_generated': [],
+ 'HypermathTransportCountermodel.step_stays_in_cycle': ['propext'],
+ 'HypermathTransportCountermodel.path_stays_in_cycle': ['propext'],
+ 'HypermathTransportCountermodel.no_finite_reproduction': ['Quot.sound', 'propext'],
+ 'HypermathTransportCountermodel.native_one_step_law_fails': ['Quot.sound', 'propext'],
+ 'HypermathTransportCountermodel.no_step_transfer': ['Quot.sound', 'propext'],
+ 'HypermathTransportCountermodel.full_model_with_cycle_without_reproduction': ['Quot.sound',
+                                                                               'propext'],
+ 'HypermathTransportCountermodel.cycleWitness': []})
+LAYERED_DERIVATION_TARGETS = tuple(LAYERED_DERIVATION_DEPENDENCIES)
+
 PROBE_TARGETS = {"countermodel": COUNTERMODEL_TARGETS, "finite_trace": TRACE_CHECK_TARGETS,
                  "observation": OBSERVATION_TARGETS, "full_model": FULL_MODEL_TARGETS,
                  "finite_action": ACTION_COUNTERMODEL_TARGETS,
                  "ground_syntax": GROUND_SYNTAX_TARGETS,
                  "ground_derivation": GROUND_DERIVATION_TARGETS,
                  "record_encoding": RECORD_ENCODING_TARGETS,
-                 "record_machine": RECORD_MACHINE_TARGETS}
+                 "record_machine": RECORD_MACHINE_TARGETS,
+                 "layered_derivation": LAYERED_DERIVATION_TARGETS}
 
 
 def probe_dependencies_valid(name: str, records: dict[str, list[str]]) -> bool:
@@ -344,6 +615,8 @@ def probe_dependencies_valid(name: str, records: dict[str, list[str]]) -> bool:
         return records == RECORD_ENCODING_DEPENDENCIES
     if name == "record_machine":
         return records == RECORD_MACHINE_DEPENDENCIES
+    if name == "layered_derivation":
+        return records == LAYERED_DERIVATION_DEPENDENCIES
     allowed = LEAN_BUILTINS if name == "countermodel" else frozenset()
     return all(dep in allowed for deps in records.values() for dep in deps)
 
@@ -482,4 +755,28 @@ def policy_errors(output: str, inputs: dict, assumptions: list[dict]) -> list[st
         reasons.append("record machine checks differ from the reviewed probes")
     if inputs.get("lean4/Hypermath/RuleSubstitution.lean") != RULE_SUBSTITUTION_SOURCE_SHA256:
         reasons.append("rule substitution and retained calls differ from the reviewed construction")
+    if inputs.get("lean4/Hypermath/Sequential.lean") != SEQUENTIAL_SOURCE_SHA256:
+        reasons.append("sequencing laws differ from the reviewed construction")
+    if inputs.get("lean4/Hypermath/UnaryFormation.lean") != UNARY_FORMATION_SOURCE_SHA256:
+        reasons.append("unary formation differs from the reviewed fixed-term boundary")
+    if inputs.get("lean4/Hypermath/LayeredDerivation.lean") != LAYERED_DERIVATION_SOURCE_SHA256:
+        reasons.append("layered derivation differs from the reviewed preservation construction")
+    if inputs.get("lean4/Hypermath/ContextualComposition.lean") != CONTEXTUAL_COMPOSITION_SOURCE_SHA256:
+        reasons.append("contextual composition differs from the reviewed premise construction")
+    if inputs.get("lean4/Hypermath/OperationalCorrespondence.lean") != OPERATIONAL_CORRESPONDENCE_SOURCE_SHA256:
+        reasons.append("operational correspondence differs from the reviewed local-law construction")
+    if inputs.get("lean4/Hypermath/TransportCountermodel.lean") != TRANSPORT_COUNTERMODEL_SOURCE_SHA256:
+        reasons.append("transport countermodel differs from the reviewed full-clause construction")
+    if inputs.get("lean4/Hypermath/PathTransport.lean") != PATH_TRANSPORT_SOURCE_SHA256:
+        reasons.append("path transport differs from the reviewed conditional reproduction construction")
+    if inputs.get("lean4/Hypermath/PathLayers.lean") != PATH_LAYERS_SOURCE_SHA256:
+        reasons.append("path layers differ from the reviewed witnessed-path construction")
+    if inputs.get("lean4/Hypermath/RetainedExecution.lean") != RETAINED_EXECUTION_SOURCE_SHA256:
+        reasons.append("retained execution differs from the reviewed frame-preservation construction")
+    if inputs.get("lean4/Hypermath/TerminalRetention.lean") != TERMINAL_RETENTION_SOURCE_SHA256:
+        reasons.append("terminal retention differs from the reviewed orbit obstruction")
+    if inputs.get("lean4/LayeredDerivationChecks.lean") != LAYERED_DERIVATION_CHECKS_SOURCE_SHA256:
+        reasons.append("layered derivation checks differ from the reviewed probes")
+    if inputs.get("lean4/SurfaceBridge.lean") != SURFACE_BRIDGE_SOURCE_SHA256:
+        reasons.append("surface transport differs from the reviewed executable bridge")
     return reasons

@@ -185,6 +185,25 @@ Fractal reuse must retain or justify the observations needed for its actual
 domain of application; neither this obstruction nor the finite-orbit result
 establishes a completeness verdict.
 
+The [finite layer-preservation construction](LAYER_PRESERVATION.md) gives
+explicit successor-layer atoms containing complete lower representations.
+Its combined theorem retains exact composition trees and their checking
+outcomes through every finite number of lifts; it also preserves invalidity.
+This realizes a host instance of the finite representation obligation, with
+an explicitly declared observation relation for the monoid laws. Native
+generation, internal acceptance, ordinal limits, and arithmetic interpretation
+remain subsequent obligations. The [finite graph adapter](LAYER_GRAPH.md)
+now checks these host operations through Lean and binds their exact ordered
+inputs and outputs in Verifier; the native geometry correspondence remains open.
+
+The [unary formation boundary](UNARY_FORMATION.md) now proves that a fixed
+expression over ground, unary application and two input variables ignores at
+least one input. On a nontrivial carrier it cannot recover both operands or
+provide a two-sided sequencing identity under symmetric, transitive congruence.
+The next layer therefore needs a justified construction beyond a fixed unary
+expression. This does not exclude derived recursion or a richer representation
+grammar and does not establish either one's native adequacy.
+
 The [composed ground calculus](COMPOSED_GROUND_DERIVATIONS.md) now supplies
 typed finite derivations and structured records for primitive rules, predicate
 closes, conjunction, and projections. Its record-only checker is sound under

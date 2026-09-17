@@ -29,6 +29,7 @@ from hypermath_foundations._reports import (
     FULL_MODEL_DEPENDENCIES,
     GROUND_DERIVATION_DEPENDENCIES,
     GROUND_SYNTAX_DEPENDENCIES,
+    LAYERED_DERIVATION_DEPENDENCIES,
     OBSERVATION_DEPENDENCIES,
     RECORD_ENCODING_DEPENDENCIES,
     RECORD_MACHINE_DEPENDENCIES,
@@ -106,6 +107,30 @@ def checkout(tmp_path, monkeypatch):
             project / "lean4/Hypermath/RecordMachine.lean").read_text(encoding="utf-8"),
         "lean4/Hypermath/RuleSubstitution.lean": (
             project / "lean4/Hypermath/RuleSubstitution.lean").read_text(encoding="utf-8"),
+        "lean4/Hypermath/Sequential.lean": (
+            project / "lean4/Hypermath/Sequential.lean").read_text(encoding="utf-8"),
+        "lean4/Hypermath/UnaryFormation.lean": (
+            project / "lean4/Hypermath/UnaryFormation.lean").read_text(encoding="utf-8"),
+        "lean4/Hypermath/LayeredDerivation.lean": (
+            project / "lean4/Hypermath/LayeredDerivation.lean").read_text(encoding="utf-8"),
+        "lean4/Hypermath/ContextualComposition.lean": (
+            project / "lean4/Hypermath/ContextualComposition.lean").read_text(encoding="utf-8"),
+        "lean4/Hypermath/OperationalCorrespondence.lean": (
+            project / "lean4/Hypermath/OperationalCorrespondence.lean").read_text(encoding="utf-8"),
+        "lean4/Hypermath/PathLayers.lean": (
+            project / "lean4/Hypermath/PathLayers.lean").read_text(encoding="utf-8"),
+        "lean4/Hypermath/PathTransport.lean": (
+            project / "lean4/Hypermath/PathTransport.lean").read_text(encoding="utf-8"),
+        "lean4/Hypermath/TransportCountermodel.lean": (
+            project / "lean4/Hypermath/TransportCountermodel.lean").read_text(encoding="utf-8"),
+        "lean4/Hypermath/RetainedExecution.lean": (
+            project / "lean4/Hypermath/RetainedExecution.lean").read_text(encoding="utf-8"),
+        "lean4/Hypermath/TerminalRetention.lean": (
+            project / "lean4/Hypermath/TerminalRetention.lean").read_text(encoding="utf-8"),
+        "lean4/LayeredDerivationChecks.lean": (
+            project / "lean4/LayeredDerivationChecks.lean").read_text(encoding="utf-8"),
+        "lean4/SurfaceBridge.lean": (
+            project / "lean4/SurfaceBridge.lean").read_text(encoding="utf-8"),
         "lean4/RecordMachineChecks.lean": (
             project / "lean4/RecordMachineChecks.lean").read_text(encoding="utf-8"),
         "lean4/FullAxiomModel.lean": (project / "lean4/FullAxiomModel.lean").read_text(encoding="utf-8"),
@@ -140,11 +165,13 @@ def checkout(tmp_path, monkeypatch):
         if command[-1] == "FiniteActionCountermodel.lean":
             return 0, action_countermodel_output()
         if command[-1] in {"GroundSyntaxChecks.lean", "GroundDerivationChecks.lean",
-                           "RecordEncodingChecks.lean", "RecordMachineChecks.lean"}:
+                           "RecordEncodingChecks.lean", "RecordMachineChecks.lean",
+                           "LayeredDerivationChecks.lean"}:
             expected = {"GroundSyntaxChecks.lean": GROUND_SYNTAX_DEPENDENCIES,
                         "GroundDerivationChecks.lean": GROUND_DERIVATION_DEPENDENCIES,
                         "RecordEncodingChecks.lean": RECORD_ENCODING_DEPENDENCIES,
-                        "RecordMachineChecks.lean": RECORD_MACHINE_DEPENDENCIES}[command[-1]]
+                        "RecordMachineChecks.lean": RECORD_MACHINE_DEPENDENCIES,
+                        "LayeredDerivationChecks.lean": LAYERED_DERIVATION_DEPENDENCIES}[command[-1]]
             return 0, "\n".join(
                 f"'{name}' depends on axioms: [{', '.join(dependencies)}]"
                 if dependencies else f"'{name}' does not depend on any axioms"
@@ -340,7 +367,7 @@ def test_nested_comments_and_strings_are_not_admissions():
 def test_redaction_preserves_relative_evidence(tmp_path):
     redact = audit_module._redactor(tmp_path)
     assert str(tmp_path) not in redact(f"{tmp_path}/lean4/Audit.lean")
-    assert "Z:" not in redact("error at Z:\\private\\source.lean:12")
+    assert "Z:" not in redact("error at Z" + ":\\private\\source.lean:12")
     assert redact("Hypermath/L0Ground.lean:12") == "Hypermath/L0Ground.lean:12"
 
 
@@ -491,6 +518,18 @@ def test_reification_dependency_policy_is_exact(checkout, monkeypatch, name, rep
                                   "lean4/RecordEncodingChecks.lean",
                                   "lean4/Hypermath/RecordMachine.lean",
                                   "lean4/Hypermath/RuleSubstitution.lean",
+                                  "lean4/Hypermath/Sequential.lean",
+                                  "lean4/Hypermath/UnaryFormation.lean",
+                                  "lean4/Hypermath/LayeredDerivation.lean",
+                                  "lean4/Hypermath/ContextualComposition.lean",
+                                  "lean4/Hypermath/OperationalCorrespondence.lean",
+                                  "lean4/Hypermath/TerminalRetention.lean",
+                                  "lean4/Hypermath/RetainedExecution.lean",
+                                  "lean4/Hypermath/PathLayers.lean",
+                                  "lean4/Hypermath/PathTransport.lean",
+                                  "lean4/Hypermath/TransportCountermodel.lean",
+                                  "lean4/LayeredDerivationChecks.lean",
+                                  "lean4/SurfaceBridge.lean",
                                   "lean4/RecordMachineChecks.lean"])
 def test_replaced_reporter_or_trace_cannot_authorize_its_own_output(checkout, path):
     root, _, _ = checkout
@@ -620,7 +659,11 @@ def test_default_library_build_covers_reporter_imports():
 
 
 @pytest.mark.parametrize("alteration", [
-    "missing", "missing_closure_boundary", "hidden_choice", "extra_choice", "admission",
+    "missing", "missing_closure_boundary", "missing_operation_binding", "missing_sequencing_execution",
+    "missing_sequencing_algebra", "missing_arithmetic_map",
+    "missing_fixed_term_boundary", "missing_pair_recovery", "missing_model_term_boundary",
+    "missing_primitive_checker_boundary", "missing_terminal_merge", "missing_valid_witnesses",
+    "hidden_choice", "extra_choice", "admission",
 ])
 def test_faithful_model_requires_exact_dependencies(checkout, monkeypatch, alteration):
     root, _, run = checkout
@@ -635,6 +678,34 @@ def test_faithful_model_requires_exact_dependencies(checkout, monkeypatch, alter
                 output = "\n".join(line for line in output.splitlines()
                                    if "FullAxiomModel.native_closure_is_not_record_acceptance'"
                                    not in line)
+            elif alteration == "missing_operation_binding":
+                output = "\n".join(line for line in output.splitlines()
+                                   if "FullAxiomModel.full_clauses_without_coherent_source_sequence'"
+                                   not in line)
+            elif alteration == "missing_sequencing_execution":
+                output = "\n".join(line for line in output.splitlines()
+                                   if "Sequential.program_composition_executes'" not in line)
+            elif alteration == "missing_sequencing_algebra":
+                output = "\n".join(line for line in output.splitlines()
+                                   if "Sequential.programSequencing'" not in line)
+            elif alteration == "missing_arithmetic_map":
+                output = "\n".join(line for line in output.splitlines()
+                                   if "Sequential.programLength'" not in line)
+            elif alteration == "missing_fixed_term_boundary":
+                output = "\n".join(line for line in output.splitlines()
+                                   if "UnaryFormation.no_term_identity'" not in line)
+            elif alteration == "missing_pair_recovery":
+                output = "\n".join(line for line in output.splitlines()
+                                   if "UnaryFormation.no_term_pair_encoder'" not in line)
+            elif alteration == "missing_model_term_boundary":
+                output = "\n".join(line for line in output.splitlines()
+                                   if "FullAxiomModel.full_clauses_without_fixed_term_composition'"
+                                   not in line)
+            elif alteration in {"missing_primitive_checker_boundary", "missing_terminal_merge", "missing_valid_witnesses"}:
+                target = {"missing_primitive_checker_boundary": "FullAxiomModel.full_clauses_without_primitive_frame_checker'",
+                          "missing_terminal_merge": "TerminalRetention.merged_fixed_states'",
+                          "missing_valid_witnesses": "FullAxiomModel.terminal_witnesses_accepted'"}[alteration]
+                output = "\n".join(line for line in output.splitlines() if target not in line)
             elif alteration == "hidden_choice":
                 output = output.replace("Classical.choice, ", "")
             elif alteration == "extra_choice":
@@ -650,6 +721,78 @@ def test_faithful_model_requires_exact_dependencies(checkout, monkeypatch, alter
     assert not evaluate_gate(report)
 
 
+@pytest.mark.parametrize("alteration", [
+    "missing_composition", "missing_recovery", "hidden_dependency", "admission", "process_failure",
+    "missing_context", "missing_history", "missing_premise_rejection",
+    "missing_operational_check", "missing_layer_commutation", "missing_alias_counterexample",
+    "missing_retained_composition", "missing_history_retention", "missing_retained_soundness",
+    "missing_native_composition", "missing_cycle_recovery", "missing_reachability_boundary", "hidden_native_dependency",
+    "missing_transport_law", "missing_transport_composition", "missing_transport_counterexample", "hidden_transport_dependency",
+    "missing_full_transport_model", "missing_transport_cycle", "missing_finite_reproduction_obstruction",
+])
+def test_layered_preservation_requires_exact_evidence(checkout, monkeypatch, alteration):
+    root, _, run = checkout
+
+    def altered(command, *args):
+        code, output = run(command, *args)
+        if command[-1] == "LayeredDerivationChecks.lean":
+            if alteration == "missing_composition":
+                output = "\n".join(line for line in output.splitlines()
+                                   if "LayeredDerivation.composition_lift_preserves'" not in line)
+            elif alteration == "missing_recovery":
+                output = "\n".join(line for line in output.splitlines()
+                                   if "LayeredDerivation.recoverThrough_iterateLift'" not in line)
+            elif alteration in {"missing_context", "missing_history", "missing_premise_rejection"}:
+                target = {"missing_context": "ContextualComposition.checked_context'",
+                          "missing_history": "ContextualComposition.lifted_history'",
+                          "missing_premise_rejection": "LayeredDerivationChecks.unsupported_premise_rejected'"}[alteration]
+                output = "\n".join(line for line in output.splitlines() if target not in line)
+            elif alteration in {"missing_operational_check", "missing_layer_commutation", "missing_alias_counterexample"}:
+                target = {"missing_operational_check": "OperationalCorrespondence.represented_composition_check'",
+                          "missing_layer_commutation": "OperationalCorrespondence.run_lift_commutes'",
+                          "missing_alias_counterexample": "LayeredDerivationChecks.canonical_check_does_not_iterate'"}[alteration]
+                output = "\n".join(line for line in output.splitlines() if target not in line)
+            elif alteration in {"missing_retained_composition", "missing_history_retention", "missing_retained_soundness"}:
+                target = {"missing_retained_composition": "RetainedExecution.composition_lift_preserves'",
+                          "missing_history_retention": "RetainedExecution.Checks.erased_history_retained'",
+                          "missing_retained_soundness": "RetainedExecution.checked_surface_sound'"}[alteration]
+                output = "\n".join(line for line in output.splitlines() if target not in line)
+            elif alteration in {"missing_native_composition", "missing_cycle_recovery", "missing_reachability_boundary"}:
+                target = {"missing_native_composition": "PathLayers.native_composition_lift_preserves'",
+                          "missing_cycle_recovery": "PathLayers.recoverCycle_reifyCycle'",
+                          "missing_reachability_boundary": "PathLayers.nonempty_iff_base'"}[alteration]
+                output = "\n".join(line for line in output.splitlines() if target not in line)
+            elif alteration in {"missing_transport_law", "missing_transport_composition", "missing_transport_counterexample"}:
+                target = {"missing_transport_law": "PathTransport.native_law_iff_transfer'",
+                          "missing_transport_composition": "PathTransport.reproduce_compose'",
+                          "missing_transport_counterexample": "PathTransport.Checks.related_without_connector'"}[alteration]
+                output = "\n".join(line for line in output.splitlines() if target not in line)
+            elif alteration in {"missing_full_transport_model", "missing_transport_cycle", "missing_finite_reproduction_obstruction"}:
+                target = {"missing_full_transport_model": "HypermathTransportCountermodel.full_axioms_hold'",
+                          "missing_transport_cycle": "HypermathTransportCountermodel.cycleWitness'",
+                          "missing_finite_reproduction_obstruction": "HypermathTransportCountermodel.no_finite_reproduction'"}[alteration]
+                output = "\n".join(line for line in output.splitlines() if target not in line)
+            elif alteration == "hidden_transport_dependency":
+                marker = "'Hypermath.PathTransport.native_law_iff_transfer'"
+                before, after = output.split(marker, 1)
+                output = before + marker + after.replace(" Hypermath.Simulation,", "", 1)
+            elif alteration == "hidden_native_dependency":
+                output = output.replace(", Hypermath.filtrationSimCong", "")
+            elif alteration == "hidden_dependency":
+                output = output.replace("Quot.sound, ", "")
+            elif alteration == "admission":
+                output = output.replace("[propext]", "[propext, sorryAx]", 1)
+            else:
+                code = 1
+        return code, output
+
+    monkeypatch.setattr(audit_module, "_run_process", altered)
+    report = run_audit(root)
+    assert report["checks"]["layered_derivation"]["status"] == "FAIL"
+    assert not report["execution"]["completed"]
+    assert not evaluate_gate(report)
+
+
 def test_timeout_validation(checkout):
     for timeout in (0, -1, 301, True, float("nan")):
         with pytest.raises(ValueError):
@@ -659,6 +802,7 @@ def test_timeout_validation(checkout):
 @pytest.mark.parametrize("relative_path", [
     "lean4/FullAxiomModel.lean",
     "lean4/FiniteActionCountermodel.lean",
+    "lean4/Hypermath/TransportCountermodel.lean",
 ])
 def test_full_models_cover_exact_reviewed_logical_clause_types(relative_path):
     """The model must cover the actual axiom list, not a smaller lookalike."""
@@ -675,6 +819,30 @@ def test_full_models_cover_exact_reviewed_logical_clause_types(relative_path):
     }
     assert len(actual) == len(expected) == 38
     assert actual == expected
+
+
+def test_transport_model_uses_native_cycle_and_reproduction_contracts():
+    """A countermodel must interpret the actual targets, including the stronger witness."""
+    import re
+
+    root = Path(__file__).resolve().parents[1]
+
+    def body(relative, marker):
+        source = lean_code((root / relative).read_text(encoding="utf-8"))
+        tail = source.split(marker, 1)[1]
+        content = re.split(r"(?m)^(?:noncomputable )?(?:def|abbrev|theorem|structure) ", tail, 1)[0]
+        return " ".join(content.replace("Hypermath.Trace", "Trace").split())
+
+    model = "lean4/Hypermath/TransportCountermodel.lean"
+    assert body(model, "structure DriverCycleWitness where") == body(
+        "lean4/Hypermath/L3Ordinatics.lean", "structure DriverCycleWitness where")
+    assert body(model, "def NativeOneStepLaw : Prop :=") == body(
+        "lean4/Hypermath/PathTransport.lean", "def NativeOneStepLaw : Prop :=")
+    native_target = body("lean4/Hypermath/L3Ordinatics.lean", "def selfDerivation : Prop :=")
+    # This infix notation is Simulation in the native namespace.
+    native_target = native_target.replace(
+        "f2f (f2f deriver) ≡ deriver", "Simulation (f2f (f2f deriver)) deriver")
+    assert body(model, "def selfDerivation : Prop :=") == native_target
 
 
 @pytest.mark.parametrize("alter", [
