@@ -1,5 +1,17 @@
+* text=auto eol=lf
+*.cff text eol=lf
+*.hm text eol=lf
+*.json text eol=lf
+*.lean text eol=lf
+*.md text eol=lf
+*.py text eol=lf
+*.toml text eol=lf
+*.yml text eol=lf
+.gitattributes text eol=lf
+
 # Reference digests bind original bytes, including historical line endings.
 references/seed-ai/** -text
+
 # The trusted Lean reporters have byte-bound policy identities on every platform.
 lean4/Audit.lean text eol=lf
 lean4/Countermodels.lean text eol=lf
@@ -19,9 +31,23 @@ lean4/Hypermath/RecordEncoding.lean text eol=lf
 lean4/RecordEncodingChecks.lean text eol=lf
 lean4/Hypermath/RecordMachine.lean text eol=lf
 lean4/RecordMachineChecks.lean text eol=lf
+lean4/Hypermath/RuleSubstitution.lean text eol=lf
+lean4/Hypermath/Sequential.lean text eol=lf
+lean4/Hypermath/UnaryFormation.lean text eol=lf
+lean4/Hypermath/LayeredDerivation.lean text eol=lf
+lean4/Hypermath/ContextualComposition.lean text eol=lf
+lean4/Hypermath/OperationalCorrespondence.lean text eol=lf
+lean4/Hypermath/TerminalRetention.lean text eol=lf
+lean4/Hypermath/RetainedExecution.lean text eol=lf
+lean4/Hypermath/PathLayers.lean text eol=lf
+lean4/LayeredDerivationChecks.lean text eol=lf
+lean4/SurfaceBridge.lean text eol=lf
 lean4/lake-manifest.json text eol=lf
 # Installed foundation bytes must match the pinned checkout on every platform.
 src/hypermath_foundations/*.py text eol=lf
 # Wheel metadata embeds these files verbatim; keep its payload portable too.
 README.md text eol=lf
 LICENSE text eol=lf
+lean4/Hypermath/PathTransport.lean text eol=lf
+lean4/Hypermath/TransportCountermodel.lean text eol=lf
+lean4/Hypermath/QuadrilateralFiltration.lean text eol=lf

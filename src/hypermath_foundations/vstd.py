@@ -22,12 +22,12 @@ from typing import Any, Mapping
 
 __all__ = ["evaluate_audit_report", "write_verification_receipt"]
 
-_VERSION = "1.3.0"
+_VERSION = "1.4.0"
 _REPOSITORY = "https://github.com/TimeLordRaps/hypermath.git"
 _CLAIMS = ("self_derivation", "source_adequacy", "recursive_arithmetic_completeness")
 _MAX_BYTES = 8 * 1024 * 1024
 _TRUST_ROOTS = (
-    "verifier-standard==1.3.0 evidence dispatch",
+    "verifier-standard==1.4.0 evidence dispatch",
     "Hypermath audit implementation and the report's named Lean toolchain",
     "Explicit source parameters and logical axioms carried in audit evidence",
 )
@@ -42,16 +42,25 @@ _LAKE_BUILD_PROGRESS = re.compile(
 )
 
 
+def _version_satisfies(version: str, minimum: str = "1.4.0") -> bool:
+    try:
+        def to_ints(v: str) -> tuple[int, ...]:
+            return tuple(int(x) for x in re.findall(r"\d+", v.split("+")[0]))
+        return to_ints(version) >= to_ints(minimum)
+    except Exception:
+        return False
+
+
 def _verifier() -> Any:
     try:
         module = importlib.import_module("verifier")
     except ImportError as exc:
         raise ImportError(
             "VSTD support requires hypermath-foundations[verification] "
-            "with verifier-standard==1.3.0"
+            "with verifier-standard>=1.4.0"
         ) from exc
-    if module.__version__ != _VERSION:
-        raise ImportError("VSTD support requires verifier-standard==1.3.0 exactly")
+    if not _version_satisfies(module.__version__, _VERSION):
+        raise ImportError(f"VSTD support requires verifier-standard>={_VERSION} (observed {module.__version__})")
     return module
 
 

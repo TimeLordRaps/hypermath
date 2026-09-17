@@ -55,6 +55,10 @@ def main() -> None:
             )
         probe += f"print('PASS: installed {args.package} wheel is importable and usable')"
         run([str(python), "-I", "-c", probe], cwd=root, timeout=30)
+        cli = environment / ("Scripts/hypermath-foundations.exe" if sys.platform == "win32" else "bin/hypermath-foundations")
+        if args.package == "hypermath_foundations" and cli.is_file():
+            run([str(cli), "audit", "--help"], cwd=root, timeout=30)
+            print("PASS: installed console script hypermath-foundations is executable")
 
 
 if __name__ == "__main__":

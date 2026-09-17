@@ -11,15 +11,28 @@ from pathlib import Path
 import pytest
 
 from hypermath_foundations._baseline import (
+    CONTEXTUAL_COMPOSITION_SOURCE_SHA256,
     GROUND_CODE_SOURCE_SHA256,
     GROUND_DERIVATION_CHECKS_SOURCE_SHA256,
     GROUND_DERIVATION_SOURCE_SHA256,
     GROUND_SYNTAX_CHECKS_SOURCE_SHA256,
     GROUND_SYNTAX_SOURCE_SHA256,
+    LAYERED_DERIVATION_CHECKS_SOURCE_SHA256,
+    LAYERED_DERIVATION_SOURCE_SHA256,
+    OPERATIONAL_CORRESPONDENCE_SOURCE_SHA256,
+    PATH_LAYERS_SOURCE_SHA256,
+    PATH_TRANSPORT_SOURCE_SHA256,
     RECORD_ENCODING_CHECKS_SOURCE_SHA256,
     RECORD_ENCODING_SOURCE_SHA256,
     RECORD_MACHINE_CHECKS_SOURCE_SHA256,
     RECORD_MACHINE_SOURCE_SHA256,
+    RETAINED_EXECUTION_SOURCE_SHA256,
+    RULE_SUBSTITUTION_SOURCE_SHA256,
+    SEQUENTIAL_SOURCE_SHA256,
+    SURFACE_BRIDGE_SOURCE_SHA256,
+    TERMINAL_RETENTION_SOURCE_SHA256,
+    TRANSPORT_COUNTERMODEL_SOURCE_SHA256,
+    UNARY_FORMATION_SOURCE_SHA256,
 )
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -79,6 +92,19 @@ def test_fresh_autocrlf_checkout_preserves_primitive_checker_policy_bytes(tmp_pa
         "lean4/RecordEncodingChecks.lean": RECORD_ENCODING_CHECKS_SOURCE_SHA256,
         "lean4/Hypermath/RecordMachine.lean": RECORD_MACHINE_SOURCE_SHA256,
         "lean4/RecordMachineChecks.lean": RECORD_MACHINE_CHECKS_SOURCE_SHA256,
+        "lean4/Hypermath/RuleSubstitution.lean": RULE_SUBSTITUTION_SOURCE_SHA256,
+        "lean4/Hypermath/Sequential.lean": SEQUENTIAL_SOURCE_SHA256,
+        "lean4/Hypermath/UnaryFormation.lean": UNARY_FORMATION_SOURCE_SHA256,
+        "lean4/Hypermath/LayeredDerivation.lean": LAYERED_DERIVATION_SOURCE_SHA256,
+        "lean4/Hypermath/ContextualComposition.lean": CONTEXTUAL_COMPOSITION_SOURCE_SHA256,
+        "lean4/Hypermath/OperationalCorrespondence.lean": OPERATIONAL_CORRESPONDENCE_SOURCE_SHA256,
+        "lean4/Hypermath/TerminalRetention.lean": TERMINAL_RETENTION_SOURCE_SHA256,
+        "lean4/Hypermath/RetainedExecution.lean": RETAINED_EXECUTION_SOURCE_SHA256,
+        "lean4/Hypermath/PathLayers.lean": PATH_LAYERS_SOURCE_SHA256,
+        "lean4/Hypermath/PathTransport.lean": PATH_TRANSPORT_SOURCE_SHA256,
+        "lean4/Hypermath/TransportCountermodel.lean": TRANSPORT_COUNTERMODEL_SOURCE_SHA256,
+        "lean4/LayeredDerivationChecks.lean": LAYERED_DERIVATION_CHECKS_SOURCE_SHA256,
+        "lean4/SurfaceBridge.lean": SURFACE_BRIDGE_SOURCE_SHA256,
     }
     for relative in expected:
         destination = source / relative
@@ -95,4 +121,4 @@ def test_fresh_autocrlf_checkout_preserves_primitive_checker_policy_bytes(tmp_pa
     destination = tmp_path / "fresh"
     git("clone", "--no-local", "--config", "core.autocrlf=true", str(source), str(destination))
     for relative, digest in expected.items():
-        assert hashlib.sha256((destination / relative).read_bytes()).hexdigest() == digest
+        assert hashlib.sha256((destination / relative).read_bytes()).hexdigest() == digest, relative

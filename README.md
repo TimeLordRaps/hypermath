@@ -113,7 +113,85 @@ calls agrees with the original checker on every finite proof record. Its 47
 additional mandatory reports preserve the distinction between represented
 inputs and source-native execution or ranked acceptance.
 
+The [finite layer-preservation construction](docs/research/LAYER_PRESERVATION.md)
+encodes complete lower surfaces as next-layer atoms. Composition and any finite
+number of lifts preserve exact recovery and checking outcomes, including
+rejection; accepted claim lists retain order and repetitions. Upper-layer
+composition forms a monoid modulo its declared checked-expansion relation.
+The original 45 preservation reports contain no admissions or native assumptions.
+This is a host construction toward the proposed fractal mechanism; native
+generation, internal acceptance, and ordinal interpretation remain open.
+
+The [contextual composition bridge](docs/research/CONTEXTUAL_COMPOSITION.md)
+constructs joint premise availability by running the second derivation in the
+context retained by the first. It connects the existing conjunction rule to
+exact history recovery and checking through every finite number of lifts.
+Its 17 additional reports check this connection and reject unsupported premise
+claims and incompatible history splices. Native generation remains open.
+
+The [operational correspondence criterion](docs/research/OPERATIONAL_CORRESPONDENCE.md)
+states sufficient local laws for native execution and layer passage to preserve
+complete checking frames. It proves their consequences for arbitrary finite
+runs and exhibits failures of checking only newly encoded inputs. Its 18
+additional required reports are conditional results and counterexamples; a
+native instance of the interface remains to be constructed.
+
+The [terminal-retention test](docs/research/TERMINAL_RETENTION.md) rules out one
+candidate in the existing two-successor-chain model: primitive forming alone
+cannot implement the total retained-frame protocol for any encoder and decoder.
+Three accepted records suffice for the obstruction. A stopped or guarded
+protocol, explicit layer information, and other carriers remain open choices
+requiring their own native derivations.
+
+The [retained-execution construction](docs/research/RETAINED_EXECUTION.md)
+stores submitted execution frames, including their actual histories. Ordered
+composition and every finite number of lifts preserve those frames exactly
+and preserve rejection of erased histories, wrong endpoints, and incomplete
+execution. The new Lean representation has a separate format from the existing
+Python graph protocol. Native formation and ordinal interpretation remain open.
+
+The [witnessed path layers](docs/research/PATH_LAYERS.md) specialize finite
+composition and lifting to existing native derivation entries, preserving
+their endpoints, edge witnesses, and exact expanded paths. A supplied stronger
+cycle certificate also survives reification with its simulation closure intact.
+Wrapping cannot supply missing base paths or cycle evidence; deriving native
+generation and checking of these representations remains open.
+
+The [path-transport construction](docs/research/PATH_TRANSPORT.md) conditionally
+reproduces a path from a distinct, related starting point. It retains the
+original, the copy, and correspondence at every vertex through composition
+and finite lifting. The exact local law needed for one-for-one native
+reproduction is identified but remains unproved.
+
+The [native transport countermodel](docs/research/NATIVE_TRANSPORT_OBLIGATION.md)
+satisfies all 38 declared clauses and an actual two-step simulation cycle,
+yet related ground-generated forms fail finite continuation reproduction.
+The formalization therefore needs operational reproduction evidence beyond
+the existing closure and relation clauses.
+
+The [finite layer graph adapter](docs/research/LAYER_GRAPH.md) executes the
+record composition and lifting operations through Lean and earns exact transformation support in Verifier's
+graph ledger. It binds ordered operands, repetitions, output encodings, and
+the source inventory. Serialized support can be replayed through the same
+checking mechanism; the stronger mathematical claims remain unresolved.
+
+The [unary formation boundary](docs/research/UNARY_FORMATION.md) identifies
+what that compositional layer must add: a fixed expression over ground and
+unary application cannot combine two independent inputs. The checked
+obstruction concerns fixed terms; a derived recursive or represented mechanism
+still requires its own native construction and correspondence proof.
+
 ## Ground and relations
+
+The [sequencing construction](docs/research/SEQUENCING_LAWS.md) follows the
+author's clarification that sequencing provides a common abstraction for
+associative composition, with commutativity as an optional property. One
+operation is bound to its identity, associativity, and relation-preservation
+laws. Instruction concatenation and natural-number addition instantiate it;
+instruction length preserves composition but loses order information.
+Inverses are separate, so the interface includes monoids as well as groups.
+The audit also retains the obstruction to the older uniform noncommutation
+clause. Native realization and ordinal interpretation remain open.
 
 `Form` names the source's forming structure, `ground` its distinguished base,
 and `apply(x)` its □ operation. In the Lean translation these are explicit

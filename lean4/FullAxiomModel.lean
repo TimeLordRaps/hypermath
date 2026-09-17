@@ -1,5 +1,8 @@
 import Hypermath.Trace
 import Hypermath.RecordEncoding
+import Hypermath.Sequential
+import Hypermath.UnaryFormation
+import Hypermath.TerminalRetention
 
 /-!
 An explicit model of all 38 logical axiom clauses declared in L0Ground,
@@ -529,6 +532,182 @@ theorem full_clauses_without_cycle_or_nontrivial_simulation :
     ¬ selfDerivationTarget :=
   ⟨full_axioms_hold, driver_cycle_claim_fails,
     nontrivial_simulation_claim_fails, self_derivation_target_fails⟩
+
+/-- The separate existential operation clauses do not extend to one function
+with the source's two-sided identity and uniform separation law. -/
+theorem no_coherent_source_sequence :
+    ¬ Hypermath.Sequential.SourceOperationExists Similar Congruent ground := by
+  apply Hypermath.Sequential.no_source_operation (related := Congruent)
+  · exact fun relation => relation.symm
+  · exact fun first second => first.trans second
+  · exact ⟨ground, f2f ground, by
+      intro equality
+      have impossible := congrArg Prod.fst equality
+      cases impossible⟩
+
+theorem full_clauses_without_coherent_source_sequence :
+    FullAxioms ∧ ¬ Hypermath.Sequential.SourceOperationExists Similar Congruent ground :=
+  ⟨full_axioms_hold, no_coherent_source_sequence⟩
+
+/-- Removing uniform noncommutation does not make a fixed unary term binary. -/
+theorem no_fixed_term_identity :
+    ¬ ∃ term : Hypermath.UnaryFormation.Term,
+      Hypermath.Sequential.TwoSidedIdentity Congruent
+        (fun x y => term.eval ground f2f x y) ground := by
+  apply Hypermath.UnaryFormation.no_term_identity ground f2f Congruent ground
+  · exact fun relation => relation.symm
+  · exact fun first second => first.trans second
+  · exact ⟨ground, f2f ground, by change ground ≠ f2f ground; decide⟩
+
+theorem no_fixed_term_pair_encoder :
+    ¬ ∃ (term : Hypermath.UnaryFormation.Term) (decode : Form → Option (Form × Form)),
+      ∀ x y, decode (term.eval ground f2f x y) = some (x, y) :=
+  Hypermath.UnaryFormation.no_term_pair_encoder ground f2f
+    ⟨ground, f2f ground, by decide⟩
+
+/-- All translated clauses coexist with the fixed-term obstruction. This
+does not exclude composition defined by other, explicitly supplied means. -/
+theorem full_clauses_without_fixed_term_composition :
+    FullAxioms ∧
+    (¬ ∃ term : Hypermath.UnaryFormation.Term,
+      Hypermath.Sequential.TwoSidedIdentity Congruent
+        (fun x y => term.eval ground f2f x y) ground) ∧
+    (¬ ∃ (term : Hypermath.UnaryFormation.Term) (decode : Form → Option (Form × Form)),
+      ∀ x y, decode (term.eval ground f2f x y) = some (x, y)) :=
+  ⟨full_axioms_hold, no_fixed_term_identity, no_fixed_term_pair_encoder⟩
+
+/-! Test primitive forming itself against the retained-frame correspondence.
+This excludes the total, terminal-stuttering protocol in this model for any
+choice of encoder/decoder. It does not exclude guarded macro-steps, a protocol
+that stops at completion, or new representation carriers at later layers. -/
+
+open Hypermath.OperationalCorrespondence Hypermath.TerminalRetention
+
+theorem primitive_run_value (count : Nat) (value : Form) :
+    run f2f count value = (value.1 + count, value.2) := by
+  induction count generalizing value with
+  | zero => cases value; rfl
+  | succ count ih => simp [run, ih, f2f, Nat.add_assoc, Nat.add_comm, Nat.add_left_comm]
+
+theorem same_chain_orbits_meet (first second : Form) (chain : first.2 = second.2) :
+    run f2f second.1 first = run f2f first.1 second := by
+  simp [primitive_run_value, chain, Nat.add_comm]
+
+/-- Apply the orbit argument to genuinely reached completed executions. -/
+theorem same_chain_terminal_records_equal (view : Representation Frame Form)
+    (correct : Respects view Frame.advance f2f)
+    (first second : Form) (left right : Record)
+    (decodedLeft : view.decode first = some (finished left left.conclusion))
+    (decodedRight : view.decode second = some (finished right right.conclusion))
+    (chain : first.2 = second.2) : left = right := by
+  have same := merged_fixed_states view Frame.advance f2f correct first second
+    (finished left left.conclusion) (finished right right.conclusion)
+    decodedLeft decodedRight (finished_fixed _ _) (finished_fixed _ _)
+    second.1 first.1 (same_chain_orbits_meet first second chain)
+  have records := congrArg Frame.record same
+  simpa [finished_record] using records
+
+/-- Only three valid primitive records are needed. Their initial frames are
+encoded, actually executed through correspondence, and then retained. -/
+theorem no_primitive_frame_checker :
+    ¬ ∃ view : Representation Frame Form, Respects view Frame.advance f2f := by
+  rintro ⟨view, correct⟩
+  let start (record : Record) := run f2f (Hypermath.RecordMachine.program record).length
+    (view.encode (Frame.initial record record.conclusion))
+  have decoded (record : Record) : view.decode (start record) =
+      some (finished record record.conclusion) :=
+    run_encoded view Frame.advance f2f correct _ _
+  have separated (left right : Record) (different : left ≠ right) :
+      (start left).2 ≠ (start right).2 := by
+    intro chain
+    exact different (same_chain_terminal_records_equal view correct (start left) (start right)
+      left right (decoded left) (decoded right) chain)
+  let first : Record := .primitive .groundSelf
+  let second : Record := .primitive (.diff .ground)
+  let third : Record := .primitive (.sim .ground)
+  have firstSecond := separated first second (by decide)
+  have firstThird := separated first third (by decide)
+  have secondThird := separated second third (by decide)
+  cases hfirst : (start first).2 <;> cases hsecond : (start second).2 <;>
+    cases hthird : (start third).2 <;> simp_all
+
+theorem full_clauses_without_primitive_frame_checker :
+    FullAxioms ∧ ¬ ∃ view : Representation Frame Form, Respects view Frame.advance f2f :=
+  ⟨full_axioms_hold, no_primitive_frame_checker⟩
+
+def terminalWitnesses : List Record :=
+  [.primitive .groundSelf, .primitive (.diff .ground), .primitive (.sim .ground)]
+
+theorem terminal_witnesses_accepted :
+    terminalWitnesses.all (fun record => (finished record record.conclusion).accept) = true := by decide
+
+def terminalRetentionProbe : IO Unit := do
+  IO.println "START terminal retention: three accepted records and merging primitive orbits"
+  unless terminalWitnesses.all (fun record => (finished record record.conclusion).accept) do
+    throw (IO.userError "terminal-retention witness was not an accepted derivation")
+  unless decide (run f2f 5 (2, false) = run f2f 2 (5, false)) do
+    throw (IO.userError "same-chain primitive orbits did not meet")
+  IO.println "PASS terminal retention: all three records accepted; same-chain primitive orbits meet"
+
+#eval terminalRetentionProbe
+
+#print axioms Hypermath.TerminalRetention.run_fixed
+#print axioms Hypermath.TerminalRetention.merged_fixed_states
+#print axioms Hypermath.TerminalRetention.finished_record
+#print axioms Hypermath.TerminalRetention.finished_fixed
+#print axioms Hypermath.TerminalRetention.finished_check
+#print axioms primitive_run_value
+#print axioms same_chain_orbits_meet
+#print axioms same_chain_terminal_records_equal
+#print axioms no_primitive_frame_checker
+#print axioms full_clauses_without_primitive_frame_checker
+#print axioms terminal_witnesses_accepted
+
+def sequencingProbe : IO Unit := do
+  let first := Hypermath.Sequential.firstProgram
+  let second := Hypermath.Sequential.secondProgram
+  if Hypermath.RecordMachine.execute (first ++ second) (some []) ==
+      Hypermath.RecordMachine.execute (second ++ first) (some []) then
+    throw (IO.userError "sequencing unexpectedly lost observable instruction order")
+  if first ++ (first ++ first) != (first ++ first) ++ first then
+    throw (IO.userError "sequencing powers failed to commute")
+  IO.println "sequencing: instruction order changes results; distinct nonempty powers commute"
+
+#eval sequencingProbe
+
+#print axioms no_coherent_source_sequence
+#print axioms full_clauses_without_coherent_source_sequence
+#print axioms no_fixed_term_identity
+#print axioms no_fixed_term_pair_encoder
+#print axioms full_clauses_without_fixed_term_composition
+#print axioms Hypermath.UnaryFormation.eval_ignores_an_input
+#print axioms Hypermath.UnaryFormation.identity_collapses_relation
+#print axioms Hypermath.UnaryFormation.no_term_identity
+#print axioms Hypermath.UnaryFormation.pair_recovery_collapses
+#print axioms Hypermath.UnaryFormation.no_term_pair_encoder
+#print axioms Hypermath.UnaryFormation.natural_add_not_a_term
+#print axioms Hypermath.UnaryFormation.singleton_term_identity
+#print axioms Hypermath.UnaryFormation.universal_relation_term_identity
+#print axioms Hypermath.Sequential.unit_commutes
+#print axioms Hypermath.Sequential.uniform_separation_double_negates_unit
+#print axioms Hypermath.Sequential.no_uniform_separation
+#print axioms Hypermath.Sequential.no_source_operation
+#print axioms Hypermath.Sequential.program_identity
+#print axioms Hypermath.Sequential.program_associative
+#print axioms Hypermath.Sequential.program_composition_executes
+#print axioms Hypermath.Sequential.program_noncommutative
+#print axioms Hypermath.Sequential.program_order_changes_result
+#print axioms Hypermath.Sequential.distinct_nonempty_programs_commute
+#print axioms Hypermath.Sequential.program_uniform_separation_fails
+#print axioms Hypermath.Sequential.programSequencing
+#print axioms Hypermath.Sequential.naturalSequencing
+#print axioms Hypermath.Sequential.natural_commutative
+#print axioms Hypermath.Sequential.program_not_commutative
+#print axioms Hypermath.Sequential.natural_no_inverses
+#print axioms Hypermath.Sequential.programLength
+#print axioms Hypermath.Sequential.program_length_preserves_composition
+#print axioms Hypermath.Sequential.program_length_forgets_order
+#print axioms Hypermath.Sequential.program_length_not_faithful
 
 #print axioms driver_cycle_claim_fails
 #print axioms nontrivial_simulation_claim_fails

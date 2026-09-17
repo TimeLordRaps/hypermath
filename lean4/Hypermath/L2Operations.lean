@@ -73,13 +73,19 @@ axiom congruentPath : DerivationPath → DerivationPath → Prop
 -- §III  Axioms for + (non-commutative sequential connection)
 -- ============================================================================
 
-/-- **ax-seq**: + stays within the ~~ class of both operands.
-    c is the Form denoted by a + b; c ~~ a and c ~~ b. -/
+-- Translation boundary: these clauses quantify separate witnesses. No binary
+-- Form operation for + or additionally is declared or bound to those witnesses.
+-- They therefore do not implement the source's operation laws. Sequential.lean
+-- proves that a common operation with the source's two-sided identity and
+-- uniform separation cannot exist for nontrivial symmetric, transitive
+-- congruence. The current clauses themselves are left unchanged.
+
+/-- **ax-seq**: a common similarity witness exists for each pair.
+    Identifying that witness with a particular a + b requires another construction. -/
 axiom axSeq : ∀ a b : Form, ∃ c : Form, (c ~~ a) ∧ (c ~~ b)
 
-/-- **ax-seq-asymm**: + is non-commutative at =~.
-    If a ≢~ b then (a + b) ≢~ (b + a).
-    (Structural argument: sequencing is order-sensitive at substance level.) -/
+/-- **ax-seq-asymm**: incongruent inputs have two incongruent similarity witnesses.
+    This translation does not bind those witnesses to a + b and b + a. -/
 axiom axSeqAsymm :
     ∀ a b : Form, ¬ (a =~ b) →
       ∃ c d : Form,
@@ -87,8 +93,7 @@ axiom axSeqAsymm :
         (d ~~ b) ∧ (d ~~ a) ∧
         ¬ (c =~ d)
 
-/-- **ax-seq-identity**: ground is the =~-identity for +.
-    (a + ground) =~ a and (ground + a) =~ a. -/
+/-- Separate identity witnesses; neither clause refers to a binary + operation. -/
 axiom axSeqIdentityR : ∀ a : Form, ∃ c : Form, (c ~~ a) ∧ (c =~ a)
 axiom axSeqIdentityL : ∀ a : Form, ∃ c : Form, (c ~~ a) ∧ (c =~ a)
 
@@ -96,17 +101,17 @@ axiom axSeqIdentityL : ∀ a : Form, ∃ c : Form, (c ~~ a) ∧ (c =~ a)
 -- §IV  Axioms for additionally (commutative co-presence)
 -- ============================================================================
 
-/-- **ax-coop**: additionally stays within ~~ of both operands. -/
+/-- **ax-coop**: a common similarity witness, without a bound additionally operation. -/
 axiom axCoop : ∀ a b : Form, ∃ c : Form, (c ~~ a) ∧ (c ~~ b)
 
-/-- **ax-coop-comm**: additionally is commutative at =~. -/
+/-- Two congruent co-presence witnesses; no binary additionally function is bound. -/
 axiom axCoopComm :
     ∀ a b : Form, ∃ ca cab : Form,
       (ca ~~ a) ∧ (ca ~~ b) ∧
       (cab ~~ b) ∧ (cab ~~ a) ∧
       (ca =~ cab)
 
-/-- **ax-coop-identity**: ground is the =~-identity for additionally. -/
+/-- A co-presence identity witness, without a bound binary operation. -/
 axiom axCoopIdentity : ∀ a : Form, ∃ c : Form, (c ~~ a) ∧ (c =~ a)
 
 -- ============================================================================
@@ -140,7 +145,8 @@ theorem plusStaysSimilar : ∀ a b : Form, ∃ c : Form, (c ~~ a) ∧ (c ~~ b) :
 theorem additionallyStaysSimilar : ∀ a b : Form, ∃ c : Form, (c ~~ a) ∧ (c ~~ b) :=
   axCoop
 
-/-- + and additionally are distinct operations (different commutativity behavior). FORM. -/
+/-- Proposed distinct witness patterns. The source describes distinct operations,
+    but this statement does not quantify operation functions; its proof is admitted. -/
 theorem plusAndAdditionallyAreDistinct :
     ∃ a b : Form,
       (∃ c d : Form, (c ~~ a) ∧ (c ~~ b) ∧ (d ~~ b) ∧ (d ~~ a) ∧ ¬ (c =~ d)) ∧
@@ -211,10 +217,10 @@ theorem compositionLengthAdditive_FRAME :
 -- Four source NCs. Their current Lean proof status is reported individually.
 -- ============================================================================
 
--- NC-1: + is a well-defined Form operation staying within ~~ (axSeq). FORM.
+-- NC-1: common similarity witnesses exist (axSeq); no operation is constructed.
 theorem nc1_L2 : ∀ a b : Form, ∃ c : Form, (c ~~ a) ∧ (c ~~ b) := axSeq
 
--- NC-2: additionally is well-defined and commutative at =~ (axCoop + axCoopComm). FORM.
+-- NC-2: common co-presence witnesses exist (axCoop); no operation is constructed.
 theorem nc2_L2 : ∀ a b : Form, ∃ c : Form, (c ~~ a) ∧ (c ~~ b) := axCoop
 
 -- NC-3: compose is well-defined with pathGround identity (axComposeAssoc + axComposeIdentity). FORM.

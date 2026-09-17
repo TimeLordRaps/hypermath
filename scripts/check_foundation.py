@@ -4,10 +4,15 @@ from __future__ import annotations
 
 import argparse
 import json
+import sys
 from pathlib import Path
 
-from hypermath_foundations import evaluate_gate, run_audit
-from hypermath_foundations.vstd import write_verification_receipt
+ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT / "src") not in sys.path:
+    sys.path.insert(0, str(ROOT / "src"))
+
+from hypermath_foundations import evaluate_gate, run_audit  # noqa: E402
+from hypermath_foundations.vstd import write_verification_receipt  # noqa: E402
 
 
 def main() -> int:
