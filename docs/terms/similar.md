@@ -5,11 +5,16 @@
 ## What it is
 
 `similar` (written `` `~~` ``) is the weakest relation in the system and the
-one from which all stronger relations are generated. `x ~~ y` iff both `x` and
-`y` `struct-continue` from [`ground`](ground.md). `~~` is symmetric, reflexive,
-and non-transitive in general. The relation that [`ground`](ground.md) generates
-first, before [`=~`](congruent.md) or [`==`](simulation.md). Declared in L0
-Section V; closed via [`struct-continues`](struct-continues.md) in Section VI.
+one from which stronger relations are intended to be generated. Its intended
+meaning is nonempty overlap of continuation capacity. Nonempty overlap is
+symmetric; reflexivity requires each admitted continuation set to be nonempty,
+and transitivity need not hold. A continuation-set interpretation has not yet
+been supplied by the current opaque declarations.
+
+L0 Section VI supplies the restricted bridge
+`struct-continues(x, ground) iff x ~~ ground`. It does not define arbitrary
+`x ~~ y` as both forms continuing from ground. That different definition would
+be transitive and must not be silently substituted for overlap.
 
 ```
 similar :: Form -> Form -> Prop
@@ -17,9 +22,9 @@ similar :: Form -> Form -> Prop
 
 ## What it is not
 
-- Not vague agreement or informally "kind of alike." `` `~~` `` is a formal
-  relation with a precise semantics: *shared generator*. Two forms are `~~` iff
-  they are both products of applying `□` from the same ground.
+- Not vague agreement. Its proposed semantics is a precise overlap relation,
+  whose continuation objects and correspondence to the declared predicates
+  remain to be defined.
 - Not transitivity-closed. `~~` does not propagate through long chains
   automatically.
 - Not "almost equal." [`=~`](congruent.md) (congruent) is the
@@ -27,9 +32,10 @@ similar :: Form -> Form -> Prop
 
 ## What it clarifies
 
-Clarifies why every `Form` is similar to `ground`: by `ax-sim` and
-`ax-ground-self`, every form produced by `□` struct-continues from ground,
-which is what `~~` names.
+By `ax-sim` and the restricted bridge, every form produced by one application
+of `□` is similar to ground. `ax-ground-self` covers ground itself. Extending
+this assertion to every declared `Form` requires a generation or coverage
+argument, especially after an ordinal limit is introduced.
 
 Grounds the relation hierarchy: `` `~~` `` is the base level. [`=~`](congruent.md)
 requires one further `□`-application. [`==`](simulation.md) requires one more.

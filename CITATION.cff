@@ -1,0 +1,17 @@
+cff-version: 1.2.0
+message: "If you use Hypermath or its formal foundations, cite this release."
+title: "Hypermath: Formal Foundations and Bounded Evidence Audits"
+type: software
+authors:
+  - name: "Tyler Roost"
+version: 0.1.0
+date-released: 2026-09-17
+license: Apache-2.0
+repository-code: "https://github.com/TimeLordRaps/hypermath"
+keywords:
+  - formal-verification
+  - lean4
+  - proof-audit
+  - hypermath
+  - foundations
+  - verifier-standard

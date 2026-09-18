@@ -1,0 +1,59 @@
+[build-system]
+requires = ["setuptools>=77", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "hypermath-foundations"
+version = "0.1.0"
+description = "Bounded evidence audits for the Hypermath formalization"
+readme = "README.md"
+requires-python = ">=3.10"
+license = "Apache-2.0"
+license-files = ["LICENSE"]
+authors = [{name = "Tyler Roost"}]
+keywords = [
+  "formal-verification",
+  "lean4",
+  "proof-audit",
+  "hypermath",
+  "foundations",
+  "verifier-standard",
+]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+]
+dependencies = []
+
+[project.optional-dependencies]
+dev = ["pytest>=8", "pytest-timeout>=2.3", "build>=1.2", "ruff>=0.9", "twine>=6"]
+test = ["pytest>=8", "pytest-timeout>=2.3", "verifier-standard==1.4.0"]
+release = ["build>=1.2", "twine>=6"]
+verification = ["verifier-standard==1.4.0"]
+
+[project.scripts]
+hypermath-foundations = "hypermath_foundations.__main__:main"
+
+[project.urls]
+Repository = "https://github.com/TimeLordRaps/hypermath"
+Documentation = "https://timelordraps.github.io/hypermath/"
+Issues = "https://github.com/TimeLordRaps/hypermath/issues"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+norecursedirs = [".artifacts", ".benchmarks", "build", "dist", ".git", ".venv", ".lake"]
+
+[tool.ruff]
+target-version = "py310"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F", "I"]
