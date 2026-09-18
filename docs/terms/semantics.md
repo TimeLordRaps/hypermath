@@ -40,10 +40,10 @@ assign semantics to the L0 Section V opaque predicate declarations.
 ## Concrete example
 
 ```
--- L1 Section IV close for similar:
-close similar(x, y) := x struct-continues ground /\ y struct-continues ground
--- This assigns semantics to similar: locating it within struct-continues.
--- That close statement IS the semantics of similar.
+-- L0 Section VI: the restricted structural-continuation bridge.
+close struct-continues(x, ground) := similar(x, ground)
+-- This does not define similar(x, y) for arbitrary x and y.
+-- The intended continuation semantics needs its own interpretation theorem.
 ```
 
 ## Visualization

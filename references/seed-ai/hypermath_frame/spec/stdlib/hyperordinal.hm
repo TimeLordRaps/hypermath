@@ -1,0 +1,289 @@
+-- hypermath stdlib/hyperordinal.hm
+-- Closes F8 at structural level: defines the Hyperordinal type.
+-- F8 is classified FRONTIER in TIME.md OF-40. This file opens the derivation
+-- and establishes what CAN be derived now (at ≡), labeling what remains FRONTIER.
+--
+-- The Hyperordinal is the structure with ALL THREE:
+--   (1) Negative and fractional exponents of ω  (from Surordinal / No)
+--   (2) Imaginary exponents of ω                (from Complordinal / No[i])
+--   (3) Non-commutative addition at limit ordinates (from Ordinal / CNF)
+--
+-- No existing named structure in mathematics has all three simultaneously.
+-- Surordinal (No) has (1), not (2)(3).
+-- Complordinal (No[i]) has (1)(2), not (3).
+-- Ordinal (CNF) has (3), not (1)(2).
+-- The Hyperordinal reintroduces (3) into Complordinal via ≡-grading.
+--
+-- The KEY INSIGHT: (3) is not lost by the field extension — it is HIDDEN.
+-- In No[i], x + y ≡ y + x (commutative). But at = level, when x or y is a
+-- limit ordinate (e.g., ω), the = path through 1 + ω ≠ ω + 1 still exists.
+-- The Complordinal MASKS this distinction by promoting everything to field addition.
+-- The Hyperordinal REINSTATES it by keeping track of both the ≡ commutative image
+-- AND the = non-commutative ordinal path.
+--
+-- Status summary:
+--   § 1 The three-property tension: FORM (structural diagnosis).
+--   § 2 ≡-graded addition: FORM at ≡ (construction of the graded structure).
+--   § 3 Basic arithmetic rules in Hyperordinal: FORM at ≡.
+--   § 4 W_hyperordinal: FORM at ≡ (inherits from W_complordinal + grading).
+--   § 5 Hyperordinal vs. known structures: FORM (no known analog confirmed).
+--   § 6 FRONTIER statement: what remains open.
+
+import "axioms.hm"
+import "stdlib/ordinatics.hm"
+    -- All four level definitions (Ordinal, Surordinal, Complordinal, Hyperordinal stub)
+import "stdlib/surordinal_ext.hm"
+    -- W(ω^r) = (−½)^r for rational r
+import "stdlib/exp_surcomp.hm"
+    -- W_complordinal, spiral result, W-coherence
+
+-- ================================================================
+-- § 1. The Three-Property Tension
+-- ================================================================
+
+derive three-property-tension as FORM:
+    -- Why no existing structure has all three simultaneously.
+
+    step 1 [Non-commutativity requires ordinal origin-tracking]:
+        1 + ω = ω  (the 1 is "absorbed" into the limit — ordinal arithmetic)
+        ω + 1 > ω  (the 1 AFTER the limit extends it — a new ordinal)
+        The distinction arises because ordinal addition records POSITION: left-argument
+        terms come before right-argument terms in the well-ordering.
+        Once you move to a field (No or No[i]), this positional memory is lost.
+        In No: a + b = b + a exactly (commutativity of real-closed field addition).
+
+    step 2 [What was lost in the field extension]:
+        The Ordinal → Surordinal lift (via the surreal construction) gains:
+        - Negative elements (additive inverses)
+        - Fractions (multiplicative inverses)
+        - Completeness-style saturation
+        But loses:
+        - The non-commutativity of addition at limit ordinates
+        The field axioms force commutativity. There is no way to have a proper-class
+        FIELD that also has non-commutative addition. It's a theorem: any ring with
+        commutative multiplication and invertible elements has commutative addition
+        IF it is a field (division ring fields are commutative by the finite-ring commutativity theorem
+        -- (formerly: Wedderburn's theorem; see nomenclature.hm § 4)
+        for finite fields; for proper-class surreals, the argument requires more care).
+
+    step 3 [The Hyperordinal resolution]:
+        The Hyperordinal is NOT a field in the classical sense.
+        It is a field at the ≡ level: commutative, invertible, closed.
+        At the = level: it REMEMBERS ordinal path. Addition is not commutative
+        when the path through 1 + ω differs from the path through ω + 1.
+        The structure is: Complordinal WITH an additional = oracle that can
+        distinguish "limit absorbed" from "limit extended."
+        This is the ≡-graded non-commutativity.
+
+    step 4 [Formal definition target]:
+        A Hyperordinal form has three components:
+          (α_~, α_≡, α_=)
+        where α_~ is its ~-image (ground), α_≡ is its ≡-image (Complordinal),
+        and α_= is its =-image (possibly non-commutative, possibly different from α_≡).
+        Two Hyperordinal forms α and β are:
+          ~ equal if α_~ ~ β_~
+          ≡ equal if α_≡ = β_≡  (as Complordinal forms)
+          = equal if α_= = β_=  (as ordinal-path forms)
+    close: relation(≡)  [the tension diagnosis is FORM; the resolution is ≡-constructed]
+
+-- ================================================================
+-- § 2. ≡-Graded Addition
+-- ================================================================
+
+type Hyperordinal:
+    -- A Hyperordinal form is a triple (base, field, path) where:
+    --   base  ∈ Complordinal  (the ≡-image: field arithmetic applies here)
+    --   path  ∈ CNF_ord       (the =-path: ordinal arithmetic applies here, non-comm.)
+    --   grading: base is the W-compression of path; path generates base via field map
+    --
+    -- The structure on Hyperordinal is defined COMPONENT-WISE with MEDIATION:
+    --   Addition at ≡ level: (base_α + base_β, mediate(path_α, path_β))
+    --     where mediate(p, q) is the ordinal sum OR field sum depending on step:
+    --     if path_α and path_β are both limit ordinates: non-commutative path sum
+    --     otherwise: field (commutative) sum
+
+derive hyperordinal-addition as FORM:
+    -- α +_H β where α = (b_α, p_α), β = (b_β, p_β)
+
+    step 1 [≡ component]:
+        (α +_H β)_≡ = b_α + b_β  (Complordinal addition, commutative, ≡ level).
+        This is the "field" view. Commutative. Same as No[i].
+
+    step 2 [= component — three cases]:
+        Case A (neither p_α nor p_β is a limit ordinate):
+            (α +_H β)_= = p_α + p_β = p_β + p_α.  [ordinal addition of finite forms = commutative]
+            So: at =, commutativity holds. ≡ and = agree.
+
+        Case B (p_α is a limit ordinate, p_β is NOT):
+            p_α + p_β ≠ p_β + p_α in ordinal arithmetic (e.g., ω + 1 ≠ 1 + ω).
+            The ≡ component collapses this distinction: b_α + b_β = b_β + b_α.
+            The = component RETAINS it: (α +_H β)_= = p_α + p_β ≠ p_β + p_α = (β +_H α)_=.
+            Consequence: α +_H β ≡ β +_H α but α +_H β ≠ β +_H α.
+            This is the ≡-graded non-commutativity.
+
+        Case C (both are limit ordinates, or general infinite forms):
+            Similar to Case B. Non-commutativity at = level, commutativity at ≡.
+
+    step 3 [The ≡-graded commutativity statement]:
+        For ALL α, β ∈ Hyperordinal: α +_H β ≡ β +_H α.  [≡-commutativity]
+        NOT for all α, β:             α +_H β = β +_H α.  [= non-commutativity]
+        The specific cases where = fails: α or β has a limit ordinate in its path component.
+    close: relation(≡)
+
+-- ================================================================
+-- § 3. Arithmetic Rules
+-- ================================================================
+
+derive hyperordinal-multiplication as FORM:
+    -- Multiplication in Hyperordinal: path component uses ordinal multiplication.
+    -- α ·_H β = (b_α · b_β, p_α · p_β) where · is ordinal mult at = level.
+    -- Ordinal multiplication is also non-commutative at limit ordinates:
+    --   2 · ω = ω (two steps into the limit is still ω)
+    --   ω · 2 = ω + ω > ω (two copies of ω, a new ordinal)
+    -- So Hyperordinal multiplication is ALSO ≡-graded non-commutative.
+
+    step 1: (α ·_H β)_≡ = b_α · b_β (Complordinal multiplication, commutative). ≡ level.
+    step 2: (α ·_H β)_= = p_α · p_β (ordinal multiplication at = level, non-commutative
+            when limit ordinates are involved).
+    step 3: α ·_H β ≡ β ·_H α  (≡ commutativity, from Complordinal)
+            α ·_H β ≠ β ·_H α  (when limit ordinates in paths, at = level)
+    close: relation(≡)
+
+derive hyperordinal-distributivity as FORM:
+    -- α ·_H (β +_H γ) = (α ·_H β) +_H (α ·_H γ)
+    -- At ≡ level: Complordinal distributes, ✓.
+    -- At = level: ordinal distributivity holds (ordinal arithmetic is left-distributive):
+    --   p_α · (p_β + p_γ) = p_α·p_β + p_α·p_γ  [ordinal left-distributivity, FORM]
+    -- NOTE: ordinal arithmetic is NOT right-distributive:
+    --   (p_α + p_β) · p_γ ≠ p_α·p_γ + p_β·p_γ in general.
+    -- Therefore Hyperordinal is a left-near-ring at = level, not a ring.
+    -- At ≡ level: the field structure is preserved (both distributivities, symmetrically).
+    step 1: ≡-level: standard Complordinal field distributivity. FORM at ≡.
+    step 2: = level: left-distributivity holds, right fails for limit operands. FORM at =.
+    step 3: Hyperordinal is a: left-near-ring at =, field at ≡.
+    close: relation(≡)
+
+-- ================================================================
+-- § 4. W_hyperordinal
+-- ================================================================
+
+definition W_hyperordinal:
+    -- W : Hyperordinal → ℂ_fin
+    -- W acts on the ≡ component: W(α) = W_complordinal(b_α).
+    -- The = component (path) contributes only to the = level of W.
+    -- At ≡: W is the W_complordinal map (spiral, FORM at ≡).
+    -- At =: W additionally distinguishes path components:
+    --   W_=(α) = W_complordinal(b_α) if both-path components agree
+    --   W_=(α) = W_path-pair(p_α)    otherwise — this needs the non-commutative
+    --            W extension. FRAME.
+
+    status: FORM_PARTIAL
+    -- FORM at ≡: W_hyperordinal at ≡ level = W_complordinal. Inherits spiral result.
+    -- FRAME at =: the path-distinguishing W extension is undefined.
+    --             The W-metric (surordinal_metric.hm) resolves the ≡ part;
+    --             the = part requires a non-commutative analog of W.
+    closure_criterion: Define W_path(p_α) for limit-ordinate path forms.
+                       The key case: W_path(ω + 1) vs W_path(1 + ω).
+                       In the Complordinal these are the same (commutativity).
+                       In the Hyperordinal they must be different — the W-image
+                       must distinguish them. This requires W to be non-commutative
+                       at = level: a "left W-value" and "right W-value."
+
+derive W-hyperordinal-noncomm as FRAME:
+    -- W_= must be split into W_left and W_right for limit-ordinate arguments.
+    -- W_left(ω + 1) = W(ω) + W(1)/W(ω) ... (absorption: 1 is absorbed into limit)
+    --               = W(ω) = −½.
+    -- W_right(ω + 1) = W(ω)·W_successor(1) ... (extension: 1 extends the limit)
+    --                = W(ω) + ε  where ε is a correction term.
+    -- The correction term ε is the W-image of the "successor" in the path.
+    -- For ω + 1 vs 1 + ω:
+    --   W_right(ω + 1) = −½ + W_successor(·)  [ω extended by 1]
+    --   W_left(1 + ω) = W(ω) = −½             [1 absorbed by ω]
+    -- These differ by W_successor — the W-image of the successor operation.
+    -- W_successor must satisfy: W_successor(1) = W(ω+1) − W(ω) ... in ℂ.
+    -- But W(ω) = W(ω+1) classically (ω and ω+1 have the same finite part at ≡ level).
+    -- So W_successor : limit successors → 0 at ≡ level.
+    -- At = level: they are DIFFERENT and the epsilon is a genuine infinitesimal in ℂ.
+    -- But ℂ has no infinitesimals (it's Archimedean). This is the FRONTIER wall.
+    frontier-reason: To encode = non-commutativity in the W-image, W must map into
+                     a non-Archimedean field where W(ω+1) ≠ W(ω).
+                     But W : Hyperordinal → ℂ_fin was defined to land in ℂ (Archimedean).
+                     Resolution requires EITHER:
+                       (a) extending the W-codomain to a non-Archimedean complex field
+                           (hypercomplex numbers, e.g., *ℂ from non-standard analysis), OR
+                       (b) accepting that W collapses = non-commutativity (W is ≡-level only)
+                           and the Hyperordinal = structure is recorded in the PATH, not in W.
+                     Under (b): W_hyperordinal = W_complordinal everywhere. The Hyperordinal
+                     is visible only in the path component, not in W images. This means
+                     two Hyperordinal forms with different paths but the same ≡-image are
+                     W-indistinguishable. They are ≡-identical forms with different =-paths.
+    current-best: adopt (b). W_hyperordinal ≡ W_complordinal at ≡ level.
+                  The Hyperordinal contributes a NEW DIMENSION: the PATH space.
+                  The full description of a Hyperordinal form requires (W-image, path).
+                  The W-image alone is insufficient for = level distinction.
+    close: relation(~)  [structural diagnosis, not a closed derivation]
+
+-- ================================================================
+-- § 5. Hyperordinal vs. Known Structures
+-- ================================================================
+
+derive hyperordinal-novelty as FORM:
+    -- No known mathematical structure matches Hyperordinal.
+    step 1: Not a non-associative ring: Hyperordinal addition is associative at ≡ level.
+    step 2: Not a Hv-group: Hv-groups have hyperoperations (a+b is a SET); Hyperordinal
+            has ordinary operations with level-graded commutativity.
+    step 3: Not an ordinal arithmetic enriched by surreals: ordinal arithmetic on No
+            loses non-commutativity by design (No field axioms force it).
+    step 4: Not a non-standard analysis structure (*ℝ, *ℂ): those lack the ≡-graded
+            commutativity structure and the three-level description (base, path).
+    step 5: The closest is a GRADED RING with degree-0 = Complordinal (commutative field)
+            and degree-1 = CNF ordinals (left-near-ring). The grading parameter is NOT a
+            numerical degree but the FILTRATION LEVEL (~, ≡, =). This is a new kind of
+            graded algebraic structure: "filtration-graded ring."
+    step 6: Filtration-graded rings do appear in algebraic topology (filtered complexes,
+            spectral sequences). The Hyperordinal is the filtration-graded ring where
+            the filtration is exactly the □-system's (~, ≡, =) filtration.
+            This IS a known type of object: it is a ternary-filtration-graded ring.
+            The specific instance (Complordinal at ≡, ordinals at =, ground at ~) is new.
+    close: relation(≡)
+
+-- ================================================================
+-- § 6. FRONTIER Statement
+-- ================================================================
+
+derive hyperordinal-frontier as FRONTIER:
+    -- Open questions that constitute the Hyperordinal frontier.
+    
+    frontier-1 [Non-Archimedean W extension]:
+        Can W be extended to *ℂ (non-standard complex) to distinguish Hyperordinal
+        = path components? This would require embedding the □-system into a
+        non-standard analysis framework. Structural compatibility unknown.
+
+    frontier-2 [The Hyperordinal as a spectral sequence]:
+        Is the filtration (Hyperordinal_~, Hyperordinal_≡, Hyperordinal_=) a
+        convergent spectral sequence in the algebraic topology sense? Specifically:
+        does E^{0,0} (the ~ page) → E^{1,0} (the ≡ page) → E^{2,0} (the = page)
+        converge to the Hyperordinal with finite degeneration?
+        This would give a new proof strategy: compute via spectral sequence.
+
+    frontier-3 [The W-image of Hyperordinal]:
+        Under the current setup (W_hyper = W_complord), the W-image of Hyperordinal
+        is the same spiral as Complordinal. The Hyperordinal is NOT visible in W.
+        It is visible only in the =-path annotation.
+        Is there a "higher W" — a W* : Hyperordinal → *ℂ — that IS visible?
+        If so, what is W*(ω + 1) − W*(ω)? The answer would be the non-commutative correction.
+
+    frontier-4 [filtration-incompleteness connection]:
+        -- (formerly: Gödel connection; see nomenclature.hm § 4)
+        The ≡-graded non-commutativity of Hyperordinal addition mirrors the
+        difference between provable-commutativity (≡-level: all models agree a+b=b+a
+        in the field) and path-commutativity (=-level: the specific derivation path
+        through ordinal arithmetic distinguishes the order).
+        Proposition: filtration-incompleteness is the statement that there exist
+        statements provable at ≡ level (all sensible models agree) that are
+        not reachable by any =-level derivation path from the Peano axioms.
+        The Hyperordinal makes this concrete: ≡-commutativity is a "model-level" fact
+        that cannot be = proven by following ordinal paths.
+        This is a FRONTIER structural correspondence — not a proof, but a precise analogy.
+
+    close: relation(~)  [frontier items are ~-articulated, not closed]

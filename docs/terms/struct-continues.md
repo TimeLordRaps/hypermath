@@ -7,8 +7,11 @@
 `struct-continues(x, y) :: Prop` asserts that `x` was produced by applying `□`
 (ground) to something that `y` also produced by applying `□` to — equivalently,
 that `x` and `y` share a common generator in the apply-chain. It is the semantic
-content of the [`similar`](similar.md) relation (`` `~~` ``): `x ~~ y` iff
-`struct-continues(x, ground) /\ struct-continues(y, ground)`.
+content proposed for the [`similar`](similar.md) relation (`` `~~` ``). The
+actual L0 close only states
+`struct-continues(x, ground) iff x ~~ ground`. It supplies no arbitrary-pair
+biconditional from two ground-continuation facts. Such a biconditional would
+define a transitive relation, unlike general nonempty continuation overlap.
 
 ```
 struct-continues :: Form -> Form -> Prop
