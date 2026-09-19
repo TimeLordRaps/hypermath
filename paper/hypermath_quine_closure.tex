@@ -153,6 +153,52 @@ The constructive Quine synthesis and APG bisimulation quotient establish interna
 
 Each higher level serves as an evidence-bearing oracle for lower levels. Because each jump is recorded as an explicit closure coordinate in the Verifier Standard (VSTD) discipline, no agent can claim verification beyond the exact rank and trust root of the discharging mechanism.
 
+\section{Machine-Checked Formalization and Its Boundary}
+The Lean~4 development accompanying this paper \cite{hypermath_lean} compiles under Lean 4.14.0 and depends on no external mathematical library. We separate what the kernel certifies from what remains prose, because that separation is itself a commitment of the framework: a named theorem carries only the weight its proof term earns.
+
+Write $\mathcal{C}$ for the thirty-eight declared logical clauses of the Hypermath kernel, bundled as the Lean structure \texttt{FullAxioms}, and write $S$ for the self-closure target \texttt{selfDerivationTarget}: the conjunction of ground continuation, reflexivity of $D$, two-sided identity of composed derivation paths, and the deriver cycle $\mathrm{Simulation}(f2f(f2f(\mathit{deriver})),\ \mathit{deriver})$.
+
+\begin{theorem}[Independence of self-closure from the clause set]
+\label{thm:independence}
+Both $\mathcal{C} \wedge \neg S$ and $\mathcal{C} \wedge S$ are satisfiable. Hence $\mathcal{C} \nvdash S$ and $\mathcal{C} \nvdash \neg S$.
+\end{theorem}
+
+\begin{proof}
+By two explicit finite models, each checked by the Lean kernel.
+
+\emph{(i)} \texttt{FullAxiomModel.lean} interprets Forms as pairs $(n,b) \in \N \times \mathrm{Bool}$ with $\mathrm{Simulation}$ read as strict syntactic identity. There \texttt{full\_axioms\_hold} establishes $\mathcal{C}$ and \texttt{self\_derivation\_target\_fails} establishes $\neg S$; their conjunction is \texttt{full\_clauses\_without\_cycle\_or\_nontrivial\_simulation}.
+
+\emph{(ii)} \texttt{FiniteActionCountermodel.lean} interprets Forms over six elements, ground lying in a two-cycle and the limit in a disjoint three-cycle. There \texttt{full\_axioms\_hold} again establishes $\mathcal{C}$, while \texttt{self\_derivation\_target\_holds} establishes $S$; their conjunction is \texttt{full\_clauses\_and\_target\_without\_nonzero\_D}.
+\end{proof}
+
+The axiom dependencies reported by \texttt{\#print axioms} are recorded below. No entry depends on \texttt{sorryAx}: each rests only on Lean's standard \texttt{propext}, \texttt{Classical.choice} and \texttt{Quot.sound}, or on nothing at all.
+
+\begin{center}
+\small
+\begin{tabular}{lll}
+\hline
+Result & Model & Axiom dependencies \\
+\hline
+\texttt{full\_axioms\_hold} & (i) & \texttt{propext}, \texttt{Classical.choice}, \texttt{Quot.sound} \\
+\texttt{self\_derivation\_target\_fails} & (i) & none \\
+\texttt{full\_clauses\_without\_cycle\_\ldots} & (i) & \texttt{propext}, \texttt{Classical.choice}, \texttt{Quot.sound} \\
+\texttt{self\_derivation\_target\_holds} & (ii) & \texttt{propext} \\
+\texttt{full\_clauses\_and\_target\_\ldots} & (ii) & \texttt{propext}, \texttt{Quot.sound} \\
+\hline
+\end{tabular}
+\end{center}
+
+\subsection{What is not machine-checked}
+Theorem~\ref{thm:independence} is the only result in this paper that the Lean kernel certifies. Three limitations follow, and we state them rather than leave them to be discovered.
+
+\begin{enumerate}
+\item \textbf{The constructive Quine synthesis of Section~3 is not formalized.} The scheduled development \texttt{lean4/Hypermath/ConstructiveQuine.lean} does not yet exist. Section~3 is a mathematical specification, and the fixed-point construction it describes has not been checked.
+\item \textbf{The APG bisimulation quotient of Section~4 is not formalized.} The present Lean definitions stipulate bisimulation to be mutual simulation, and the accompanying uniqueness statement reduces to the identity function on that stipulation. It is therefore a tautology and supplies no evidence for the claims of Section~4.
+\item \textbf{Eleven declarations across the L0--L3 kernel layers use \texttt{sorry}.} These are the disclosed proof obligations of the underlying formalization. None of them lies among the clauses of $\mathcal{C}$, and none is a dependency of Theorem~\ref{thm:independence}.
+\end{enumerate}
+
+The verified contribution is therefore precise, and narrower than the prose above: self-closure is consistent with the current clause set but not entailed by it. It must be \emph{earned} by a stronger semantics, of the kind Sections~3 and~4 propose, rather than assumed or asserted.
+
 \section{Conclusion}
 Hypermath provides an explicit, constructive bridge between finite derivation paths, non-well-founded graph quotients, and transfinite reflection ladders. By distinguishing path identity from bisimulation congruence and wrap valuation, it delivers a rigorous foundation for superintelligent self-models that remain bounded, verifiable, and free of paradox.
 
@@ -163,6 +209,7 @@ Hypermath provides an explicit, constructive bridge between finite derivation pa
 \bibitem{tarski} Alfred Tarski. The Semantic Conception of Truth and the Foundations of Semantics. \emph{Philosophy and Phenomenological Research} 4(3), 341--376, 1944.
 \bibitem{kleene} Stephen Cole Kleene. \emph{Introduction to Metamathematics}. D. Van Nostrand Co., Inc., New York, 1952.
 \bibitem{roost_ordinatics} Tyler Roost. \emph{Ordinal Arithmetic: An Ordinal-First Metalanguage Approach to Definable Arithmetic Truth}. Preprint, version 0.3.0, 2026.
+\bibitem{hypermath_lean} Tyler Roost. \emph{Hypermath: a Lean 4 formalization of the ground kernel and its countermodels}. Directory \texttt{lean4/}, in particular \texttt{FullAxiomModel.lean} and \texttt{FiniteActionCountermodel.lean}. \href{https://github.com/TimeLordRaps/hypermath}{github.com/TimeLordRaps/hypermath}, 2026.
 \end{thebibliography}
 
 \end{document}
