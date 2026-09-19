@@ -161,3 +161,20 @@ Work lands via pull request into `main`. Commits are GPG-signed (`git commit -S`
 Never pass `--no-gpg-sign` or set `commit.gpgsign=false`.
 Tagging and PyPI publication are maintainer-only operations executed through the OIDC
 Trusted Publishing workflow in `.github/workflows/release.yml`.
+
+## 8. Test skip disclosure and rubric classification
+
+To prevent skip slippage, automated contributors and maintainers MUST disclose the
+explicit rationale behind every skipped test or unrun check. Skips must clear a
+standard checklist of rubricized definitional categories:
+
+1. `OS_CAPABILITY_GUARD`: Underlying operating system capability absent.
+2. `OPTIONAL_DEPENDENCY_ABSENT`: Non-core third-party dependency or optional extra not installed.
+3. `EXTERNAL_SERVICE_BOUNDARY`: Live network service, external API, or daemon unavailable.
+4. `ARCHITECTURAL_PLATFORM_UNSUPPORTED`: Processor architecture or endianness unsupported.
+5. `HARDWARE_DEVICE_UNAVAILABLE`: Physical accelerator or specialized hardware absent.
+6. `PRIVILEGE_OR_CREDENTIAL_BOUNDARY`: Elevated administrator/root privilege or secret keys absent.
+7. `PERFORMANCE_OR_DURATION_EXCLUSION`: Long-running stress, soak, or intensive benchmark excluded.
+8. `QUARANTINED_DEFECT`: Known tracked issue isolated under active quarantine.
+
+An omitted or skipped test is never a pass. Pull requests must include the Test Skip Rubric Disclosure section and enumerate all skips with their rubric category, bounded reason, and claim consequence.
