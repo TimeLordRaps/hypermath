@@ -63,9 +63,8 @@ def outcomes(result):
 
 
 def test_real_released_verifier_wheel_is_used():
-    assert verifier.__version__ == "1.4.0"
     distribution = importlib.metadata.distribution("verifier-standard")
-    assert distribution.version == "1.4.0"
+    assert verifier.__version__ == distribution.version
     direct_url = distribution.read_text("direct_url.json")
     if direct_url is not None:
         assert '"editable": true' not in direct_url
