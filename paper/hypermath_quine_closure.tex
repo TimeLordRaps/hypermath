@@ -104,9 +104,10 @@ The evaluation of $Q_\Phi$ does not evaluate an unstratified global truth predic
 \end{theorem}
 \begin{proof}
 The synthesis operates via the constructive diagonal map $D(x) = \operatorname{apply}(x, \operatorname{quote}(x))$. Let $P$ be the program that takes input $x$, computes $D(x)$, and applies $\Phi$ to the result: $P(x) = \langle D(x), \Phi(D(x)) \rangle$. Setting $Q_\Phi = D(\code{P})$ yields
-\[
-Q_\Phi = \operatorname{apply}(\code{P}, \operatorname{quote}(\code{P})) \implies \operatorname{eval}(Q_\Phi) = P(\code{P}) = \langle D(\code{P}), \Phi(D(\code{P})) \rangle = \langle \code{Q_\Phi}, \Phi(\code{Q_\Phi}) \rangle.
-\]
+\begin{align*}
+Q_\Phi &= \operatorname{apply}(\code{P}, \operatorname{quote}(\code{P})) \\
+\implies \operatorname{eval}(Q_\Phi) &= P(\code{P}) = \langle D(\code{P}), \Phi(D(\code{P})) \rangle = \langle \code{Q_\Phi}, \Phi(\code{Q_\Phi}) \rangle.
+\end{align*}
 Since substitution and pairing are primitive recursive, the computation terminates in a bounded number of reduction steps.
 \end{proof}
 
@@ -164,11 +165,12 @@ Both $\mathcal{C} \wedge \neg S$ and $\mathcal{C} \wedge S$ are satisfiable. Hen
 \end{theorem}
 
 \begin{proof}
+\sloppy
 By two explicit finite models, each checked by the Lean kernel.
 
-\emph{(i)} \texttt{FullAxiomModel.lean} interprets Forms as pairs $(n,b) \in \N \times \mathrm{Bool}$ with $\mathrm{Simulation}$ read as strict syntactic identity. There \texttt{full\_axioms\_hold} establishes $\mathcal{C}$ and \texttt{self\_derivation\_target\_fails} establishes $\neg S$; their conjunction is \texttt{full\_clauses\_without\_cycle\_or\_nontrivial\_simulation}.
+\emph{(i)} \texttt{FullAxiomModel.lean} interprets Forms as pairs $(n,b) \in \N \times \mathrm{Bool}$ with $\mathrm{Simulation}$ read as strict syntactic identity. There \texttt{full\_\allowbreak axioms\_\allowbreak hold} establishes $\mathcal{C}$ and \texttt{self\_\allowbreak derivation\_\allowbreak target\_\allowbreak fails} establishes $\neg S$; their conjunction is \texttt{full\_\allowbreak clauses\_\allowbreak without\_\allowbreak cycle\_\allowbreak or\_\allowbreak nontrivial\_\allowbreak simulation}.
 
-\emph{(ii)} \texttt{FiniteActionCountermodel.lean} interprets Forms over six elements, ground lying in a two-cycle and the limit in a disjoint three-cycle. There \texttt{full\_axioms\_hold} again establishes $\mathcal{C}$, while \texttt{self\_derivation\_target\_holds} establishes $S$; their conjunction is \texttt{full\_clauses\_and\_target\_without\_nonzero\_D}.
+\emph{(ii)} \texttt{FiniteAction\allowbreak Countermodel.lean} interprets Forms over six elements, ground lying in a two-cycle and the limit in a disjoint three-cycle. There \texttt{full\_\allowbreak axioms\_\allowbreak hold} again establishes $\mathcal{C}$, while \texttt{self\_\allowbreak derivation\_\allowbreak target\_\allowbreak holds} establishes $S$; their conjunction is \texttt{full\_\allowbreak clauses\_\allowbreak and\_\allowbreak target\_\allowbreak without\_\allowbreak nonzero\_\allowbreak D}.
 \end{proof}
 
 The axiom dependencies reported by \texttt{\#print axioms} are recorded below. No entry depends on \texttt{sorryAx}: each rests only on Lean's standard \texttt{propext}, \texttt{Classical.choice} and \texttt{Quot.sound}, or on nothing at all.
