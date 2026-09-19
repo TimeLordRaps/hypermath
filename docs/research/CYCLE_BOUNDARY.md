@@ -90,4 +90,11 @@ Adding the desired cycle as an axiom would assume the current remaining
 obligation. Typed record acceptance, observation preservation, arithmetic
 soundness, and transfinite truth coverage still require their own constructions.
 
-For the formal resolution architecture, see [Constructive Quine Synthesis and Bisimulation Quotients](CONSTRUCTIVE_QUINE_SELF_CLOSURE.md), which details how explicit combinatorial Quine terms (Kleene's Second Recursion Theorem) and Accessible Pointed Graph (APG) bisimulation quotients exclude the rigid syntactic countermodel and provide a factually proper, machine-verified proof of self-closure.
+For the proposed resolution architecture, see [Constructive Quine Synthesis
+and Bisimulation Quotients](CONSTRUCTIVE_QUINE_SELF_CLOSURE.md). That document
+is a specification, not a completed proof. It sets out how explicit
+combinatorial Quine terms (Kleene's Second Recursion Theorem) and Accessible
+Pointed Graph (APG) bisimulation quotients would exclude the rigid syntactic
+countermodel and yield a machine-verified proof of self-closure. The Lean
+construction it schedules, `lean4/Hypermath/ConstructiveQuine.lean`, does not
+yet exist, so self-closure remains an open obligation.
