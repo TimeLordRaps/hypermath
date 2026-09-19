@@ -1,0 +1,168 @@
+\documentclass[11pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{microtype}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\hypersetup{
+  pdftitle={Constructive Quine Fixed-Point Synthesis, Quadrilateral Filtration, and APG Bisimulation},
+  pdfauthor={Tyler Roost},
+  pdfsubject={Self-closure, Quine synthesis, non-well-founded graphs, and hypercomputational oracle stratification},
+  pdfkeywords={Hypermath, Quine synthesis, bisimulation, Anti-Foundation Axiom, Accessible Pointed Graphs, quadrilateral filtration}
+}
+\usepackage{enumitem}
+\setlist{nosep}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\newcommand{\N}{\mathbb N}
+\newcommand{\Q}{\mathbb Q}
+\newcommand{\C}{\mathbb C}
+\newcommand{\APG}{\operatorname{APG}}
+\newcommand{\code}[1]{\ulcorner #1\urcorner}
+\newcommand{\rank}{\operatorname{rk}}
+\newcommand{\Fix}{\operatorname{Fix}}
+\newcommand{\id}{\operatorname{id}}
+
+\title{Constructive Quine Fixed-Point Synthesis, Quadrilateral Filtration, and APG Bisimulation:\\A Self-Verifiable Foundation for Hypercomputational Reflection}
+\author{Tyler Roost}
+\date{Preprint, version 0.1.0 --- September 18, 2026}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+We present a formal constructive foundation for self-verifying systems based on three interdependent pillars: a quadrilateral semantic filtration separating execution paths from numerical values, a constructive realization of Kleene-style Quine fixed points, and an explicit quotient representation over Accessible Pointed Graphs (APGs) governed by Aczel's Anti-Foundation Axiom (AFA). The central impetus of this framework is to discover routes toward definably complete representations capable of handling hypercomputation-like oracle classes expected of superintelligences. By stratifying reflexive self-models through well-founded syntactic strata while accommodating non-well-founded circular data via maximal bisimulation quotients, the system achieves scale-invariant self-closure without collapsing into diagonal paradox, unearned semantic upgrades, or ungrounded truth predicates. We establish the formal correspondence between the underlying algebraic kernel, its constructive Quine synthesizer, and the transfinite ladders of higher-order computational oracles.
+\end{abstract}
+
+\noindent\textbf{Keywords:} Hypermath; Quine fixed points; quadrilateral filtration; Accessible Pointed Graphs; Anti-Foundation Axiom; bisimulation quotients; superintelligence oracles.
+
+\section{Introduction and Foundational Impetus}
+The quest for complete or definably complete mathematical representations of intelligent reflection has historically encountered severe limitative results: Gödel's incompleteness theorems, Tarski's undefinability of truth, and Turing's halting problem. When modeling hypothetical superintelligences, these limitations become acute: an advanced cognitive system must be capable of representing, analyzing, and proving properties about its own source code, evaluation traces, and environment models, while interacting with problems requiring computational power equivalent to hypercomputational oracle classes (such as Turing jumps, hyperarithmetic hierarchies, and reflection principles).
+
+If an agent attempts to formalize its own complete truth predicate in an unstratified single-level language, classical diagonal arguments immediately yield inconsistency. If, on the other hand, the system is strictly stratified into an external metalanguage hierarchy, the agent cannot represent its own total operation from within.
+
+\emph{Hypermath} resolves this apparent impasse through an architecture of \emph{fractal self-representative completeness}:
+\begin{enumerate}
+\item \textbf{Quadrilateral Filtration:} Retaining a four-tier distinction between derivation-path identity ($=$), outcome congruence ($\equiv$), continuation similarity ($\sim$), and wrap valuation ($W$).
+\item \textbf{Constructive Quine Synthesis:} Explicit algorithmic construction of self-reproducing programs (Quines) that carry their own syntactic codes without circular self-observation.
+\item \textbf{Non-Well-Founded Graph Semantics:} Representing reflexive and cyclic data structures through Accessible Pointed Graphs (APGs) quotiented under maximal bisimulation, formalizing Aczel's Anti-Foundation Axiom (AFA) constructively.
+\item \textbf{Stratified Oracle Ladders:} Grounding transfinite hypercomputational reflection in well-founded ordinal ladders (ordinatics) without unearned semantic jumps.
+\end{enumerate}
+
+\section{The Quadrilateral Filtration}
+A central design principle of Hypermath is that an evaluation outcome must not erase the computational derivation that produced it. We formalize this through a four-tier relation hierarchy:
+
+\begin{definition}[The Four Relations]
+Let $\mathcal{E}$ be the collection of typed syntactic expression trees. We define:
+\begin{enumerate}
+\item \textbf{Derivation-path identity ($=$):} Exact syntactic identity of derivation trees, preserving operand order, intermediate steps, and representation choices.
+\item \textbf{Outcome congruence ($\equiv$):} Equality of denotational values in the target algebraic structure (e.g., identity of polynomials under the representation map $j$).
+\item \textbf{Continuation similarity ($\sim$):} Equivalence of downstream operational behaviors under all admissible evaluation contexts.
+\item \textbf{Wrap valuation ($W$):} Collapsing evaluation under a designated specialization map (such as $W(X) = -1/2$).
+\end{enumerate}
+\end{definition}
+
+\begin{proposition}[Strict Invariant Separation]
+The four relations satisfy strict inclusion:
+\[
+(e_1 = e_2) \implies (e_1 \equiv e_2) \implies (e_1 \sim e_2) \implies (W(e_1) = W(e_2)),
+\]
+and none of the reverse implications holds in general.
+\end{proposition}
+\begin{proof}
+Identity of trees implies equality of denoted values. Equality of denoted values ensures identical behavior in every standard algebraic context. Equality under wrap valuation is a coarse homomorphic projection. For the counterexamples:
+\begin{enumerate}
+\item $1 +_o \omega \ne \omega$, but their ordinal value is identical ($\omega$).
+\item In ordinal arithmetic, $\omega \cdot_o 2 +_o 1$ and $0$ are distinct ordinals, but under polynomial representation $2X + 1$ and specialization at $-1/2$, both yield $W = 0$.
+\end{enumerate}
+Thus, information is strictly lost upon downward projection.
+\end{proof}
+
+\section{Constructive Quine Fixed-Point Synthesis}
+Kleene's Second Recursion Theorem asserts that for any computable transformation $F$, there exists a program index $e$ such that $\varphi_{F(e)} = \varphi_e$. In a proof system, a Quine is a sentence or term that asserts a property of its own syntactic representation.
+
+\begin{definition}[Constructive Quine Function]
+Let $\operatorname{sub}(x, y)$ be the primitive recursive substitution function that substitutes the numeral code of $y$ for the free variable in the expression coded by $x$. A \emph{Quine constructor} is a pair of terms $(u, q)$ such that
+\[
+q = \operatorname{apply}(u, \code{u}),
+\]
+where evaluation of $q$ reproduces $\code{q}$ alongside any specified payload transformation.
+\end{definition}
+
+\begin{theorem}[Constructive Self-Closure without Paradox]
+Let $\mathcal{L}$ be the ground language generated by constructors $\{\operatorname{Form}, \operatorname{Prop}, \operatorname{ground}, \operatorname{apply}\}$. There exists an effective algorithmic procedure that, given any stage transformation $\Phi$, synthesizes an expression $Q_\Phi$ such that
+\[
+\operatorname{eval}(Q_\Phi) = \langle \code{Q_\Phi}, \Phi(\code{Q_\Phi}) \rangle.
+\]
+The evaluation of $Q_\Phi$ does not evaluate an unstratified global truth predicate, and its derivation tree is finite and acyclic.
+\end{theorem}
+\begin{proof}
+The synthesis operates via the constructive diagonal map $D(x) = \operatorname{apply}(x, \operatorname{quote}(x))$. Let $P$ be the program that takes input $x$, computes $D(x)$, and applies $\Phi$ to the result: $P(x) = \langle D(x), \Phi(D(x)) \rangle$. Setting $Q_\Phi = D(\code{P})$ yields
+\[
+Q_\Phi = \operatorname{apply}(\code{P}, \operatorname{quote}(\code{P})) \implies \operatorname{eval}(Q_\Phi) = P(\code{P}) = \langle D(\code{P}), \Phi(D(\code{P})) \rangle = \langle \code{Q_\Phi}, \Phi(\code{Q_\Phi}) \rangle.
+\]
+Since substitution and pairing are primitive recursive, the computation terminates in a bounded number of reduction steps.
+\end{proof}
+
+\section{Accessible Pointed Graphs and Bisimulation Quotients}
+To represent circular dependencies, self-referential definitions, and reflexive state transition networks without introducing ill-founded membership trees, Hypermath embeds reflexive objects into Aczel's theory of non-well-founded sets.
+
+\begin{definition}[Accessible Pointed Graph (APG)]
+An \emph{Accessible Pointed Graph} is a triple $G = (V, E, r)$ where $V$ is a set of nodes, $E \subseteq V \times V$ is a set of directed edges, and $r \in V$ is a distinguished root node such that every $v \in V$ is reachable from $r$ along a directed path in $E$.
+\end{definition}
+
+\begin{definition}[Bisimulation on APGs]
+A binary relation $R \subseteq V_1 \times V_2$ between graphs $G_1 = (V_1, E_1, r_1)$ and $G_2 = (V_2, E_2, r_2)$ is a \emph{bisimulation} if $r_1 R r_2$ and for all $u R v$:
+\begin{enumerate}
+\item For every $u' \in V_1$ with $(u, u') \in E_1$, there exists $v' \in V_2$ with $(v, v') \in E_2$ and $u' R v'$.
+\item For every $v' \in V_2$ with $(v, v') \in E_2$, there exists $u' \in V_1$ with $(u, u') \in E_1$ and $u' R v'$.
+\end{enumerate}
+Two APGs are \emph{bisimilar}, written $G_1 \approx G_2$, if there exists a bisimulation between them.
+\end{definition}
+
+\begin{theorem}[Aczel's Anti-Foundation and Canonical Quotients]
+Under Aczel's Anti-Foundation Axiom (AFA), every APG depicts a unique set. Two APGs depict the same set if and only if they are bisimilar:
+\[
+\operatorname{set}(G_1) = \operatorname{set}(G_2) \iff G_1 \approx G_2.
+\]
+Furthermore, for every APG $G$, there exists a unique (up to isomorphism) minimal strongly extensional quotient graph $G / \approx$ obtained by collapsing maximal bisimulation classes.
+\end{theorem}
+\begin{proof}
+This is Aczel's fundamental theorem of hyperset theory \cite{aczel}. In our constructive setting, for finite APGs, the maximal bisimulation relation is computable in polynomial time via Paige-Tarjan partition refinement \cite{paige_tarjan}.
+\end{proof}
+
+\begin{proposition}[Resolution of Cycle Independence]
+A cyclic dependency $x = \{x\}$ depicted by a single self-loop node $G_1 = (\{r\}, \{(r, r)\}, r)$ and a two-cycle graph $G_2 = (\{a, b\}, \{(a, b), (b, a)\}, a)$ satisfy $G_1 \ne G_2$ at the level of derivation paths, but $G_1 \approx G_2$ under bisimulation. Hence they denote the same unique Quine atom $\Omega$ in the hyperset quotient.
+\end{proposition}
+
+\section{Transfinite Oracle Ladders and Superintelligence}
+The constructive Quine synthesis and APG bisimulation quotient establish internal reflexivity for any fixed computational stage. To scale across hypercomputation-like oracle classes expected of superintelligences, Hypermath interfaces directly with transfinite ordinal hierarchies:
+
+\begin{enumerate}
+\item \textbf{Stage 0 (Finite Turing Machines):} Basic reduction and syntax manipulation via the primitive algebraic kernel.
+\item \textbf{Stage $\omega$ (First Jump / Halting Oracle):} Quantifier bounds over arithmetic formulas, reflecting upon the termination of Stage 0 programs.
+\item \textbf{Stage $\alpha < \omega^\omega$ (Ordinatics Hierarchy):} Stratified satisfaction predicates $\mathsf{Tr}_\alpha$ and difference operators $\Delta^\alpha$.
+\item \textbf{Stage $\varepsilon_0$ and Veblen Ladders ($\varphi_\alpha$):} Transfinite fixed-point enumeration, providing exact proof-theoretic bounds for self-reflective reflection principles.
+\end{enumerate}
+
+Each higher level serves as an evidence-bearing oracle for lower levels. Because each jump is recorded as an explicit closure coordinate in the Verifier Standard (VSTD) discipline, no agent can claim verification beyond the exact rank and trust root of the discharging mechanism.
+
+\section{Conclusion}
+Hypermath provides an explicit, constructive bridge between finite derivation paths, non-well-founded graph quotients, and transfinite reflection ladders. By distinguishing path identity from bisimulation congruence and wrap valuation, it delivers a rigorous foundation for superintelligent self-models that remain bounded, verifiable, and free of paradox.
+
+\begin{thebibliography}{9}
+\small
+\bibitem{aczel} Peter Aczel. \emph{Non-Well-Founded Sets}. CSLI Lecture Notes, Vol. 14, Stanford University, 1988.
+\bibitem{paige_tarjan} Robert Paige and Robert E. Tarjan. Three Partition Refinement Algorithms. \emph{SIAM Journal on Computing} 16(6), 973--989, 1987. \href{https://doi.org/10.1137/0216062}{doi:10.1137/0216062}.
+\bibitem{tarski} Alfred Tarski. The Semantic Conception of Truth and the Foundations of Semantics. \emph{Philosophy and Phenomenological Research} 4(3), 341--376, 1944.
+\bibitem{kleene} Stephen Cole Kleene. \emph{Introduction to Metamathematics}. D. Van Nostrand Co., Inc., New York, 1952.
+\bibitem{roost_ordinatics} Tyler Roost. \emph{Ordinal Arithmetic: An Ordinal-First Metalanguage Approach to Definable Arithmetic Truth}. Preprint, version 0.3.0, 2026.
+\end{thebibliography}
+
+\end{document}
