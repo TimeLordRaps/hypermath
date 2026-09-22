@@ -89,9 +89,9 @@ The source specifies more than a returning endpoint:
 
 | Source statement | Required bridge content | Current evidence |
 |---|---|---|
-| [Chapter 24](../../references/seed-ai/hyper-grammar/docs/prerequisites/24_fractal_hypergrammar_compression.md) makes completed trajectories the atoms of the next grammar and retains their formation history | Reify the whole checked trajectory, with its layer and recoverable derivation | `PathLayers` retains supplied witnessed paths; native generation of the representation remains open |
-| [Chapter 36](../../references/seed-ai/hyper-grammar/36_meta_closure.math-excerpt.md) distinguishes generative meta-closure from zero-order self-verification | Generated structure must participate in subsequent applications of the operation | The existing two-step cycle alone does not establish this generative correspondence |
-| [The relations source](../../references/seed-ai/hypermath_form/relations.hm) describes simulation as mutual reproduction of paths and futures | Explain which continuations and observations are preserved, and construct their correspondence | `PathTransport` supplies finite preservation conditional on a transport operation; the native operation remains unconstructed |
+| [Chapter 24](../../references/precursor/hyper-grammar/docs/prerequisites/24_fractal_hypergrammar_compression.md) makes completed trajectories the atoms of the next grammar and retains their formation history | Reify the whole checked trajectory, with its layer and recoverable derivation | `PathLayers` retains supplied witnessed paths; native generation of the representation remains open |
+| [Chapter 36](../../references/precursor/hyper-grammar/36_meta_closure.math-excerpt.md) distinguishes generative meta-closure from zero-order self-verification | Generated structure must participate in subsequent applications of the operation | The existing two-step cycle alone does not establish this generative correspondence |
+| [The relations source](../../references/precursor/hypermath_form/relations.hm) describes simulation as mutual reproduction of paths and futures | Explain which continuations and observations are preserved, and construct their correspondence | `PathTransport` supplies finite preservation conditional on a transport operation; the native operation remains unconstructed |
 
 These are documented design requirements, not newly proved native laws.
 The first two statements allow the next layer to have a different carrier.
@@ -101,7 +101,7 @@ Similarity (`~~`), congruence (`=~`), and simulation (`==`) keep their source
 meanings; the following interpreter symbols do not establish a translation.
 
 A September 12, 2026 read-only probe refreshed the previously documented
-boundary in the live Seed-ai `hyper-grammar/src/hypergrammar` interpreter.
+boundary in the live precursor interpreter.
 Its ordinary grammar-schema path compares normalized endpoint strings (`=`),
 unwrapped bases (`≡`), or lexical overlap/unwrapped bases (`~`). The source
 README calls the general axiom checks a computational approximation.

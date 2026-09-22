@@ -15,7 +15,7 @@ closes and ground anchoring. The Lean translation reads these propositions in
 Lean's host proposition sort; adequacy for the source's own proposition type
 remains open.
 
-The earlier [frame kernel](../../references/seed-ai/hypermath_frame/spec/kernel.hm),
+The earlier [frame kernel](../../references/precursor/hypermath_frame/spec/kernel.hm),
 Section 2, specifies parsing, relation-stratum checks, import and name resolution,
 and propagation of unresolved steps. Its minimum-stratum rule presupposes
 justified step relations. These comments do not give a formal substitution
