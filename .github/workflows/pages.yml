@@ -83,30 +83,29 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Build the site, preferring a builder the repository already has
+      - name: Build the site from every builder the repository has
         id: build
         env:
           SOURCE_SHA: ${{ steps.qualify.outputs.source_sha }}
         shell: bash
         run: |
           set -euo pipefail
-          # Discovered, never listed. Four of these repositories already had a
-          # working `scripts/build_pages.py` tuned to their own contents before
-          # this workflow existed, and all four take exactly `--output`.
-          # Replacing them with a generic renderer would be a downgrade
-          # wearing the word standardisation, so the shared fallback is used
-          # only where there is nothing to prefer.
+          # Discovered, never listed -- and composed, not chosen. Four of these
+          # repositories already had a `scripts/build_pages.py` before this
+          # workflow existed. Measured, each emits a landing page and a family
+          # explorer built from `docs/family/family-graph.json`: six files, and
+          # no rendered documents at all. So it is not a rival to the shared
+          # renderer and must not be treated as one. It runs first, and the
+          # renderer fills in around it under `--keep-existing`, adding the
+          # rendered documents, a contents page, and one link to that page
+          # from the landing page the other builder wrote.
+          builder="shared"
           if [ -f scripts/build_pages.py ]; then
-            builder="scripts/build_pages.py"
-            python "$builder" --output _site
-          else
-            builder=".github/build_pages.py"
-            python -m pip install --quiet "markdown==3.7"
-            python "$builder" \
-              --output _site \
-              --source-ref "$SOURCE_SHA" \
-              --repository "$GITHUB_REPOSITORY"
+            builder="scripts/build_pages.py + shared"
+            python scripts/build_pages.py --output _site
           fi
+          python -m pip install --quiet "markdown==3.7"
+          python .github/build_pages.py --output _site --keep-existing --source-ref "$SOURCE_SHA" --repository "$GITHUB_REPOSITORY"
           echo "[pages] built by $builder"
           digest=$(python .github/pages_manifest.py _site \
             --source-ref "$SOURCE_SHA" \
