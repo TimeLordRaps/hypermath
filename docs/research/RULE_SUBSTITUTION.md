@@ -16,7 +16,7 @@ unchanged self-derivation target are not strengthened by this construction.
 
 ## Correspondence with the retained source
 
-The retained [form kernel](../../references/seed-ai/hypermath_form/kernel.hm)
+The retained [form kernel](../../references/precursor/hypermath_form/kernel.hm)
 describes substitution as an ordinal-indexed mapping from variables to forms.
 Its `metamath-step-is-apply` proposal, steps 1–2, retains the rule, substitution,
 and substituted hypotheses and conclusion. Steps 3–6 then identify that

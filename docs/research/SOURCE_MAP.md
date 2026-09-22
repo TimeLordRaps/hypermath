@@ -1,15 +1,15 @@
-# Seed-ai to Hypermath source map
+# Precursor to Hypermath source map
 
 Mapped September 7, 2026, against Hypermath base commit
 `819f6856101c91fb3f0f4d25126e2f7329137b53`. The current root specifications are
 preserved. Selected earlier sources live under
-[`references/seed-ai`](../../references/seed-ai/README.md), with exact byte
+[`references/precursor`](../../references/precursor/README.md), with exact byte
 provenance in its manifest. They supply missing context for fractal
 meta-representation and self-derivation; importing them establishes no theorem.
 
 ## Correspondence
 
-| Seed-ai source | Current destination or obligation | Disposition |
+| Precursor source | Current destination or obligation | Disposition |
 | --- | --- | --- |
 | `hypermath/spec/axioms.hm` | `L0_ground.hm`, relation foundations | Earlier unified specification; reference copy |
 | `hypermath/spec/casting.hm`, `links.hm` | `L1_relations.hm`, explicit casts and dependency links | Unique proposed machinery; reference copies |
@@ -54,7 +54,7 @@ merely sharing names.
 
 Personal/clinical material, business and political notes, historical state
 ledgers, generated scaffolds, archives, and Windows device-like entries are
-excluded. The original Seed-ai worktrees remain untouched.
+excluded. The original source worktrees remain untouched.
 
 ## Semantic differences that must not be merged by name
 
