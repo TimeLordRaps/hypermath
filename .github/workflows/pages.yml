@@ -1,0 +1,192 @@
+name: pages
+
+# The analog of verifier's gated Pages promotion. verifier's own version
+# validates a component index and a public CLI that exist in one repository;
+# what generalises is the invariant underneath, which is the whole point of
+# the workflow: nothing reaches the published site unless the conformance
+# gate succeeded on that exact commit, and that commit is still the head of
+# the default branch when the bytes go out.
+
+on:
+  workflow_run:
+    workflows: [conformance]
+    types: [completed]
+  workflow_dispatch:
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    # A gate that ran on a pull request says nothing about the default branch.
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.workflow_run.conclusion == 'success' &&
+       github.event.workflow_run.event == 'push' &&
+       github.event.workflow_run.head_branch == github.event.repository.default_branch)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      actions: read
+      contents: read
+    outputs:
+      source_sha: ${{ steps.qualify.outputs.source_sha }}
+      manifest_sha256: ${{ steps.build.outputs.manifest_sha256 }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+          persist-credentials: false
+
+      - name: Require a successful conformance-gate for this exact commit
+        id: qualify
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SOURCE_SHA: ${{ github.event.workflow_run.head_sha || github.sha }}
+          RUN_ID: ${{ github.event.workflow_run.id || '' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          default_branch=$(gh api "repos/$GITHUB_REPOSITORY" --jq .default_branch)
+          default_sha=$(gh api "repos/$GITHUB_REPOSITORY/commits/$default_branch" --jq .sha)
+          if [ "$SOURCE_SHA" != "$default_sha" ]; then
+            echo "[pages] refusing: $SOURCE_SHA is not the current $default_branch head ($default_sha)" >&2
+            exit 1
+          fi
+          run_id="$RUN_ID"
+          if [ -z "$run_id" ]; then
+            run_id=$(gh api \
+              "repos/$GITHUB_REPOSITORY/actions/workflows/ci.yml/runs?head_sha=$SOURCE_SHA&event=push&status=success&per_page=1" \
+              --jq '.workflow_runs[0].id // empty')
+          fi
+          if [ -z "$run_id" ]; then
+            echo "[pages] refusing: no successful conformance push run for $SOURCE_SHA" >&2
+            exit 1
+          fi
+          # The workflow concluding success is not the same claim as the gate
+          # job concluding success -- ask about the job by name.
+          gates=$(gh api \
+            "repos/$GITHUB_REPOSITORY/actions/runs/$run_id/jobs?filter=latest&per_page=100" \
+            --jq '[.jobs[] | select(.name == "conformance-gate" and .conclusion == "success")] | length')
+          if [ "$gates" -ne 1 ]; then
+            echo "[pages] refusing: run $run_id has $gates successful conformance-gate job(s), expected 1" >&2
+            exit 1
+          fi
+          echo "source_sha=$SOURCE_SHA" >> "$GITHUB_OUTPUT"
+          echo "[pages] qualified $SOURCE_SHA by run $run_id"
+
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.12"
+
+      - name: Build the site, preferring a builder the repository already has
+        id: build
+        env:
+          SOURCE_SHA: ${{ steps.qualify.outputs.source_sha }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          # Discovered, never listed. Four of these repositories already had a
+          # working `scripts/build_pages.py` tuned to their own contents before
+          # this workflow existed, and all four take exactly `--output`.
+          # Replacing them with a generic renderer would be a downgrade
+          # wearing the word standardisation, so the shared fallback is used
+          # only where there is nothing to prefer.
+          if [ -f scripts/build_pages.py ]; then
+            builder="scripts/build_pages.py"
+            python "$builder" --output _site
+          else
+            builder=".github/build_pages.py"
+            python -m pip install --quiet "markdown==3.7"
+            python "$builder" \
+              --output _site \
+              --source-ref "$SOURCE_SHA" \
+              --repository "$GITHUB_REPOSITORY"
+          fi
+          echo "[pages] built by $builder"
+          digest=$(python .github/pages_manifest.py _site \
+            --source-ref "$SOURCE_SHA" \
+            --repository "$GITHUB_REPOSITORY" \
+            --builder "$builder" | tail -1)
+          echo "manifest_sha256=$digest" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/configure-pages@983d7736d9b0ae728b81ab479565c72886d7745b # v5.0.0
+      - uses: actions/upload-pages-artifact@7b1f4a764d45c48632c6b24a0339c27f5614fb0b # v4.0.0
+        with:
+          path: _site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    outputs:
+      page_url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Reconfirm the promoted commit is still the default-branch head
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SOURCE_SHA: ${{ needs.build.outputs.source_sha }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          default_branch=$(gh api "repos/$GITHUB_REPOSITORY" --jq .default_branch)
+          default_sha=$(gh api "repos/$GITHUB_REPOSITORY/commits/$default_branch" --jq .sha)
+          if [ "$SOURCE_SHA" != "$default_sha" ]; then
+            echo "[pages] refusing: $default_branch moved to $default_sha since the build" >&2
+            exit 1
+          fi
+
+      - id: deployment
+        uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e # v4.0.5
+
+  observe:
+    needs: [build, deploy]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.12"
+      - name: Require the live site to serve the bytes that were built
+        env:
+          PAGE_URL: ${{ needs.deploy.outputs.page_url }}
+          EXPECTED: ${{ needs.build.outputs.manifest_sha256 }}
+          SOURCE_SHA: ${{ needs.build.outputs.source_sha }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          base="${PAGE_URL%/}"
+          for attempt in 1 2 3 4 5 6; do
+            if curl --fail --silent --show-error --location \
+                 "$base/deployment-manifest.json" -o live-manifest.json; then
+              break
+            fi
+            echo "[pages] manifest not served yet (attempt $attempt); waiting"
+            sleep 20
+          done
+          if [ ! -s live-manifest.json ]; then
+            echo "[pages] refusing: $base/deployment-manifest.json never became reachable" >&2
+            exit 1
+          fi
+          observed=$(python -c "import hashlib,pathlib;print(hashlib.sha256(pathlib.Path('live-manifest.json').read_bytes()).hexdigest())")
+          served=$(python -c "import json;print(json.load(open('live-manifest.json'))['source_ref'])")
+          echo "expected manifest $EXPECTED for $SOURCE_SHA"
+          echo "observed manifest $observed for $served"
+          if [ "$observed" != "$EXPECTED" ] || [ "$served" != "$SOURCE_SHA" ]; then
+            echo "[pages] the live site does not match what this run built" >&2
+            exit 1
+          fi
+          echo "[pages] the live site serves exactly the promoted build"
