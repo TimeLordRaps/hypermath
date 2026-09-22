@@ -102,7 +102,17 @@ def tracked() -> list[str]:
     names = subprocess.run(
         ["git", "ls-files"], capture_output=True, text=True, check=True
     ).stdout.splitlines()
-    return [n for n in names if not EXCLUDED.search(n)]
+    names = [n for n in names if not EXCLUDED.search(n)]
+    # A path can be in the index and not on disk -- a working tree mid-edit,
+    # a sparse checkout. CI checks out everything, so this is a courtesy to
+    # whoever runs the builder locally; it is reported rather than swallowed,
+    # because silently publishing fewer documents than the repository tracks
+    # is the failure this whole workflow exists to catch.
+    present = [n for n in names if pathlib.Path(n).is_file()]
+    missing = len(names) - len(present)
+    if missing:
+        print(f"note: {missing} tracked path(s) absent from disk, skipped", file=sys.stderr)
+    return present
 
 
 def published_path(name: str) -> str:
@@ -149,12 +159,43 @@ def render(text: str) -> str:
     )
 
 
-def breadcrumb_for(published: str) -> str:
-    if published == "index.html":
+def breadcrumb_for(published: str, contents_at: str) -> str:
+    if published == contents_at:
         return ""
     depth = published.count("/")
     up = "../" * depth if depth else ""
-    return f'<nav class="breadcrumb"><a href="{up}index.html">&#8592; Contents</a></nav>'
+    return f'<nav class="breadcrumb"><a href="{up}{contents_at}">&#8592; Contents</a></nav>'
+
+
+def link_into_landing(landing: pathlib.Path, contents_at: str, emitted: dict) -> None:
+    """Add one link to the contents page into a landing page someone else built.
+
+    Four of these repositories generate their own `index.html` -- a landing
+    page and a family explorer, built from `docs/family/family-graph.json`.
+    That page is kept, so the rendered documents need a way in from it, or
+    they are published and unreachable.
+
+    Idempotent by marker, and it restructures nothing: a landing page with no
+    `</body>` is left untouched rather than guessed at.
+    """
+    marker = "<!-- rendered-documents-link -->"
+    try:
+        text = landing.read_text(encoding="utf-8")
+    except (OSError, UnicodeDecodeError):
+        return
+    if marker in text or "</body>" not in text:
+        return
+    block = (
+        f'{marker}\n'
+        '<p style="max-width:46rem;margin:2rem auto;padding:0 1rem;'
+        'font:16px/1.65 -apple-system,BlinkMacSystemFont,\'Segoe UI\',Helvetica,Arial,sans-serif">'
+        f'<a href="{contents_at}">Browse every document in this repository &#8594;</a>'
+        "</p>\n"
+    )
+    text = text.replace("</body>", block + "</body>", 1)
+    data = text.encode("utf-8")
+    landing.write_bytes(data)
+    emitted["index.html"] = hashlib.sha256(data).hexdigest()
 
 
 def title_for(text: str, fallback: str) -> str:
@@ -188,6 +229,17 @@ def main() -> int:
     parser.add_argument("--output", default="_site")
     parser.add_argument("--source-ref", required=True)
     parser.add_argument("--repository", default="")
+    parser.add_argument(
+        "--keep-existing",
+        action="store_true",
+        help=(
+            "Never overwrite a file already in the output directory. Set when "
+            "running after a repository's own scripts/build_pages.py, which "
+            "generates a landing page and the family explorer -- a different "
+            "artifact from rendered documents, not a worse one. Both belong "
+            "in the site, so this renderer fills in around it."
+        ),
+    )
     options = parser.parse_args()
 
     out = pathlib.Path(options.output)
@@ -199,10 +251,17 @@ def main() -> int:
         print("no tracked markdown document: nothing to publish", file=sys.stderr)
         return 1
 
+    # Where the generated table of contents goes depends on whether another
+    # builder already owns the landing page. Decided before anything is
+    # rendered, because every document's breadcrumb points at it.
+    contents_at = "contents.html" if (out / "index.html").exists() else "index.html"
+
     emitted: dict[str, str] = {}
 
     def write(relative: str, data: bytes) -> None:
         destination = out / relative
+        if options.keep_existing and destination.exists():
+            return
         destination.parent.mkdir(parents=True, exist_ok=True)
         destination.write_bytes(data)
         emitted[relative] = hashlib.sha256(data).hexdigest()
@@ -212,23 +271,32 @@ def main() -> int:
         page = PAGE.format(
             title=html.escape(title_for(text, posixpath.basename(source))),
             style=STYLE,
-            breadcrumb=breadcrumb_for(published),
+            breadcrumb=breadcrumb_for(published, contents_at),
             body=render(rewrite_links(text, source, documents)),
             repository=html.escape(options.repository),
             source_ref=html.escape(options.source_ref),
         )
         write(published, page.encode("utf-8"))
 
-    if "index.html" not in emitted:
-        page = PAGE.format(
-            title=html.escape(options.repository or "Contents"),
-            style=STYLE,
-            breadcrumb="",
-            body=contents_page(documents),
-            repository=html.escape(options.repository),
-            source_ref=html.escape(options.source_ref),
-        )
-        write("index.html", page.encode("utf-8"))
+    landing = out / "index.html"
+    page = PAGE.format(
+        title=html.escape(options.repository or "Contents"),
+        style=STYLE,
+        breadcrumb="",
+        body=contents_page(documents),
+        repository=html.escape(options.repository),
+        source_ref=html.escape(options.source_ref),
+    )
+    if contents_at == "index.html":
+        if "index.html" not in emitted:
+            write("index.html", page.encode("utf-8"))
+    else:
+        # Written unconditionally: --keep-existing protects the OTHER builder's
+        # files, not a stale copy of this one's.
+        destination = out / contents_at
+        destination.write_bytes(page.encode("utf-8"))
+        emitted[contents_at] = hashlib.sha256(page.encode("utf-8")).hexdigest()
+        link_into_landing(landing, contents_at, emitted)
 
     # Publish exactly the non-document files the documents point at -- images,
     # data, the scaffold scripts a chapter links to. Not a suffix allowlist,
@@ -256,18 +324,12 @@ def main() -> int:
     # Jekyll would otherwise drop every path beginning with an underscore.
     write(".nojekyll", b"")
 
-    manifest = {
-        "source_ref": options.source_ref,
-        "repository": options.repository,
-        "document_count": len(documents),
-        "files": dict(sorted(emitted.items())),
-    }
-    serialized = json.dumps(manifest, indent=2, sort_keys=True) + "\n"
-    (out / "deployment-manifest.json").write_text(serialized, encoding="utf-8")
-
-    digest = hashlib.sha256(serialized.encode("utf-8")).hexdigest()
+    # No manifest is written here on purpose. `.github/pages_manifest.py` walks
+    # the built directory afterwards, so one receipt covers whatever a
+    # repository's own builder contributed to this directory as well. Writing
+    # a second one here would leave two manifests, free to disagree.
     print(f"built {len(emitted)} file(s) from {len(documents)} document(s)")
-    print(f"deployment manifest sha256: {digest}")
+    print(f"contents page at {contents_at}")
     return 0
 
 
