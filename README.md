@@ -11,6 +11,10 @@ become an atom for further derivation while retaining its formation path. The
 completeness definition, preservation theorem, and arithmetic soundness bridge
 are active research obligations.
 
+**Preprint:** *Constructive Quine Fixed-Point Synthesis, Quadrilateral Filtration, and APG Bisimulation: A Self-Verifiable Foundation for Hypercomputational Reflection* ([PDF](paper/paper.pdf), [source](paper/paper.tex)) --- version 0.2.0, September 18, 2026.
+
+The paper states its evidential boundary explicitly: it names the sections that are not machine-checked, records that `lean4/Hypermath/ConstructiveQuine.lean` has not been written, and specifies `#print axioms` with no `sorryAx` dependency as the discharge condition. The Lean 4 development currently carries **eleven admitted `sorry` obligations** across `L0Ground`, `L1Relations`, `L2Operations` and `L3Ordinatics`. The theorems the paper cites are in [`lean4/`](lean4/) at the coordinates it gives.
+
 ## Current state
 
 The repository contains four `.hm` specification layers and a Lean 4 translation.
@@ -225,7 +229,7 @@ occur in later sections; the whole specification is not merely four axioms.
 | L2: Operations | [L2_operations.hm](L2_operations.hm) | Composition and paths |
 | L3: Ordinatics | [L3_ordinatics.hm](L3_ordinatics.hm) | Ordinal extension and proposed self-derivation |
 
-The [Seed-ai source map](docs/research/SOURCE_MAP.md) connects the broader
+The [precursor source map](docs/research/SOURCE_MAP.md) connects the broader
 hypergrammar and earlier hypermath specifications to these layers. Selected
 source snapshots retain their original wording for comparison; they do not
 replace the current specifications or become checked proofs through import.

@@ -3,7 +3,9 @@ message: "If you use Hypermath or its formal foundations, cite this release."
 title: "Hypermath: Formal Foundations and Bounded Evidence Audits"
 type: software
 authors:
-  - name: "Tyler Roost"
+  - family-names: "Roost"
+    given-names: "Tyler"
+    orcid: "https://orcid.org/0009-0007-7850-489X"
 version: 0.1.0
 date-released: 2026-09-17
 license: Apache-2.0
@@ -15,3 +17,12 @@ keywords:
   - hypermath
   - foundations
   - verifier-standard
+preferred-citation:
+  type: manuscript
+  title: "Constructive Quine Fixed-Point Synthesis, Quadrilateral Filtration, and APG Bisimulation: A Self-Verifiable Foundation for Hypercomputational Reflection"
+  authors:
+    - family-names: "Roost"
+      given-names: "Tyler"
+      orcid: "https://orcid.org/0009-0007-7850-489X"
+  year: 2026
+  url: "https://github.com/TimeLordRaps/hypermath/blob/main/paper/paper.pdf"
