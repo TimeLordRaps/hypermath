@@ -42,10 +42,10 @@ The composition operation, identity, and relation on `S_(n+1)` must be generated
 and shown to satisfy the sequencing laws. Merely assigning a layer number to
 the existing instruction-list example would not establish this obligation.
 
-The retained [Chapter 24](../../references/seed-ai/hyper-grammar/docs/prerequisites/24_fractal_hypergrammar_compression.md)
+The retained [Chapter 24](../../references/precursor/hyper-grammar/docs/prerequisites/24_fractal_hypergrammar_compression.md)
 describes complete lower trajectories becoming atoms for a larger grammar
 while retaining formation history. That gives source context for the placement.
-The captured [`hypermath_form/kernel.hm`](../../references/seed-ai/hypermath_form/kernel.hm)
+The captured [`hypermath_form/kernel.hm`](../../references/precursor/hypermath_form/kernel.hm)
 imports Ordinatics and discusses whole-proof checking. Its import dependency
 is distinct from the author's relative compositional layers; it does not
 already implement the displayed formation construction.
@@ -236,7 +236,7 @@ revised native arithmetic proposal.
 
 ## Order sensitivity in the finite sequencing instance
 
-The retained [earlier source definition](../../references/seed-ai/hypermath/spec/axioms.hm),
+The retained [earlier source definition](../../references/precursor/hypermath/spec/axioms.hm),
 section 7, describes definitive expansion as all of the first form followed
 by all of the second. For the already implemented finite checker, instruction
 list concatenation realizes that reading directly:

@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "captured_at_utc": "2026-09-07T19:36:54.805432+00:00",
-  "source_root_label": "Seed-ai local working files",
+  "source_root_label": "Author local working files",
   "status": "reference material; source closure labels are not proof verification",
   "records": [
     {
@@ -11,7 +11,7 @@
       "classification": "earlier specification",
       "maps_to": "L0_ground.hm",
       "disposition": "reference_snapshot",
-      "destination": "references/seed-ai/hypermath/spec/axioms.hm",
+      "destination": "references/precursor/hypermath/spec/axioms.hm",
       "sha256": "953a2a0dc598ff8445541a2690812276682cce045347a5596bbcfbbcf782827e",
       "bytes": 18284
     },
@@ -22,7 +22,7 @@
       "classification": "design proposal",
       "maps_to": "L1_relations.hm",
       "disposition": "reference_snapshot",
-      "destination": "references/seed-ai/hypermath/spec/casting.hm",
+      "destination": "references/precursor/hypermath/spec/casting.hm",
       "sha256": "4c551da5c13a92d8fcb17aaf34b940d2ebd32e666ce3d4ef757403b22ecda8ef",
       "bytes": 16018
     },
@@ -33,7 +33,7 @@
       "classification": "design proposal",
       "maps_to": "L1_relations.hm",
       "disposition": "reference_snapshot",
-      "destination": "references/seed-ai/hypermath/spec/links.hm",
+      "destination": "references/precursor/hypermath/spec/links.hm",
       "sha256": "98fae14dcf7948e1a2442a20e90d507a60fa8a2736437528702976a4f4967011",
       "bytes": 14154
     },
@@ -44,7 +44,7 @@
       "classification": "checker specification; not executable",
       "maps_to": "lean4/",
       "disposition": "reference_snapshot",
-      "destination": "references/seed-ai/hypermath/spec/verify.hm",
+      "destination": "references/precursor/hypermath/spec/verify.hm",
       "sha256": "544b821bece5151afe5bd15f44c0d618dbcefb4675a16020581f94dd3c6a24e0",
       "bytes": 14560
     },
@@ -55,7 +55,7 @@
       "classification": "earlier layered presentation",
       "maps_to": "L0_ground.hm",
       "disposition": "reference_snapshot",
-      "destination": "references/seed-ai/hypermath_form/ground.hm",
+      "destination": "references/precursor/hypermath_form/ground.hm",
       "sha256": "13a10df24eaaaf1339f90d88a6c2719fb3afcb4d78922844362aafd29fe6ec8e",
       "bytes": 3752
     },
@@ -66,7 +66,7 @@
       "classification": "earlier layered presentation",
       "maps_to": "L1_relations.hm",
       "disposition": "reference_snapshot",
-      "destination": "references/seed-ai/hypermath_form/relations.hm",
+      "destination": "references/precursor/hypermath_form/relations.hm",
       "sha256": "c12597aa6f0a824376ce724c477009e17e20e5eb8e23c9339ae0eb1ebaa6957e",
       "bytes": 3586
     },
@@ -77,7 +77,7 @@
       "classification": "earlier layered presentation",
       "maps_to": "L2_operations.hm",
       "disposition": "reference_snapshot",
-      "destination": "references/seed-ai/hypermath_form/operations.hm",
+      "destination": "references/precursor/hypermath_form/operations.hm",
       "sha256": "06e8d7d5d35b50503fff0f47568a93cc4d0ff1d169ce32fce7bb725b60fbbf24",
       "bytes": 7621
     },
@@ -88,7 +88,7 @@
       "classification": "earlier layered presentation",
       "maps_to": "L3_ordinatics.hm",
       "disposition": "reference_snapshot",
-      "destination": "references/seed-ai/hypermath_form/ordinatics.hm",
+      "destination": "references/precursor/hypermath_form/ordinatics.hm",
       "sha256": "417e5fb0bc256919bad336cf5f4c40676a719548e161ca6518fd9b9ba6978c13",
       "bytes": 15476
     },
@@ -99,7 +99,7 @@
       "classification": "proposed Metamath correspondence",
       "maps_to": "lean4/",
       "disposition": "reference_snapshot",
-      "destination": "references/seed-ai/hypermath_form/kernel.hm",
+      "destination": "references/precursor/hypermath_form/kernel.hm",
       "sha256": "0fb8b6c0c4ef4bf43b9009b7d1c0e28f2feac8010487b0fae5338f3edf32a3ad",
       "bytes": 11159
     },
@@ -110,7 +110,7 @@
       "classification": "checker design and explicit limits",
       "maps_to": "lean4/",
       "disposition": "reference_snapshot",
-      "destination": "references/seed-ai/hypermath_frame/spec/kernel.hm",
+      "destination": "references/precursor/hypermath_frame/spec/kernel.hm",
       "sha256": "dc6f5c36f2a0b8de601fa389d42e93931b9f94a90e6a7029094e73e75e62a0df",
       "bytes": 10649
     },
@@ -121,7 +121,7 @@
       "classification": "value-layer design proposal",
       "maps_to": "L3_ordinatics.hm",
       "disposition": "reference_snapshot",
-      "destination": "references/seed-ai/hypermath_frame/spec/ordinatics.hm",
+      "destination": "references/precursor/hypermath_frame/spec/ordinatics.hm",
       "sha256": "60ea5b986333f3b4377adca958883f256ee60f214309a067cd74fb07d0dba242",
       "bytes": 31837
     },
@@ -132,7 +132,7 @@
       "classification": "path/value design proposal",
       "maps_to": "L3_ordinatics.hm",
       "disposition": "reference_snapshot",
-      "destination": "references/seed-ai/hypermath_frame/spec/stdlib/hyperordinal.hm",
+      "destination": "references/precursor/hypermath_frame/spec/stdlib/hyperordinal.hm",
       "sha256": "f1dee004907921ad67d8766d3dbf87b2bbc775d34cb96618c3225c4122e7fc01",
       "bytes": 17587
     },
@@ -143,7 +143,7 @@
       "classification": "fractal proposal; compression unproved",
       "maps_to": "docs/research/FRACTAL_COMPLETENESS.md",
       "disposition": "reference_snapshot",
-      "destination": "references/seed-ai/hyper-grammar/docs/prerequisites/24_fractal_hypergrammar_compression.md",
+      "destination": "references/precursor/hyper-grammar/docs/prerequisites/24_fractal_hypergrammar_compression.md",
       "sha256": "86d6d1cec5050f911b32f51a77bccd5d66bfd3c72075a55a71d7030506019fed",
       "bytes": 4917
     },
@@ -159,7 +159,7 @@
         "last_line": 149,
         "numbering": "one-based inclusive"
       },
-      "destination": "references/seed-ai/hyper-grammar/36_meta_closure.math-excerpt.md",
+      "destination": "references/precursor/hyper-grammar/36_meta_closure.math-excerpt.md",
       "sha256": "45059c58a49bdecc3d2ef8dd609df6fc75bb5dde876d56119075bb91c2ac6cfb",
       "bytes": 7011
     },
@@ -170,7 +170,7 @@
       "classification": "proposal with numerical errors",
       "maps_to": "docs/research/PROOF_AUDIT.md",
       "disposition": "reference_snapshot",
-      "destination": "references/seed-ai/hyper-grammar/docs/prerequisites/45_hyper_information_theory.md",
+      "destination": "references/precursor/hyper-grammar/docs/prerequisites/45_hyper_information_theory.md",
       "sha256": "103227c9cae37cca1169ed7a42ab86201b8fe57ba23529807ec4e44ed53ddccb",
       "bytes": 7475
     },
@@ -181,7 +181,7 @@
       "classification": "historical argument with coding error",
       "maps_to": "docs/research/PROOF_AUDIT.md",
       "disposition": "reference_snapshot",
-      "destination": "references/seed-ai/hyper-grammar/docs/prerequisites/46_hypergrammar_and_godel.md",
+      "destination": "references/precursor/hyper-grammar/docs/prerequisites/46_hypergrammar_and_godel.md",
       "sha256": "6d8f59e3a9bd15e80c86c4dcfb9f9323efa7bfc2c2daea408b2f11bc40d8e09c",
       "bytes": 7117
     },
@@ -192,7 +192,7 @@
       "classification": "explicit open research target",
       "maps_to": "docs/research/FRACTAL_COMPLETENESS.md",
       "disposition": "reference_snapshot",
-      "destination": "references/seed-ai/hyper-grammar/docs/prerequisites/47_hypermath.md",
+      "destination": "references/precursor/hyper-grammar/docs/prerequisites/47_hypermath.md",
       "sha256": "b5f2075af9af00899396dda6a6c00061f5696c650fdfd72587afb8e2a80e5366",
       "bytes": 2845
     },
@@ -203,7 +203,7 @@
       "classification": "hierarchy design proposal",
       "maps_to": "L3_ordinatics.hm",
       "disposition": "reference_snapshot",
-      "destination": "references/seed-ai/hyper-grammar/docs/prerequisites/97_ordinate_hierarchy_ordinatics_ordinetics_ordinaretics.md",
+      "destination": "references/precursor/hyper-grammar/docs/prerequisites/97_ordinate_hierarchy_ordinatics_ordinetics_ordinaretics.md",
       "sha256": "68a3fbe4ba2d712bc63ab2bd379766ff209644a7d0c1ad2aa557328be9d94fa6",
       "bytes": 18591
     },
@@ -214,7 +214,7 @@
       "classification": "open operator proposal with operation mismatch",
       "maps_to": "L3_ordinatics.hm",
       "disposition": "reference_snapshot",
-      "destination": "references/seed-ai/hyper-grammar/docs/prerequisites/98_dimensional_transition_operators.md",
+      "destination": "references/precursor/hyper-grammar/docs/prerequisites/98_dimensional_transition_operators.md",
       "sha256": "55dfb8a1378fcdabf78730ef99bdb36dfdf19273f4b05973850982e51ec4702e",
       "bytes": 14317
     },
@@ -225,7 +225,7 @@
       "classification": "downstream gaps; not proof authority",
       "maps_to": "docs/research/PROOF_AUDIT.md",
       "disposition": "reference_snapshot",
-      "destination": "references/seed-ai/hyper-grammar/docs/prerequisites/99_language_calculus_downstream_closures.md",
+      "destination": "references/precursor/hyper-grammar/docs/prerequisites/99_language_calculus_downstream_closures.md",
       "sha256": "ddd6ecc26aeeb23cac9c3929955b7f46acf22cdd6c81447a98424a61c5911c26",
       "bytes": 10312
     },
@@ -235,7 +235,7 @@
       "source_bytes": 18284,
       "disposition": "mapped_without_copy",
       "classification": "byte-identical duplicate",
-      "alias_of": "references/seed-ai/hypermath/spec/axioms.hm"
+      "alias_of": "references/precursor/hypermath/spec/axioms.hm"
     },
     {
       "source": "hypermath_frame/spec/nomenclature.hm",

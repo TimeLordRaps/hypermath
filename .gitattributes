@@ -10,7 +10,7 @@
 .gitattributes text eol=lf
 
 # Reference digests bind original bytes, including historical line endings.
-references/seed-ai/** -text
+references/precursor/** -text
 
 # The trusted Lean reporters have byte-bound policy identities on every platform.
 lean4/Audit.lean text eol=lf
