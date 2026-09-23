@@ -3,7 +3,7 @@
 Base: `TimeLordRaps/hypermath` commit
 `819f6856101c91fb3f0f4d25126e2f7329137b53`. Scope: four root `.hm` layers,
 their Lean translation, directly related dictionary entries, and the selected
-Seed-ai mathematical sources. This is an assisted internal review, not an
+precursor mathematical sources. This is an assisted internal review, not an
 external peer review or a consistency/completeness certificate.
 
 ## Repairs made without changing the intended mathematical laws

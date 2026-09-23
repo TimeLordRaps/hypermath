@@ -225,7 +225,7 @@ occur in later sections; the whole specification is not merely four axioms.
 | L2: Operations | [L2_operations.hm](L2_operations.hm) | Composition and paths |
 | L3: Ordinatics | [L3_ordinatics.hm](L3_ordinatics.hm) | Ordinal extension and proposed self-derivation |
 
-The [Seed-ai source map](docs/research/SOURCE_MAP.md) connects the broader
+The [precursor source map](docs/research/SOURCE_MAP.md) connects the broader
 hypergrammar and earlier hypermath specifications to these layers. Selected
 source snapshots retain their original wording for comparison; they do not
 replace the current specifications or become checked proofs through import.
