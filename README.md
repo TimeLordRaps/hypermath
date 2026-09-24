@@ -235,7 +235,13 @@ The [term dictionary](docs/terms/Form.md) explains the project's vocabulary.
 
 The Python distribution is `hypermath-foundations`; its import name is
 `hypermath_foundations`. The unrelated package named `hypermath` on the Python
-Package Index is not this project. From a checkout, with Python 3.10 or newer:
+Package Index is not this project. From PyPI or a checkout, with Python 3.10 or newer:
+
+```console
+pip install hypermath-foundations
+```
+
+Or with verification dependencies from source:
 
 ```console
 python -m pip install '.[verification]'
@@ -245,8 +251,147 @@ python -u scripts/check_foundation.py --require-self-derivation
 This runs fresh Lean checks and a Verifier Standard (VSTD) evidence session,
 then applies the self-derivation gate. Unresolved claims remain `UNKNOWN`, and
 the gate exits with status 2. Evidence is retained under `build/verification`.
-The current package is prepared for source installation; an index release is
-a separate publication step.
+
+## Python Library Architecture and API
+
+The `hypermath_foundations` package provides an executable foundation for formal
+mathematical audits, fractal representations, non-well-founded set graphs, and
+derivational bridges.
+
+```python
+import hypermath_foundations as hmf
+```
+
+### 1. Quadrilateral Filtration
+
+`FiltrationTier` names the four nodes of the filtration diagram:
+
+- **`SYNTAX`**: The written form of a derivation term.
+- **`SUBSTANCE`**: What the term is made of, independent of its spelling.
+- **`SEMANTICS`**: What the term denotes.
+- **`ABSTRACTION`**: The schema the term instantiates.
+
+`QuadrilateralFiltration` is the engine that moves between them. It takes no
+constructor arguments; the terms are passed to its methods.
+
+```python
+from hypermath_foundations import FiltrationTier, FormTerm, QuadrilateralFiltration
+
+term = FormTerm("apply", (FormTerm.ground(),))
+assert str(term) == "apply(ground)"
+
+filtration = QuadrilateralFiltration()
+assert filtration.syntax_similarity(term, term)
+
+proof = filtration.abstraction_reflexive(term)
+assert proof.rule_name == "reflexive"
+
+assert [tier.name for tier in FiltrationTier] == [
+    "SYNTAX", "SUBSTANCE", "SEMANTICS", "ABSTRACTION",
+]
+```
+
+### 2. Accessible Pointed Graphs and Quine Atoms
+
+Constructs non-well-founded sets under Aczel's Anti-Foundation Axiom (AFA) and
+computes bisimulation equivalence on membership graphs:
+
+```python
+from hypermath_foundations import AccessiblePointedGraph, QuineAtom
+
+# A Quine atom satisfies Ω = {Ω} (a 1-cycle membership graph)
+omega = QuineAtom()
+assert omega.satisfies_self_membership()
+assert str(omega.to_form()) == "quine_atom"
+
+# 2-cycle graph x -> y -> x unwinds to the identical infinite tree
+apg = AccessiblePointedGraph(
+    nodes=frozenset({"x", "y"}),
+    edges=frozenset({("x", "y"), ("y", "x")}),
+    root="x",
+)
+assert apg.outgoing("x") == ["y"]
+```
+
+### 3. The Five Hypercalculi
+
+Five peer bridges, each an independent calculus in
+`hypermath_foundations.calculus_bridge`. None of them contains the others:
+
+```python
+from hypermath_foundations import (
+    HyperCalculus,
+    LanguageCalculus,
+    MathCalculus,
+    MetaCalculus,
+    OrdinalCalculus,
+)
+
+math = MathCalculus()
+assert math.verify_leibniz_rule(lambda x: x**2, lambda x: x + 1, 1.5)
+
+meta = MetaCalculus()
+meta.add_rewrite_rule("identity", lambda term: term)
+assert "identity" in meta.rules
+
+language = LanguageCalculus()
+language.add_production("S", ["a", "S"])
+assert len(language.productions) == 1
+
+for calculus in (HyperCalculus(), OrdinalCalculus()):
+    assert calculus.__class__.__module__.endswith("calculus_bridge")
+```
+
+### 4. Proof Trajectories and Homotopy
+
+Tracks derivation trajectories through state spaces, establishing homotopy
+equivalences between alternate proof paths:
+
+```python
+from hypermath_foundations import (
+    FormTerm,
+    ProofTrajectory,
+    TrajectoryHomotopy,
+    TrajectoryStep,
+)
+
+start = FormTerm.ground()
+end = FormTerm("apply", (start,))
+step = TrajectoryStep(step_index=0, source=start, target=end, rule="apply_rule")
+
+trajectory = ProofTrajectory(start=start, end=end, steps=(step,))
+assert trajectory.length() == 1
+
+# are_homotopic is a static predicate over two trajectories sharing a boundary.
+assert TrajectoryHomotopy.are_homotopic(trajectory, trajectory)
+
+# The 2-cell itself records which rewrite rule relates the two paths.
+homotopy = TrajectoryHomotopy(
+    source_trajectory=trajectory,
+    target_trajectory=trajectory,
+    rewrite_rule="identity",
+)
+assert homotopy.certified
+```
+
+### 5. Bounded Evidence Audits (CLI and Python)
+
+Audits formal Lean 4 declarations and exports Verifier Standard (VSTD) receipts:
+
+```python
+from hypermath_foundations import evaluate_gate, run_audit
+
+# Runs bounded audit over checkout
+report = run_audit(".", timeout=60, inventory_only=True)
+passed = evaluate_gate(report)
+```
+
+CLI entry point:
+
+```console
+hypermath-foundations audit --inventory-only
+```
+
 
 ## Lean translation
 
