@@ -1,4 +1,4 @@
-"""Capture an explicit mathematical allowlist from an existing Seed-ai folder.
+"""Capture an explicit mathematical allowlist from an existing precursor folder.
 
 Source files remain untouched. Existing differing snapshots are never overwritten.
 The manifest records original and imported byte identities, including excerpts.
@@ -12,7 +12,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-PREFIX = Path("references/seed-ai")
+PREFIX = Path("references/precursor")
 CHAPTERS = "hyper-grammar/docs/prerequisites/"
 SELECTED = {
     "hypermath/spec/axioms.hm": ("earlier specification", "L0_ground.hm"),
@@ -107,7 +107,7 @@ def main():
     manifest = {
         "schema_version": 1,
         "captured_at_utc": datetime.now(timezone.utc).isoformat(),
-        "source_root_label": "Seed-ai local working files",
+        "source_root_label": "Author local working files",
         "status": "reference material; source closure labels are not proof verification",
         "records": records,
         "excluded_categories": ["personal and clinical notes", "business and political material", "generated scaffolds", "archives", "nul device entries", "historical TIME ledger"],

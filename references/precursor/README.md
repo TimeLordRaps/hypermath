@@ -1,4 +1,4 @@
-# Seed-ai mathematical reference snapshots
+# Precursor mathematical reference snapshots
 
 These are selected, author-supplied mathematical source documents mapped into
 Hypermath on September 7, 2026. They preserve original source bytes except the

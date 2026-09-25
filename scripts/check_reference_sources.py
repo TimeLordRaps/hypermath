@@ -11,7 +11,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 def main():
-    manifest = json.loads((ROOT / "references/seed-ai/manifest.json").read_text(encoding="utf-8"))
+    manifest = json.loads((ROOT / "references/precursor/manifest.json").read_text(encoding="utf-8"))
     copied = 0
     seen = set()
     for record in manifest["records"]:
@@ -19,7 +19,7 @@ def main():
         seen.add(record["source"])
         if record["disposition"] == "reference_snapshot":
             path = (ROOT / record["destination"]).resolve(strict=True)
-            assert path.is_relative_to(ROOT / "references/seed-ai")
+            assert path.is_relative_to(ROOT / "references/precursor")
             data = path.read_bytes()
             assert len(data) == record["bytes"], path
             assert hashlib.sha256(data).hexdigest() == record["sha256"], path
