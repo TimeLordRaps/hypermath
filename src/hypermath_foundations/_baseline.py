@@ -1,6 +1,8 @@
 """Reviewed declaration identity baseline, not an assertion of consistency.
 
-Initially captured with Lean 4.14.0 at revision db141d669491ce6b51d7fe15602c0925398f3154.
+Initially captured with Lean 4.14.0 at revision 822ee2eca983a04afded5f3264d141fde16b5201,
+which was db141d669491ce6b51d7fe15602c0925398f3154 before the 2026-10-02 history
+rewrite. The rewrite changed no file under lean4/ or src/.
 The finite-trace repair removes D from the allowance: its reviewed definitions
 and constructive milestone statements are bound separately below. The remaining
 67 declarations retain their original meaning. The finite ground closure is now
