@@ -68,7 +68,12 @@ state intent and are not evidence for any claim on this page.
 
 **Form and the `.hm` files (USER-STATED, 2026-10-04).**
 
-> **USER-STATED, 2026-10-04.** "A form is a reachable closed derivation chain from the ground L0", and the purpose of `.hm` files is that "they are translatable to any language".
+> 1. "universal ~~ is what I envisioned"
+> 2. "Im not sure how we can infer derivation backwards guaranteed if we can go the single directional path of (a and b) or just c derives d"
+> 3. "A form is a reachable closed derivation chain from the ground L0 that results from a non contradictory complete derivation path that involves derivation through the natural derivation of self-derivation, the kernel, derivation of the kernel, all through L3 into a compositional possibly contradictory orderly discovery of that closed form, if you avoid contradictions and all inner derivations are also forms then you get the natural meaning of a form. This is close to derives is directional"
+> 4. "So the meaning of doing hm files is that they are translatable to any language, we were going to ship it with python that would translate it to metamath, lean4, etc so if you went above L3 like I say above for compositional derivations having these translation operation python tools is necessary."
+
+The first two are answers to the maintainer's questions of that date (items 1 and 2 are the universal `~~` and backward inference). Item 2 is consistent with `derives` being directional and is recorded as an open constraint on any "work backwards" step, not as a result.
 
 **Towers, collapse and the average fold.**
 
