@@ -121,3 +121,17 @@ and `finite_action`; the last runs the six-form model and its failure witnesses.
 `Audit.lean` prints dependencies without exporting its report as library theorems.
 In particular, `Hypermath.selfDerivation` currently depends on `sorryAx` through
 its admitted components. The file does not remove, discharge, or hide those gaps.
+
+## Standalone proof files
+
+Six further files are each checked by `audit.py` as their own process and import no
+Hypermath module: `TransfiniteForm.lean`, `RecursionRescue.lean`, `ConatTop.lean`,
+`SurrealFiltration.lean`, `LadderInduction.lean` and `RankOrder.lean`. None declares an
+axiom or `sorry`, and they leave the reviewed kernel inventory untouched. Their audited
+`#print axioms` records are fixed in `src/hypermath_foundations/_reports.py`
+(`EXTENSION_PROBES`). `RecursionRescue.lean` reproduces the model of
+`FiniteActionCountermodel.lean` by hand and is not mechanically tied to it. What each
+file proves, what it only models on a finite or toy carrier, and what stays open is in
+[transfinite form, ladder induction, and the counterexample rescue](../docs/research/LADDER_INDUCTION.md).
+The `.hm` to Lean/Metamath translator is documented in
+[the translator page](../docs/research/HM_TRANSLATOR.md); the audit does not run it.

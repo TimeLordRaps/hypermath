@@ -65,9 +65,17 @@ def _execute(args, *, legacy=False):
 
 
 def main(argv=None):
+    argv = sys.argv[1:] if argv is None else list(argv)
+    if argv[:1] == ["translate"]:
+        # Lazy import keeps the audit entry point independent of the translator.
+        from .translate.cli import main as translate_main
+
+        return translate_main(argv[1:])
     parser = argparse.ArgumentParser(description=__doc__)
     commands = parser.add_subparsers(dest="command", required=True)
     _options(commands.add_parser("audit", help="run a fresh bounded evidence audit"))
+    commands.add_parser("translate", help="translate .hm files to Lean 4 / Metamath "
+                                          "(run `translate --help` for its options)")
     return _execute(parser.parse_args(argv))
 
 

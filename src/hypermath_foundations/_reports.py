@@ -590,6 +590,56 @@ LAYERED_DERIVATION_DEPENDENCIES.update({'HypermathTransportCountermodel.simulati
  'HypermathTransportCountermodel.cycleWitness': []})
 LAYERED_DERIVATION_TARGETS = tuple(LAYERED_DERIVATION_DEPENDENCIES)
 
+# Standalone Lean files added after the reviewed baseline. Each has no `axiom` declaration; the
+# dependencies below are exactly what Lean 4.14.0 reports for every `#print axioms` line of the
+# file. They are bound here, not in `_baseline.py`, so the reviewed 18-axiom inventory and its
+# source digests are untouched. A maintainer should review this extension before release.
+_PROP = ["propext"]
+_QS = ["Quot.sound", "propext"]
+_CH = ["Classical.choice", "Quot.sound", "propext"]
+EXTENSION_PROBES = {
+    "transfinite_form": ("TransfiniteForm.lean", {
+        "HypermathTransfinite.path_length_arithmetic": [],
+        "HypermathTransfinite.finite_reachability_contradicts_limit": [],
+        "HypermathTransfinite.minimality": []}),
+    "conat_top": ("ConatTop.lean", {
+        "HypermathTop.extrapolated_top_unique": _QS,
+        "HypermathTop.succ_top": _QS,
+        "HypermathTop.watch_top_iff": _QS,
+        "HypermathTop.finite_or_top": _CH}),
+    "surreal_filtration": ("SurrealFiltration.lean", {
+        "HypermathSurreal.tower_injective_at_simulation": _QS,
+        "HypermathSurreal.similar_invariants_cannot_count": _QS,
+        "HypermathSurreal.identity_at_similar_not_at_simulation": _QS,
+        "HypermathSurreal.ax_diff": _QS}),
+    "ladder_induction": ("LadderInduction.lean", {
+        "HypermathLadder.ladder_induction": [],
+        "HypermathLadder.no_infinite_descent": [],
+        "HypermathLadder.descent_terminates": []}),
+    "rank_order": ("RankOrder.lean", {
+        "HypermathRank.lt_trichotomy": [],
+        "HypermathRank.lt_trans": [],
+        "HypermathRank.omegaPow_strictMono": _QS,
+        "HypermathRank.band_lower": _QS,
+        "HypermathRank.omega_cofinal": _PROP}),
+    "recursion_rescue": ("RecursionRescue.lean", {
+        "HypermathRecursionRescue.full_axioms_hold": _QS,
+        "HypermathRecursionRescue.rec_zero_identity": [],
+        "HypermathRecursionRescue.rec_succ_applies": [],
+        "HypermathRecursionRescue.rec_path_length_arithmetic": _QS,
+        "HypermathRecursionRescue.clauses_and_computation_laws_consistent": _QS}),
+}
+EXTENSION_SOURCE_SHA256 = {
+    "lean4/TransfiniteForm.lean": "2fccbf88a9c1c00a75e3cf897f85eb86758f1d7a17509e84a896e3590915b18c",
+    "lean4/ConatTop.lean": "acea425262f6be647647646841cf529f8388328b9cf3a8bb2f406f778f55c5a1",
+    "lean4/SurrealFiltration.lean": "6a6d985ec0da8f5e531b0bf57a46d67038eaba027e187453f4350327da353851",
+    "lean4/LadderInduction.lean": "e28337835d7d065b99680bf05b38368a4f41fb3a351c0df7b338950b2f91154d",
+    "lean4/RankOrder.lean": "7aae9ea47682b94cf9309f3fbd0df2e9e15debd16d8d31e916c60428a59023ea",
+    "lean4/RecursionRescue.lean": "30f961b191ba1eb27a110455d1348cc83a68cfdf3d28b4c40fd0acbeb7fe1dbe",
+}
+EXTENSION_DEPENDENCIES = {name: deps for name, (_, deps) in EXTENSION_PROBES.items()}
+EXTENSION_FILES = {name: file for name, (file, _) in EXTENSION_PROBES.items()}
+
 PROBE_TARGETS = {"countermodel": COUNTERMODEL_TARGETS, "finite_trace": TRACE_CHECK_TARGETS,
                  "observation": OBSERVATION_TARGETS, "full_model": FULL_MODEL_TARGETS,
                  "finite_action": ACTION_COUNTERMODEL_TARGETS,
@@ -597,7 +647,8 @@ PROBE_TARGETS = {"countermodel": COUNTERMODEL_TARGETS, "finite_trace": TRACE_CHE
                  "ground_derivation": GROUND_DERIVATION_TARGETS,
                  "record_encoding": RECORD_ENCODING_TARGETS,
                  "record_machine": RECORD_MACHINE_TARGETS,
-                 "layered_derivation": LAYERED_DERIVATION_TARGETS}
+                 "layered_derivation": LAYERED_DERIVATION_TARGETS,
+                 **{name: tuple(deps) for name, deps in EXTENSION_DEPENDENCIES.items()}}
 
 
 def probe_dependencies_valid(name: str, records: dict[str, list[str]]) -> bool:
@@ -617,6 +668,8 @@ def probe_dependencies_valid(name: str, records: dict[str, list[str]]) -> bool:
         return records == RECORD_MACHINE_DEPENDENCIES
     if name == "layered_derivation":
         return records == LAYERED_DERIVATION_DEPENDENCIES
+    if name in EXTENSION_DEPENDENCIES:
+        return records == EXTENSION_DEPENDENCIES[name]
     allowed = LEAN_BUILTINS if name == "countermodel" else frozenset()
     return all(dep in allowed for deps in records.values() for dep in deps)
 
@@ -779,4 +832,7 @@ def policy_errors(output: str, inputs: dict, assumptions: list[dict]) -> list[st
         reasons.append("layered derivation checks differ from the reviewed probes")
     if inputs.get("lean4/SurfaceBridge.lean") != SURFACE_BRIDGE_SOURCE_SHA256:
         reasons.append("surface transport differs from the reviewed executable bridge")
+    for path, expected in EXTENSION_SOURCE_SHA256.items():
+        if inputs.get(path) != expected:
+            reasons.append(f"{path} differs from its recorded standalone-proof source")
     return reasons

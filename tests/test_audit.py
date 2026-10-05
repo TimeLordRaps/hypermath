@@ -26,6 +26,9 @@ from hypermath_foundations._reports import (
     ACTION_COUNTERMODEL_DEPENDENCIES,
     COUNTERMODEL_TARGETS,
     DEPENDENCY_TARGETS,
+    EXTENSION_DEPENDENCIES,
+    EXTENSION_FILES,
+    EXTENSION_SOURCE_SHA256,
     FULL_MODEL_DEPENDENCIES,
     GROUND_DERIVATION_DEPENDENCIES,
     GROUND_SYNTAX_DEPENDENCIES,
@@ -138,6 +141,8 @@ def checkout(tmp_path, monkeypatch):
             project / "lean4/Hypermath/FiniteAction.lean").read_text(encoding="utf-8"),
         "lean4/FiniteActionCountermodel.lean": (
             project / "lean4/FiniteActionCountermodel.lean").read_text(encoding="utf-8"),
+        **{f"lean4/{file}": (project / "lean4" / file).read_text(encoding="utf-8")
+           for file in EXTENSION_FILES.values()},
         "lean4/Hypermath/L0Ground.lean": "-- fixture",
         "lean4/Hypermath/L1Relations.lean": "-- fixture",
         "lean4/Hypermath/L2Operations.lean": "-- fixture",
@@ -177,6 +182,13 @@ def checkout(tmp_path, monkeypatch):
                 if dependencies else f"'{name}' does not depend on any axioms"
                 for name, dependencies in expected.items()
             )
+        for name, file in EXTENSION_FILES.items():
+            if command[-1] == file:
+                return 0, "\n".join(
+                    f"'{target}' depends on axioms: [{', '.join(dependencies)}]"
+                    if dependencies else f"'{target}' does not depend on any axioms"
+                    for target, dependencies in EXTENSION_DEPENDENCIES[name].items()
+                )
         for filename, expected in (("ObservationChecks.lean", OBSERVATION_DEPENDENCIES),
                                    ("FullAxiomModel.lean", FULL_MODEL_DEPENDENCIES)):
             if command[-1] == filename:
@@ -878,4 +890,50 @@ def test_finite_action_model_requires_exact_dependency_surface(checkout, monkeyp
     report = run_audit(root)
     assert report["checks"]["finite_action"]["status"] == "FAIL"
     assert not report["execution"]["completed"]
+    assert not evaluate_gate(report)
+
+
+def test_standalone_proof_files_are_registered_and_have_no_axiom_declarations():
+    lean_root = Path(__file__).resolve().parents[1] / "lean4"
+    assert set(EXTENSION_FILES) == set(EXTENSION_DEPENDENCIES)
+    for file in EXTENSION_FILES.values():
+        text = (lean_root / file).read_text(encoding="utf-8")
+        code = lean_code(text)
+        assert not re.search(r"(?m)^\s*(axiom|opaque|sorry|admit)\b|\bsorry\b", code), file
+    assert {f"lean4/{file}" for file in EXTENSION_FILES.values()} == set(EXTENSION_SOURCE_SHA256)
+
+
+@pytest.mark.parametrize("name", sorted(EXTENSION_FILES))
+@pytest.mark.parametrize("alteration", ["missing_target", "extra_choice", "admission", "failure",
+                                        "edited_source"])
+def test_standalone_proof_checks_require_exact_dependencies(checkout, monkeypatch, name,
+                                                            alteration):
+    root, _, run = checkout
+    file = EXTENSION_FILES[name]
+    if alteration == "edited_source":
+        path = root / "lean4" / file
+        path.write_text(path.read_text(encoding="utf-8") + "\n-- edit\n", encoding="utf-8")
+
+    def altered(command, *args):
+        code, output = run(command, *args)
+        if command[-1] == file:
+            if alteration == "missing_target":
+                output = "\n".join(output.splitlines()[1:])
+            elif alteration == "extra_choice":
+                output = re.sub(r"does not depend on any axioms|depends on axioms: \[[^\]]*\]",
+                                "depends on axioms: [Classical.choice, sorryAx]", output, count=1)
+            elif alteration == "admission":
+                output = re.sub(r"does not depend on any axioms|depends on axioms: \[[^\]]*\]",
+                                "depends on axioms: [sorryAx]", output, count=1)
+            elif alteration == "failure":
+                code = 1
+        return code, output
+
+    monkeypatch.setattr(audit_module, "_run_process", altered)
+    report = run_audit(root)
+    if alteration == "edited_source":
+        assert report["checks"]["assumption_policy"]["status"] == "FAIL"
+    else:
+        assert report["checks"][name]["status"] == "FAIL"
+        assert not report["execution"]["completed"]
     assert not evaluate_gate(report)

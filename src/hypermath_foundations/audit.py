@@ -22,6 +22,7 @@ from pathlib import Path
 from ._inventory import inventory
 from ._reports import (
     DEPENDENCY_TARGETS,
+    EXTENSION_FILES,
     FORMAT,
     PROBE_TARGETS,
     REPOSITORY,
@@ -219,6 +220,8 @@ def run_audit(root, timeout=60, *, inventory_only=False, lake=None) -> dict:
                 "record_encoding": [executable, "env", "lean", "RecordEncodingChecks.lean"],
                 "record_machine": [executable, "env", "lean", "RecordMachineChecks.lean"],
                 "layered_derivation": [executable, "env", "lean", "LayeredDerivationChecks.lean"],
+                **{name: [executable, "env", "lean", file]
+                   for name, file in EXTENSION_FILES.items()},
             }
             for name, command in commands.items():
                 check = report["checks"][name]

@@ -15,6 +15,7 @@ import pytest
 import verifier
 
 import hypermath_foundations
+from hypermath_foundations._reports import EXTENSION_FILES
 from hypermath_foundations.vstd import (
     _AuditMechanism,
     _portable,
@@ -46,7 +47,7 @@ def report():
                    for name in ("lean_build", "dependency_output", "countermodel", "finite_trace",
                                 "observation", "full_model", "finite_action", "ground_syntax",
                                 "ground_derivation", "record_encoding", "record_machine",
-                                "layered_derivation",
+                                "layered_derivation", *EXTENSION_FILES,
                                 "proof_admissibility")},
         "target": {"name": "Hypermath.selfDerivation", "kind": "theorem", "dependencies": ["sorryAx"]},
         "admissions": {"source": [{"path": "L0_ground.hm", "line": 1, "token": "sorry"}],
@@ -440,8 +441,8 @@ def test_matching_unresolved_replay_remains_writable(report, monkeypatch, tmp_pa
 @pytest.mark.parametrize("side", ["supplied", "replayed"])
 @pytest.mark.parametrize("failure", ["countermodel", "finite_trace", "observation", "full_model",
                                      "finite_action", "ground_syntax", "ground_derivation",
-                                     "record_encoding", "record_machine", "layered_derivation", "inventory",
-                                     "inconsistent_completion"])
+                                     "record_encoding", "record_machine", "layered_derivation", *EXTENSION_FILES,
+                                     "inventory", "inconsistent_completion"])
 def test_incomplete_lean_audit_never_matches_replay(report, monkeypatch, tmp_path, side, failure):
     replay = copy.deepcopy(report)
     candidate = report if side == "supplied" else replay
@@ -451,7 +452,7 @@ def test_incomplete_lean_audit_never_matches_replay(report, monkeypatch, tmp_pat
         name = failure if failure in {
             "finite_trace", "observation", "full_model", "finite_action", "ground_syntax",
             "ground_derivation", "record_encoding", "record_machine",
-            "layered_derivation",
+            "layered_derivation", *EXTENSION_FILES,
         } else "countermodel"
         candidate["checks"][name].update(status="FAIL", attempted=True, exit_code=1)
         candidate["execution"]["completed"] = failure == "inconsistent_completion"
