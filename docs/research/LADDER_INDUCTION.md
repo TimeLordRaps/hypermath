@@ -203,8 +203,12 @@ tower is a single point at `~~` (`similar_invariants_cannot_count`) and injectiv
 
 This realizes the maintainer's decision recorded above that the natural numbers are
 definable only at `==`, in this toy. Not shown: every `FullAxioms` clause in this model;
-rational or real coefficients; the fold at limit stages. The numerical fold check that
-accompanied the model was not migrated.
+rational or real coefficients; the fold at limit stages. The exact numerical fold check that
+accompanied the model is `tests/test_surreal_fold.py` (iterated midpoints reproduce Conway's
+birthdays; a fold at one third fails the same oracle). The exhaustive search that found the
+rescue table is `tests/test_rescue_search.py`; it parses the model from
+`lean4/FiniteActionCountermodel.lean` and the table from `lean4/RecursionRescue.lean`, so it
+evaluates the definitions the kernel accepted by a different mechanism.
 
 ## 5. Ladder induction and rank order below ω^ω
 
@@ -242,7 +246,8 @@ HYPER, from memory and unchecked here: the Hardy and fundamental-sequence descen
 ω^ω (ω^ω[n] = ω^n and so on down to the naturals) terminate by exactly this induction while
 their length grows without bound, and termination of the analogous descent for towers of
 towers is not provable in Peano arithmetic. The Python computations behind those
-numbers were not migrated.
+numbers are computed in the ordinatics repository (branch `claude/ladder-and-value-map`,
+`hardy` and `hardy_descent`), not here.
 
 ## What is proved, what is only a finite model, what is open
 
