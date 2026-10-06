@@ -124,9 +124,9 @@ its admitted components. The file does not remove, discharge, or hide those gaps
 
 ## Standalone proof files
 
-Six further files are each checked by `audit.py` as their own process and import no
+Seven further files are each checked by `audit.py` as their own process and import no
 Hypermath module: `TransfiniteForm.lean`, `RecursionRescue.lean`, `ConatTop.lean`,
-`SurrealFiltration.lean`, `LadderInduction.lean` and `RankOrder.lean`. None declares an
+`SurrealFiltration.lean`, `LadderInduction.lean`, `RankOrder.lean` and `ChainValidity.lean`. None declares an
 axiom or `sorry`, and they leave the reviewed kernel inventory untouched. Their audited
 `#print axioms` records are fixed in `src/hypermath_foundations/_reports.py`
 (`EXTENSION_PROBES`). `RecursionRescue.lean` reproduces the model of

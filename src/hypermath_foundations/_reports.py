@@ -622,6 +622,12 @@ EXTENSION_PROBES = {
         "HypermathRank.omegaPow_strictMono": _QS,
         "HypermathRank.band_lower": _QS,
         "HypermathRank.omega_cofinal": _PROP}),
+    "chain_validity": ("ChainValidity.lean", {
+        "HypermathChain.viol_eq_zero_iff": _QS,
+        "HypermathChain.valid_eq_forced": _QS,
+        "HypermathChain.valid_unique": _QS,
+        "HypermathChain.viol_pos_of_broken": _QS,
+        "HypermathChain.closed_periodic": _QS}),
     "recursion_rescue": ("RecursionRescue.lean", {
         "HypermathRecursionRescue.full_axioms_hold": _QS,
         "HypermathRecursionRescue.rec_zero_identity": [],
@@ -636,6 +642,7 @@ EXTENSION_SOURCE_SHA256 = {
     "lean4/LadderInduction.lean": "e28337835d7d065b99680bf05b38368a4f41fb3a351c0df7b338950b2f91154d",
     "lean4/RankOrder.lean": "7aae9ea47682b94cf9309f3fbd0df2e9e15debd16d8d31e916c60428a59023ea",
     "lean4/RecursionRescue.lean": "30f961b191ba1eb27a110455d1348cc83a68cfdf3d28b4c40fd0acbeb7fe1dbe",
+    "lean4/ChainValidity.lean": "efe0f88cedb745568561b298fa73a52ebb8de258113d9a8677f8d1fa47fead92",
 }
 EXTENSION_DEPENDENCIES = {name: deps for name, (_, deps) in EXTENSION_PROBES.items()}
 EXTENSION_FILES = {name: file for name, (file, _) in EXTENSION_PROBES.items()}

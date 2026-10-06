@@ -281,3 +281,7 @@ depend on a different axiom set, or on `sorryAx`, fails the audit. A clause of `
 that fails in a model with the recorded `ordinalApplyRec` table would be a counterexample to
 the finite result only if it changed the model of `FiniteActionCountermodel.lean`, which the
 audit pins; the finite result is therefore exact for that model and silent about any other.
+
+## Chain validity (added 2026-10-06)
+
+`lean4/ChainValidity.lean` proves the discrete core of the reading "a form is a reachable closed derivation chain, with `derives` directional": for a rule `step : Nat → α → α`, the violation count of a chain `psi` up to `n` is zero exactly when every step below `n` is the rule applied to its predecessor (`viol_eq_zero_iff`); two chains valid up to `n` with the same start agree (`valid_unique`, `valid_eq_forced`: derivation is forced by the start); a corrupted interior state is detected (`viol_pos_of_broken`); and a closed circuit under a periodic rule repeats (`closed_periodic`). Axioms: `propext`, `Quot.sound` only, audited as an extension probe. It says nothing about unitary operators or energies: the finite model in hyperphysics (`hyperphysics.chain`, `docs/research/TIME_BUBBLE_SHEET.md`) has the energy as the total squared violation of the steps, checked numerically, and this file is its discrete shadow. It does not show that every form is such a chain.
