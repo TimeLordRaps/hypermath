@@ -1,0 +1,21 @@
+name = "Hypermath"
+version = "0.1.0"
+description = "A proposed self-derivational universe built around the operation □."
+
+defaultTargets = ["Hypermath"]
+
+[[lean_lib]]
+name = "Hypermath"
+
+# The transfinite declarations live in the ordinatics repository, which owns the
+# ordinal structure for this family. Hypermath instantiates them; it does not
+# restate them. See Hypermath/L3Ordinatics.lean.
+#
+# Sibling checkout by default. To build against the published repository
+# instead, replace the two lines below with:
+#   git = "https://github.com/TimeLordRaps/ordinatics"
+#   rev = "<commit>"
+#   subDir = "lean4"
+[[require]]
+name = "Ordinatics"
+path = "../../ordinatics/lean4"

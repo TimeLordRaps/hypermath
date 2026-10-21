@@ -1,0 +1,15 @@
+# Certified 38-clause WIP snapshot
+
+This directory preserves the files added by the certified-intellidynamics work
+based on the earlier 38-clause Hypermath layer stack. The active repository has
+since advanced to the constructive 44-clause stack. Merging these files into
+the active Lean library without reconciling their clause inventory made both
+audit surfaces internally inconsistent.
+
+The files remain byte-preserved here as work in progress. They are not part of
+the active Lean build, active clause census, or release claims. Their original
+paths are represented by the directory structure below this note. The exact
+pre-consolidation Git state is also retained in the private recovery archive.
+
+Promotion back into the active library requires an explicit 44-clause port,
+updated dependency sweeps, and passing audit and Lean gates.

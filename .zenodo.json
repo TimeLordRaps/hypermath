@@ -1,0 +1,20 @@
+{
+  "creators": [
+    {
+      "name": "Roost, Tyler"
+    }
+  ],
+  "description": "Bounded evidence audits and formal verification framework for the Hypermath formalization, finite layer graphs, proof obligations, and self-derivation gating.",
+  "keywords": [
+    "formal-verification",
+    "lean4",
+    "proof-audit",
+    "hypermath",
+    "foundations",
+    "verifier-standard"
+  ],
+  "license": "Apache-2.0",
+  "title": "Hypermath: Formal Foundations and Bounded Evidence Audits",
+  "version": "0.1.0",
+  "upload_type": "software"
+}

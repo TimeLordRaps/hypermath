@@ -1,0 +1,25 @@
+# Hypermath L0--L3 proof-debt dispositions
+
+This ledger records the eleven executable proof holes present at the inspected
+`dc89cbb4` baseline.  A declaration that is now a `Prop` is a retained claim,
+not a proof.  A replacement theorem is listed separately so that removing an
+admission cannot be mistaken for establishing the original meaning.
+
+| ID | Baseline declaration | Disposition | Current checked result or exact boundary |
+|---|---|---|---|
+| HM-L0-01 | `derivesIsDirectional_FRAME` | `NON_ENTAILED_BY_STATED_ASSUMPTIONS` | Retained as a `Prop`. `Countermodels.directionality_claim_fails` supplies a Bool model of all 24 L0/L1-prefix clauses in which `Derives` is symmetric. |
+| HM-L0-02 | `definitionOfGround` | `PROVED` | Staged to L1 and proved as `definitionOfGround` from `closeDefinitionOpaque`, `closeDerivesOpaque`, and `axGroundSubstanceAx`. |
+| HM-L1-01 | `similarReflexive` | `UNKNOWN` | Native `Similar` is opaque and has no global continuation-overlap close. `overlapSimilarReflexive` proves the source-faithful overlap statement under an explicit nonempty-continuation premise. |
+| HM-L1-02 | `similarSymmetric` | `UNKNOWN` | Native adequacy remains unproved. `overlapSimilarSymmetric` proves symmetry for the constructed continuation-overlap relation. |
+| HM-L1-03 | `simulationPairExists_L1` | `PROVED` | The literal statement permits equal endpoints; `(ground, ground)` is a checked witness. This does not establish the stronger distinct-pair claim, refuted by `FullAxiomModel.nontrivial_simulation_claim_fails`. |
+| HM-L1-04 | `nc4_L1` | `PROVED` | Witnesses `f2f ground, ground`; distinctness follows by contradiction from `axDiffInRelationLanguage` and ground self-simulation. |
+| HM-L1-05 | `derivesIsDirectional` | `NON_ENTAILED_BY_STATED_ASSUMPTIONS` | Alias of the retained L0 claim; the same checked prefix countermodel applies. |
+| HM-L2-01 | `plusAndAdditionallyAreDistinct` | `NON_ENTAILED_BY_STATED_ASSUMPTIONS` | Retained as a `Prop`. The Bool prefix model also satisfies the local sequential/cooperative witness clauses while `plus_and_additionally_claim_fails`; `witnessPatternsOfIncongruent` is the proved conditional correction. Neither statement constructs two binary operations. |
+| HM-L2-02 | `orbitReflexionQuotient` | `UNKNOWN` | Retained as a native-adequacy claim. `SameDColumn` is constructed and proved reflexive, symmetric, and transitive; no clause maps D-column equality to opaque native `Similar`. |
+| HM-L2-03 | `compositionLengthAdditive_FRAME` | `UNKNOWN` | Retained as the exact old `Prop`; opaque `compose`/`pathLength` have no computation law. `finiteTraceLengthCompose` proves exact addition for constructed finite D-entry traces. |
+| HM-L3-01 | `congruentPathInternals` | `UNKNOWN` | Retained as native adequacy. `CongruentPathByInternals`, defined by equality of an explicit four-field observation, is proved reflexive, symmetric, and transitive. |
+
+The target closure must continue to report the four `UNKNOWN` adequacy items.
+They require a source/representation decision or an additional proved bridge;
+none is discharged by an annotation check, an axiom, or the corrected theorem
+beside it.

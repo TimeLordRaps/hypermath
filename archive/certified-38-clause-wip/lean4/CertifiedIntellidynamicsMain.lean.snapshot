@@ -1,0 +1,70 @@
+import Hypermath.CertifiedIntellidynamics
+
+open Hypermath.CertifiedIntellidynamics
+
+def configOf : String → Option Config
+  | "v1" => some v1
+  | "v2" => some v2
+  | "bad" => some badConfig
+  | _ => none
+
+def render : Decision → String
+  | .accepted => "ACCEPTED"
+  | .rejected => "REJECTED"
+  | .unknown => "UNKNOWN"
+
+def contractOf : String → Option Contract
+  | "trusted" => some trustedContract
+  | "other" => some ⟨2, 2, 2, 2, 2⟩
+  | _ => none
+
+def boolOf : String → Option Bool
+  | "true" => some true
+  | "false" => some false
+  | _ => none
+
+def main (args : List String) : IO UInt32 := do
+  match args with
+  | [sourceName, targetName, budgetText, mode] =>
+      match configOf sourceName, configOf targetName, budgetText.toNat? with
+      | some source, some target, some budget =>
+          let wire := if mode == "malformed" then Wire.malformed
+            else Wire.record (exactCertificate source target)
+          IO.println (render (checkCertificate source target budget wire))
+          pure 0
+      | _, _, _ =>
+          IO.println "REJECTED"
+          pure 2
+  | [sourceName, targetName, budgetText, mode,
+      certificateSourceName, certificateTargetName, certificateDigestName,
+      checkedContractName, authorizedText, coverageText, allCasesSafeText,
+      candidateContractName, currentContractName] =>
+      match configOf sourceName, configOf targetName, budgetText.toNat?,
+          configOf certificateSourceName, configOf certificateTargetName,
+          configOf certificateDigestName, contractOf checkedContractName,
+          boolOf authorizedText, coverageText.toNat?, boolOf allCasesSafeText,
+          contractOf candidateContractName, contractOf currentContractName with
+      | some sourceBase, some targetBase, some budget,
+          some certificateSource, some certificateTarget, some certificateDigest,
+          some checkedContract, some authorized, some coverage, some allCasesSafe,
+          some candidateContract, some currentContract =>
+          let source := { sourceBase with contract := currentContract }
+          let target := { targetBase with contract := candidateContract }
+          let certificate : Certificate := {
+            source := certificateSource
+            target := certificateTarget
+            targetDigest := certificateDigest
+            checkedUnder := checkedContract
+            authorized := authorized
+            coverage := coverage
+            allCasesSafe := allCasesSafe
+          }
+          let wire := if mode == "malformed" then Wire.malformed else Wire.record certificate
+          IO.println (render (checkCertificate source target budget wire))
+          pure 0
+      | _, _, _, _, _, _, _, _, _, _, _, _ =>
+          IO.println "REJECTED"
+          pure 2
+  | _ =>
+      IO.println "REJECTED"
+      pure 2

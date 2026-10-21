@@ -1,0 +1,77 @@
+-- relations.hm
+-- The relations layer of the hypermath_form system.
+-- This file derives the three relations from the ground layer.
+-- File boundary == layer boundary. No section headers inside.
+-- Status: FORM at ~~ (orbit structure present; == closure needs ordinatics layer)
+
+import "ground.hm"
+    -- provides: □, Form, apply, ax-diff, ax-sim, ax-box, ground-fixed-point
+
+-- Terms introduced in this file:
+-- ~~              -- similar-to in form: non-empty overlap in continuation capacity.
+-- =~              -- congruent-to in form: full coincidence of continuation capacity.
+-- ==              -- simulation: mutual reproduction of paths additionally futures.
+-- filtration      -- the axiom deriving that == implies =~ implies ~~.
+-- □-orbit         -- the generating structure: □ □ ~~ □ =~ □ == □ □ □
+
+relation similar :: Form -> Form -> Prop
+    -- ~~ : non-empty overlap in continuation capacity.
+    -- The founding relation. Every other relation earns ~~ first.
+    -- Symmetric. Reflexive. Not transitive in general.
+
+relation congruent :: Form -> Form -> Prop
+    -- =~ : full coincidence of continuation capacity.
+    -- All futures identical. Stronger than ~~.
+    -- Implies ~~. Not necessarily ==.
+
+relation simulation :: Form -> Form -> Prop
+    -- == : mutual simulation.
+    -- x simulates y and y simulates x.
+    -- x can reproduce every behavior of y; y every behavior of x.
+    -- Indistinguishable by any continuation.
+    -- Requires the paths through futures to also be mutually reproducible,
+    -- not just the futures themselves.
+    -- Earned by closure, never presupposed.
+    -- Implies =~ implies ~~.
+
+-- The □-orbit: relations are stopping points, not nested sets.
+-- □ is the connective. □ generates each relation. □ does not contain.
+--
+--   □  □  ~~  □  =~  □  ==  □  □  □
+--
+-- □ before ~~   : the generating act arrives at the founding relation.
+-- □ between ~~ and =~ : generates congruence from similarity.
+-- □ between =~ and == : generates simulation from congruence.
+-- □ □ □ at end  : ax-box closes the orbit. Two applications return to ~~-class.
+--                 The third is the ground itself.
+--
+-- □ is the hyperclosure. Hyperclosure is □.
+-- Both directions. Neither prior.
+
+axiom filtration:
+    -- == (simulation) implies =~ (congruent) implies ~~ (similar).
+    -- Derived from the orbit, not presupposed by containment.
+    simulation(x, y) -> congruent(x, y)
+    congruent(x, y)  -> similar(x, y)
+
+derive similar-reflexive as FORM:
+    step 1: ax-box with x := y: similar(apply(apply(y)), y)
+    step 2: y shares all continuation capacity with itself by definition.
+    close: relation(~~)
+
+derive similar-symmetric as FORM:
+    step 1: similar(x, y) means non-empty overlap in continuation sets.
+    step 2: overlap is symmetric by definition of intersection.
+    close: relation(~~)
+
+derive orbit-closes as FORM:
+    -- Two □-applications on any relation return to the ~~-class.
+    -- This is ax-box stated at the relation level.
+    step 1: ax-box: apply(apply(x)) ~~ x for all x in Form.
+    step 2: interpret x as a form encoding a relation R.
+            Then apply(apply(R)) ~~ R.
+    step 3: the orbit □ □ ~~ □ =~ □ == □ □ □ closes at ~~ in three steps.
+    close: relation(~~)
+    -- FRAME at ==: requires Form-indexed relation representation in ordinatics layer.
+    -- Closure criterion: ordinatics.hm derives relation-forms,
+    -- then ax-box applies directly.

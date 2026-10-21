@@ -1,0 +1,119 @@
+-- operations.hm
+-- The operations layer of the hypermath_form system.
+-- Derives: +, additionally, quant family.
+-- Imports: relations.hm (which imports ground.hm)
+-- Status: FORM at == for additionally-is-commutative and definitive-expansion.
+
+import "relations.hm"
+    -- provides: □, Form, apply, ax-diff, ax-sim, ax-box,
+    --           ~~, =~, ==, filtration, similar-reflexive, similar-symmetric
+
+-- Terms introduced in this file:
+-- +                   -- definitive expansion: the end of a connects to the beginning of b.
+--                        Non-commutative. Inter-layer. Ordered. Sempiternal: stays in form.
+-- additionally        -- keyword for co-presence within a layer.
+--                        Commutative. Intra-layer. Both sides close at the same moment.
+-- quant               -- finite ordinal unit in the act of being ranged over. Not yet measured.
+--                        Replaces n as a ranging variable: for quant in domain.
+-- quanta              -- one quant measured. A specific finite ordinal value resolved to ==.
+-- quantity            -- accumulated measurement: the result of sum(quanta).
+-- quantify            -- the act of measurement: the derive step resolving quant to quanta.
+-- quantified          -- a form whose quant variables are all resolved to quanta.
+-- quantification      -- the object of measurement: the derive block performing quantify.
+-- quantum             -- a form carrying unresolved quant variables. FRAME-status by nature.
+-- quantitative        -- the nature of a form being measurable: carrying quant variables.
+-- m                   -- the finite ordinal unit. The unit form ranges over in for(m).
+--                        Quant is m in the act of ranging. Quanta is m having been resolved.
+-- subset              -- the relation: every member of a is also a member of b.
+--                        Derived. Not presupposed. Written: subset(a, b).
+-- contset             -- contained-set additionally continued-set.
+--                        cont has two simultaneous meanings encoded in one word:
+--                        (1) contained: a is inside b (subset from b's perspective).
+--                        (2) continued: the structure of b continues beyond a.
+--                        contset(a, b) == subset(a, b) additionally (b contains forms not in a).
+--                        This is proper containment. additionally holds both meanings at once.
+
+derive definitive-expansion as FORM:
+    -- a + b: the end of a connects to the beginning of b.
+    -- Definitively: having come into form, the expanded result stays in form.
+    step 1: form a has an end position: the last element in its ordinal walk.
+    step 2: form b has a beginning position: the first element in its ordinal walk.
+    step 3: a + b joins a's end to b's beginning, producing one expanded form
+            containing all of a followed by all of b.
+    step 4: the result is definitive -- it does not retract.
+    step 5: non-commutativity: a's end joining b's beginning is a different act
+            from b's end joining a's beginning.
+            quanta_1 + ordinal_limit == ordinal_limit
+              -- one finite step before the limit disappears into it
+            ordinal_limit + quanta_1 != ordinal_limit
+              -- one finite step after the limit extends it
+    close: relation(==)
+
+derive additionally-is-commutative as FORM:
+    -- additionally(a, b): a and b are co-present in the same formal layer.
+    -- Not ordered. Not expanded from each other's end.
+    step 1: additionally(a, b) asserts a is co-present with b at the same layer.
+    step 2: co-presence is symmetric: if a is co-present with b, then b with a.
+    step 3: additionally(a, b) == additionally(b, a).
+    close: relation(==)
+
+derive additionally-vs-expansion as FORM:
+    -- Formal separation of + and additionally.
+    step 1: a + b requires a has an end and b has a beginning joined in order.
+            Closure of a + b requires closure of a then closure of b in sequence.
+    step 2: additionally(a, b) requires a and b close at the same layer simultaneously.
+            Neither is the end of the other. No order between them.
+    step 3: + is how layers relate to layers (expansion, order-dependent).
+            additionally is how forms relate within a layer (co-presence, order-free).
+    step 4: a file boundary in hypermath_form IS a + boundary.
+            additionally operates strictly within one file.
+    close: relation(==)
+
+derive quant-family as FORM:
+    -- The quant family formalizes finite ordinal units from the for(m) etymology.
+    -- form == for(m): the ranging-over of finite units (see ground.hm).
+    -- The finite unit m is what form ranges over.
+    -- quant is m in the act of ranging. quanta is m having been resolved.
+    step 1: quant is a finite ordinal unit in the act of being ranged over.
+            for quant in domain: [body] -- quant is the ranging variable here.
+            quant is not yet measured to a specific value.
+    step 2: quanta is one quant measured: a specific finite ordinal value.
+            quanta is produced when quant resolves to == at a specific position.
+            quanta_1, quanta_2, quanta_3 ... are specific measured instances.
+    step 3: quantity is sum(quanta) -- accumulated measurement over resolved instances.
+    step 4: quantify is the derive step that resolves quant to quanta.
+    step 5: quantified is a form whose every quant variable is resolved to quanta.
+    step 6: quantification is the derive block performing quantify.
+    step 7: quantum is a form carrying unresolved quant variables.
+            FRAME-status by nature: carries potential measurement, not resolution.
+    step 8: quantitative is the property of carrying quant variables at all --
+            the nature of a form being measurable.
+    close: relation(==)
+    -- == closure: each term in the family is fully specified by its derive step.
+    -- No classical arithmetic presupposed. Quant family derives from for(m) ground.
+
+derive subset-definition as FORM:
+    -- subset(a, b): every member of a is also a member of b.
+    -- Derived here. Not presupposed. Written in English, not Unicode.
+    step 1: form a is a collection of forms (a Form whose parts can be enumerated).
+    step 2: form b is a collection of forms.
+    step 3: subset(a, b) holds iff for-all x: (x in a) -> (x in b).
+    step 4: the word "subset" is self-describing: sub (below, inside) + set (collection).
+            a is inside b. Every part of a is also a part of b.
+    close: relation(==)
+
+derive contset-definition as FORM:
+    -- contset(a, b): a is a proper subset of b.
+    -- cont encodes two simultaneous meanings held by additionally:
+    --   (1) contained: a is inside b (subset from b's perspective).
+    --   (2) continued: b's structure continues beyond a.
+    -- Both meanings are co-present at the same closure level (additionally).
+    step 1: contset(a, b) requires subset(a, b) -- a is contained in b.
+    step 2: contset(a, b) additionally requires: exists x such that
+            (x in b) and (x not-in a) -- b continues beyond a.
+    step 3: the additionally in step 2 is operative: both conditions hold
+            at the same layer closure. Neither is derived from the other.
+    step 4: contset(a, b) != contset(b, a) in general -- cont is not symmetric.
+            a being contained-additionally-continued-beyond in b
+            is a different claim from b being so in a.
+    close: relation(==)

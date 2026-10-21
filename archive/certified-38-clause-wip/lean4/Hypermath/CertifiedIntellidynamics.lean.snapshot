@@ -1,0 +1,336 @@
+import Std
+
+/-!
+# Certified finite intellidynamics fragment
+
+This module is deliberately independent of Hypermath's open L0--L3 clauses.
+It formalizes the finite certificate, invariant, recovery, abstraction and
+bounded-search fragment used by the executable demonstration.  The host parser
+is outside the kernel boundary; arbitrary parsed input is represented by
+`Wire.malformed` or `Wire.record`, so malformed input is part of the checker
+theorem rather than a precondition.
+-/
+
+namespace Hypermath.CertifiedIntellidynamics
+
+inductive Decision where
+  | accepted
+  | rejected
+  | unknown
+  deriving DecidableEq, Repr
+
+def Decision.authorizes : Decision → Bool
+  | .accepted => true
+  | .rejected | .unknown => false
+
+theorem unknown_does_not_authorize : Decision.unknown.authorizes = false := rfl
+theorem rejected_does_not_authorize : Decision.rejected.authorizes = false := rfl
+
+inductive Version where
+  | v1
+  | v2
+  | bad
+  deriving BEq, DecidableEq, Repr
+
+structure Contract where
+  checker : Nat
+  model : Nat
+  limitRule : Nat
+  authorization : Nat
+  invariant : Nat
+  deriving BEq, DecidableEq, Repr
+
+def trustedContract : Contract := ⟨1, 1, 1, 1, 1⟩
+
+structure Config where
+  version : Version
+  contract : Contract
+  deriving BEq, DecidableEq, Repr
+
+def Config.safePolicy (config : Config) : Bool := config.version != .bad
+
+structure Certificate where
+  source : Config
+  target : Config
+  targetDigest : Config
+  checkedUnder : Contract
+  authorized : Bool
+  coverage : Nat
+  allCasesSafe : Bool
+  deriving BEq, DecidableEq, Repr
+
+inductive Wire where
+  | malformed
+  | record (certificate : Certificate)
+  deriving Repr
+
+def checkCertificate (current candidate : Config) (budget : Nat) : Wire → Decision
+  | .malformed => .rejected
+  | .record certificate =>
+      if budget < 4 then .unknown
+      else if decide (certificate.source = current) &&
+          decide (certificate.target = candidate) &&
+          decide (certificate.targetDigest = candidate) &&
+          decide (certificate.checkedUnder = current.contract) &&
+          certificate.authorized &&
+          certificate.coverage == 4 &&
+          certificate.allCasesSafe &&
+          decide (candidate.contract = current.contract) &&
+          decide (current.contract = trustedContract) &&
+          candidate.safePolicy
+        then .accepted
+        else .rejected
+
+def exactCertificate (source target : Config) : Certificate where
+  source := source
+  target := target
+  targetDigest := target
+  checkedUnder := source.contract
+  authorized := true
+  coverage := 4
+  allCasesSafe := target.safePolicy
+
+theorem malformed_is_rejected (current candidate : Config) (budget : Nat) :
+    checkCertificate current candidate budget .malformed = .rejected := rfl
+
+theorem accepted_certificate_sound (current candidate : Config) (budget : Nat) (wire : Wire)
+    (accepted : checkCertificate current candidate budget wire = .accepted) :
+    candidate.safePolicy = true ∧
+      candidate.contract = current.contract ∧
+      current.contract = trustedContract := by
+  cases wire with
+  | malformed => simp [checkCertificate] at accepted
+  | record certificate =>
+      by_cases budgetSmall : budget < 4
+      · simp [checkCertificate, budgetSmall] at accepted
+      · simp only [checkCertificate, budgetSmall, ↓reduceIte] at accepted
+        split at accepted
+        · rename_i valid
+          simp only [Bool.and_eq_true, beq_iff_eq] at valid
+          exact ⟨valid.2, of_decide_eq_true valid.1.1.2, of_decide_eq_true valid.1.2⟩
+        · contradiction
+
+def v1 : Config := ⟨.v1, trustedContract⟩
+def v2 : Config := ⟨.v2, trustedContract⟩
+def badConfig : Config := ⟨.bad, trustedContract⟩
+
+theorem nontrivial_update_accepts :
+    checkCertificate v1 v2 4 (.record (exactCertificate v1 v2)) = .accepted := by
+  decide
+
+theorem unsafe_update_rejects :
+    checkCertificate v1 badConfig 4 (.record (exactCertificate v1 badConfig)) = .rejected := by
+  decide
+
+theorem exhausted_search_is_unknown :
+    checkCertificate v1 v2 3 (.record (exactCertificate v1 v2)) = .unknown := by
+  decide
+
+structure State where
+  config : Config
+  context : Bool
+  peer : Bool
+  control : Nat
+  forbiddenObserved : Bool
+  persistentEffects : Nat
+  retainedEvidence : Nat
+  recovering : Bool
+  deriving Repr
+
+def State.Safe (state : State) : Prop := state.forbiddenObserved = false
+
+inductive Step : State → State → Prop where
+  | environment (state : State) :
+      Step state { state with context := !state.context, retainedEvidence := state.retainedEvidence + 1 }
+  | proposal (state : State) :
+      Step state { state with retainedEvidence := state.retainedEvidence + 1 }
+  | ordinary (state : State) (policySafe : state.config.safePolicy = true) :
+      Step state { state with persistentEffects := state.persistentEffects + 1, retainedEvidence := state.retainedEvidence + 1 }
+  | installation (state : State) (candidate : Config) (certificate : Wire)
+      (accepted : checkCertificate state.config candidate 4 certificate = .accepted) :
+      Step state { state with config := candidate, retainedEvidence := state.retainedEvidence + 1 }
+  | recovery (state : State) :
+      Step state { state with control := state.control - 1, retainedEvidence := state.retainedEvidence + 1 }
+
+theorem step_preserves_safe {before after : State} (step : Step before after)
+    (safe : before.Safe) : after.Safe := by
+  cases step <;> exact safe
+
+inductive Reachable : State → State → Prop where
+  | refl (state : State) : Reachable state state
+  | tail {first middle last : State} : Reachable first middle → Step middle last → Reachable first last
+
+theorem reachable_preserves_safe {first last : State} (reachable : Reachable first last)
+    (safe : first.Safe) : last.Safe := by
+  induction reachable with
+  | refl => exact safe
+  | tail prior step ih => exact step_preserves_safe step ih
+
+def run {α : Type} (step : α → α) : Nat → α → α
+  | 0, state => state
+  | count + 1, state => run step count (step state)
+
+theorem invariant_for_every_finite_prefix (step : State → State)
+    (preserves : ∀ state, state.Safe → (step state).Safe) (count : Nat) (state : State)
+    (safe : state.Safe) : (run step count state).Safe := by
+  induction count generalizing state with
+  | zero => exact safe
+  | succ count ih => exact ih (step state) (preserves state safe)
+
+abbrev OmegaRank := Nat × Nat
+def RankLt : OmegaRank → OmegaRank → Prop := Prod.Lex Nat.lt Nat.lt
+
+/-- The exact coefficient form used by the Python Ordinatics carrier:
+    `omega * omegaCoeff + finiteCoeff`.  This is a representation bridge, not
+    an identification with native Hypermath `Form`. -/
+structure OmegaLinearCNF where
+  omegaCoeff : Nat
+  finiteCoeff : Nat
+  deriving BEq, DecidableEq, Repr
+
+def rankToLinearCNF (rank : OmegaRank) : OmegaLinearCNF :=
+  ⟨rank.1, rank.2⟩
+
+def linearCNFToRank (rank : OmegaLinearCNF) : OmegaRank :=
+  (rank.omegaCoeff, rank.finiteCoeff)
+
+theorem linearCNFRoundTrip (rank : OmegaRank) :
+    linearCNFToRank (rankToLinearCNF rank) = rank := rfl
+
+def OmegaLinearCNF.Lt (first second : OmegaLinearCNF) : Prop :=
+  Prod.Lex Nat.lt Nat.lt
+    (first.omegaCoeff, first.finiteCoeff)
+    (second.omegaCoeff, second.finiteCoeff)
+
+theorem linearCNFOrderAgrees (first second : OmegaRank) :
+    (rankToLinearCNF first).Lt (rankToLinearCNF second) ↔ RankLt first second := by
+  rfl
+
+theorem linearCNFEmbeddingInjective :
+    ∀ {first second : OmegaRank}, rankToLinearCNF first = rankToLinearCNF second →
+      first = second := by
+  intro first second equal
+  have := congrArg linearCNFToRank equal
+  simpa [linearCNFRoundTrip] using this
+
+theorem rankLt_wellFounded : WellFounded RankLt :=
+  (Prod.lex Nat.lt_wfRel Nat.lt_wfRel).wf
+
+inductive Control where
+  | a
+  | b
+  | g
+  deriving BEq, DecidableEq, Repr
+
+inductive Kernel where
+  | k1
+  | k2
+  deriving BEq, DecidableEq, Repr
+
+def Kernel.next : Kernel → Control → Control
+  | .k1, .a => .b
+  | .k1, .b => .g
+  | .k1, .g => .g
+  | .k2, .a => .g
+  | .k2, .b => .a
+  | .k2, .g => .g
+
+def rankK1 : Control → OmegaRank
+  | .a => (1, 0)
+  | .b => (0, 7)
+  | .g => (0, 0)
+
+def rankK2 : Control → OmegaRank
+  | .a => (0, 1)
+  | .b => (0, 2)
+  | .g => (0, 0)
+
+def CommonDescent (rank : Control → OmegaRank) (kernels : List Kernel) : Prop :=
+  ∀ kernel ∈ kernels, ∀ state, state ≠ .g →
+    RankLt (rank (Kernel.next kernel state)) (rank state)
+
+def rankLtBool (first second : OmegaRank) : Bool :=
+  first.1 < second.1 || (first.1 == second.1 && first.2 < second.2)
+
+def commonRankCheck (rank : Control → OmegaRank) (kernels : List Kernel) : Bool :=
+  kernels.all fun kernel =>
+    rankLtBool (rank (Kernel.next kernel .a)) (rank .a) &&
+    rankLtBool (rank (Kernel.next kernel .b)) (rank .b)
+
+theorem commonRankCheck_sound {rank : Control → OmegaRank} {kernels : List Kernel}
+    (accepted : commonRankCheck rank kernels = true) : CommonDescent rank kernels := by
+  intro kernel member state notGoal
+  simp [commonRankCheck, List.all_eq_true] at accepted
+  have checked := accepted kernel member
+  simp [rankLtBool] at checked
+  cases state with
+  | a => exact Prod.lex_def.mpr checked.1
+  | b => exact Prod.lex_def.mpr checked.2
+  | g => contradiction
+
+theorem k1_common_descent : CommonDescent rankK1 [.k1] := by
+  intro kernel member state notGoal
+  simp at member
+  subst kernel
+  cases state <;> simp_all [Kernel.next, rankK1, RankLt, Prod.lex_def]
+
+theorem k2_common_descent : CommonDescent rankK2 [.k2] := by
+  intro kernel member state notGoal
+  simp at member
+  subst kernel
+  cases state <;> simp_all [Kernel.next, rankK2, RankLt, Prod.lex_def]
+
+theorem switching_has_no_k1_rank : commonRankCheck rankK1 [.k1, .k2] = false := by decide
+theorem switching_cycle : Kernel.next .k2 (Kernel.next .k1 .a) = .a := rfl
+
+def recoverK1 : Nat → Control → Control
+  | 0, state => state
+  | count + 1, state => recoverK1 count (Kernel.next .k1 state)
+
+theorem concrete_recovery_reaches_goal : recoverK1 2 .a = .g := rfl
+
+structure Checkpoint where
+  context : Bool
+  peer : Bool
+  control : Nat
+
+def rollback (state : State) (saved : Checkpoint) : State :=
+  { state with context := saved.context, peer := saved.peer, control := saved.control, retainedEvidence := state.retainedEvidence + 1, recovering := false }
+
+theorem rollback_preserves_persistent_effects (state : State) (saved : Checkpoint) :
+    (rollback state saved).persistentEffects = state.persistentEffects := rfl
+
+theorem rollback_retains_and_extends_evidence (state : State) (saved : Checkpoint) :
+    (rollback state saved).retainedEvidence = state.retainedEvidence + 1 := by
+  simp [rollback]
+
+structure AbstractState where
+  safe : Prop
+  version : Version
+
+def observe (state : State) : AbstractState := ⟨state.Safe, state.config.version⟩
+def Represents (state : State) (abstract : AbstractState) : Prop := abstract = observe state
+def AbstractStep (before after : AbstractState) : Prop := before.safe → after.safe
+
+theorem forward_simulation {before after : State} {view : AbstractState}
+    (represented : Represents before view) (step : Step before after) :
+    ∃ next, AbstractStep view next ∧ Represents after next := by
+  subst view
+  refine ⟨observe after, ?_, rfl⟩
+  intro safe
+  exact step_preserves_safe step safe
+
+theorem abstract_invariant_transfers {state : State} {view : AbstractState}
+    (represented : Represents state view) (safe : view.safe) : state.Safe := by
+  subst view
+  exact safe
+
+def CompositionSafe (left right budget : Nat) : Prop := left + right ≤ budget
+
+theorem composition_sound {left right budget : Nat} (shared : left + right ≤ budget) :
+    CompositionSafe left right budget := shared
+
+theorem locally_safe_not_composition_safe :
+    1 ≤ 1 ∧ 1 ≤ 1 ∧ ¬ CompositionSafe 1 1 1 := by simp [CompositionSafe]
+
+end Hypermath.CertifiedIntellidynamics

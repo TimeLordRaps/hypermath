@@ -1,0 +1,29 @@
+import Hypermath.CertifiedIntellidynamics
+
+open Hypermath.CertifiedIntellidynamics
+
+#check accepted_certificate_sound
+#check step_preserves_safe
+#check reachable_preserves_safe
+#check invariant_for_every_finite_prefix
+#check rankLt_wellFounded
+#check commonRankCheck_sound
+#check k1_common_descent
+#check k2_common_descent
+#check switching_has_no_k1_rank
+#check forward_simulation
+#check abstract_invariant_transfers
+#check composition_sound
+
+#print axioms accepted_certificate_sound
+#print axioms step_preserves_safe
+#print axioms reachable_preserves_safe
+#print axioms invariant_for_every_finite_prefix
+#print axioms rankLt_wellFounded
+#print axioms commonRankCheck_sound
+#print axioms k1_common_descent
+#print axioms k2_common_descent
+#print axioms switching_has_no_k1_rank
+#print axioms forward_simulation
+#print axioms abstract_invariant_transfers
+#print axioms composition_sound

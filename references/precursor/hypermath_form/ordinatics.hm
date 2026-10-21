@@ -1,0 +1,236 @@
+-- ordinatics.hm
+-- The ordinal arithmetic layer of hypermath_form.
+-- Derives: ordinal_limit, ordinal addition, wrap operation W.
+-- This is the first layer that can express infinite forms and their return paths.
+-- Imports: operations.hm (which imports relations.hm, which imports ground.hm)
+-- Status: FORM at ~~ for ordinal_limit definition and non-commutative addition.
+--         FRAME at == for wrap-closes-orbit (closure criterion stated explicitly).
+
+import "operations.hm"
+    -- provides: □, Form, apply, ax-diff, ax-sim, ax-box,
+    --           ~~, =~, ==, filtration,
+    --           +, additionally, quant, quanta, quantity, subset, contset
+
+-- Terms introduced in this file:
+-- ordinal_limit   -- the first form that cannot be reached by any finite count of
+--                    □-applications from ground. The limit of accumulating quanta.
+--                    Replaces omega throughout. Named for what it IS: the limit ordinal.
+-- ordinal_finite  -- any ordinal reachable by finite □-applications from ground.
+--                    The class of all quanta.
+-- ordinal_wrap    -- the return operation: maps any infinite ordinal form back to
+--                    its finite representative in the ~~-class of ground.
+--                    The sempiternal consequence of ax-box at the ordinal level.
+-- a_ordinal       -- ordinal variable a. Ranging variable for ordinal expressions.
+-- b_ordinal       -- ordinal variable b.
+
+derive ordinal_limit-definition as FORM:
+    -- ordinal_limit is the first form not reachable by finite □-applications.
+    step 1: ordinal_finite forms are: ground (0), apply(ground) (1),
+            apply(apply(ground)) (2), ... -- each reachable by finite quanta steps.
+    step 2: ordinal_limit is the form such that for-all ordinal_finite f:
+            f is in the ordinal walk leading to ordinal_limit,
+            but ordinal_limit itself is not reachable from ground by any finite count.
+    step 3: ordinal_limit is the first stopping point where the for(m) act
+            -- the ranging over finite units -- can point but not arrive finitely.
+    step 4: ordinal_limit exists by the same structure as ax-box:
+            the sequence of □-applications does not terminate at any quanta,
+            so the limit of the sequence is the form ~~ ground that no finite chain reaches.
+    close: relation(~~)
+    -- ~~ closure: ordinal_limit is ~~ ground by ax-sim (every □-application stays in class).
+    -- == closure FRAME: requires a formal limit construction in this system.
+    -- Closure criterion: derive the limit as the supremum of finite ordinals
+    -- under the ordinal ordering defined from +.
+
+derive ordinal-addition-non-commutative as FORM:
+    -- a_ordinal + b_ordinal: the end of a_ordinal connects to the beginning of b_ordinal.
+    -- Non-commutative, derived from definitive-expansion (operations.hm).
+    step 1: by definitive-expansion: a_ordinal + b_ordinal joins a_ordinal's end to
+            b_ordinal's beginning.
+    step 2: quanta_1 + ordinal_limit == ordinal_limit.
+            -- One finite step before the limit: the end of quanta_1 connects to
+            -- the beginning of ordinal_limit, which absorbs it.
+            -- quanta_1 disappears into the limit.
+    step 3: ordinal_limit + quanta_1 != ordinal_limit.
+            -- One finite step after the limit: the end of ordinal_limit connects to
+            -- the beginning of quanta_1, producing a form strictly larger than ordinal_limit.
+    step 4: therefore + is non-commutative on ordinals containing ordinal_limit.
+    close: relation(==)
+
+derive ordinal_wrap-definition as FORM:
+    -- ordinal_wrap(x) maps any infinite ordinal form to its finite ~~-class representative.
+    -- This is ax-box applied at the ordinal level.
+    step 1: by ax-box: apply(apply(x)) ~~ x for all x.
+    step 2: for any infinite ordinal a_ordinal (one that accumulates beyond ordinal_limit):
+            the orbit of □ applied to a_ordinal returns ~~ to a_ordinal's ground form.
+    step 3: ordinal_wrap(a_ordinal) is the finite form f such that a_ordinal ~~ f.
+            It is the return point: the finite representative of the infinite ordinal.
+    step 4: ordinal_wrap exists because ax-sim guarantees apply(x) ~~ ground for all x.
+            No infinite ordinal leaves the ~~-class of ground.
+            ordinal_wrap is the name for finding the specific finite member of that class.
+    close: relation(~~)
+    -- ~~ closure: ordinal_wrap is ~~ to the identity on finite ordinals.
+    -- == closure FRAME: requires the specific computation of which finite form each
+    -- infinite ordinal wraps to. This is the content of the W-function.
+    -- Closure criterion: for-all infinite ordinal a_ordinal,
+    -- derive the specific quanta that ordinal_wrap(a_ordinal) resolves to.
+    -- The core instance (ordinal_wrap applied to the triangular ordinal at ordinal_limit)
+    -- resolves to -1/12 in the rational-coefficient domain.
+    -- That specific closure is FRONTIER until the rational domain is derived in this system.
+    -- UPDATE 2026-04-13: the rational domain is derivable within this file.
+    -- See: ordinal-ratio-definition below. The full close is now in triangular-ordinal-wrap.
+
+derive ordinal-ordering as FORM:
+    -- Derives the less-than relation on ordinals from ordinal addition.
+    -- Required by: ordinal_limit-as-supremum, ordinal-multiplication.
+    step 1: define: a_ordinal < b_ordinal iff
+            exists c_ordinal such that (c_ordinal != ground) and (a_ordinal + c_ordinal == b_ordinal).
+            -- "b_ordinal is reachable from a_ordinal by a non-zero definitive expansion."
+    step 2: ground < quanta_1 because ground + quanta_1 == quanta_1.
+            (by ordinal-addition: the end of ground connects to beginning of quanta_1)
+    step 3: for-all ordinal_finite f: f < ordinal_limit.
+            -- ordinal_limit is unreachable by finite steps from ground,
+            -- so for every f there exists ordinal_limit - f (the remaining gap),
+            -- which is non-zero, such that f + (ordinal_limit - f) == ordinal_limit.
+    step 4: ordinal-ordering is strict (a_ordinal < b_ordinal implies not b_ordinal < a_ordinal).
+            Proof: if a + c == b and b + d == a with c,d != ground,
+            then a + c + d == a. But c + d != ground (ax-diff: generating more generates more).
+            Contradiction.
+    close: relation(==)
+
+derive ordinal_limit-as-supremum as FORM:
+    -- Closes ordinal_limit-definition from ~~ to ==.
+    -- ordinal_limit == the smallest ordinal not in ordinal_finite.
+    step 1: by ordinal-ordering: for-all ordinal_finite f: f < ordinal_limit.
+    step 2: no ordinal between all ordinal_finite and ordinal_limit:
+            assume x such that for-all f: f < x and x < ordinal_limit.
+            Then x would be reached from ground by some finite steps (by ordinal ordering),
+            making x an ordinal_finite. But x > all ordinal_finite. Contradiction.
+    step 3: ordinal_limit == the supremum: the unique form satisfying
+            (a) for-all ordinal_finite f: f < ordinal_limit
+            (b) for-all x < ordinal_limit: x is ordinal_finite.
+    close: relation(==)
+
+derive ordinal-multiplication as FORM:
+    -- Derives multiplication as repeated definitive addition.
+    -- Required by: triangular-ordinal-definition, triangular-ordinal-wrap.
+    step 1: define a_ordinal * ground == ground.
+            -- Zero times anything is ground (the empty-expansion).
+    step 2: define a_ordinal * (b_ordinal + quanta_1) == (a_ordinal * b_ordinal) + a_ordinal.
+            -- Multiplication is repeated addition: adding a_ordinal one more time.
+    step 3: ground * quanta_1 == ground additionally quanta_1... wait, applied:
+            quanta_1 * quanta_2 == (quanta_1 * quanta_1) + quanta_1 == quanta_1 + quanta_1 == quanta_2.
+            Check: 1*2 == 2. FORM.
+            quanta_2 * quanta_3 == (quanta_2 * quanta_2) + quanta_2 == quanta_4 + quanta_2 == quanta_6.
+            Check: 2*3 == 6. FORM.
+    step 4: multiplicativeness-of-2:
+            quanta_2 * a_ordinal == a_ordinal + a_ordinal.
+            -- Doubling is the most primitive multiplication: adding a form to itself.
+            -- This is the structural origin of the "multiplicativeness of 2" in ordinal_wrap.
+    close: relation(==)
+
+derive signed-ordinal-definition as FORM:
+    -- Introduces negative forms as additive inverses: the return-path direction.
+    -- Ax-box says □(□(x)) ~~ x: there is a return path for every form.
+    -- Signed ordinals name the forms on that return path explicitly.
+    step 1: define signed_ordinal(a_ordinal) as the pair (a_ordinal, b_ordinal)
+            representing "a_ordinal - b_ordinal" -- i.e. the form satisfying
+            b_ordinal + x == a_ordinal.
+    step 2: the additive inverse of a_ordinal is signed_ordinal(ground, a_ordinal),
+            the form satisfying a_ordinal + x == ground.
+            Notation: neg(a_ordinal).
+    step 3: neg(quanta_1) exists by ax-box: □ applied twice returns ~~ to ground,
+            so the sequence quanta_1 -> apply(quanta_1) -> ... -> ground has a return path.
+            neg(quanta_1) is the form that, added to quanta_1, closes the loop at ground.
+    step 4: integer_forms are: all ordinal_finite additionally all neg(ordinal_finite).
+            These are the "small forms" situted symmetrically around ground.
+    step 5: neg(quanta_12) is the form satisfying quanta_12 + neg(quanta_12) == ground.
+    close: relation(==)
+
+derive ordinal-ratio-definition as FORM:
+    -- Derives rational forms as quotients of integer forms.
+    -- ordinal_ratio(a, b) is the form x satisfying b * x == a, where b != ground.
+    step 1: define ordinal_ratio(a, b) as the form satisfying b * x == a.
+    step 2: ordinal_ratio(quanta_1, quanta_4) is the form x satisfying quanta_4 * x == quanta_1.
+            Notation: the form "one-quarter."
+    step 3: ordinal_ratio(neg(quanta_1), quanta_12) is the form x satisfying
+            quanta_12 * x == neg(quanta_1).
+            This is the form "negative-one-twelfth."
+    step 4: ordinal-ratio forms are closed under ordinal-addition and ordinal-multiplication
+            (computable from their integer numerators and denominators).
+    close: relation(==)
+
+derive grandi-wrap as FORM:
+    -- ordinal_wrap(1-1+1-1+...) == ordinal_ratio(quanta_1, quanta_2).
+    -- The fundamental 2-fold self-consistency: G == 1 - G.
+    -- This is the simplest non-trivial ordinal_wrap evaluation.
+    step 1: let grandi == 1-1+1-1+... (the ordinal form with alternating unit terms).
+    step 2: grandi is in the ~~-class of ground (by ax-sim applied infinitely).
+    step 3: self-consistency: grandi == quanta_1 - grandi.
+            -- The first term is quanta_1, the rest is neg(grandi) (same infinite alternating form).
+    step 4: grandi + grandi == quanta_1.
+            quanta_2 * grandi == quanta_1.
+            grandi == ordinal_ratio(quanta_1, quanta_2).
+    step 5: ordinal_wrap(grandi) == ordinal_ratio(quanta_1, quanta_2).
+    close: relation(==)
+    -- Note: the quanta_2 in step 4 IS the "multiplicativeness of 2" --
+    -- it arises from the self-consistency of the form, not from an assumption.
+
+derive alternating-triangular-wrap as FORM:
+    -- ordinal_wrap(1-2+3-4+...) == ordinal_ratio(quanta_1, quanta_4).
+    -- Derives eta (the alternating triangular series) = 1/4
+    -- via 2-fold self-consistency: eta + eta_shifted == grandi.
+    -- The quanta_4 == quanta_2 * quanta_2: multiplicativeness of 2 applied twice.
+    step 1: let eta == 1-2+3-4+5-6+... (alternating triangular ordinal form).
+    step 2: let eta_shifted == 0+1-2+3-4+5-...
+            -- eta_shifted is eta prepended with ground (one position shift).
+            -- eta_shifted at position n == neg(eta-form at position n-1) for n > 1.
+    step 3: eta + eta_shifted at each position:
+            position 1: quanta_1 + ground == quanta_1.
+            position 2: neg(quanta_2) + quanta_1 == neg(quanta_1).
+            position 3: quanta_3 + neg(quanta_2) == quanta_1.
+            position 4: neg(quanta_4) + quanta_3 == neg(quanta_1).
+            pattern: alternates quanta_1, neg(quanta_1), quanta_1, neg(quanta_1), ...
+            That is: grandi (the Grandi form from grandi-wrap).
+    step 4: eta + eta_shifted == grandi == ordinal_ratio(quanta_1, quanta_2).
+            But eta_shifted ~~ eta (same infinite form, shifted by ground at start).
+            Under ordinal_wrap: ordinal_wrap(eta_shifted) == ordinal_wrap(eta).
+            Therefore: quanta_2 * ordinal_wrap(eta) == ordinal_ratio(quanta_1, quanta_2).
+    step 5: ordinal_wrap(eta) == ordinal_ratio(quanta_1, quanta_4).
+            -- quanta_4 == quanta_2 * quanta_2: the doubled double.
+            -- This is the "multiplicativeness of 2": two doublings produce the quanta_4 denominator.
+    close: relation(==)
+
+derive triangular-ordinal-wrap as FORM:
+    -- ordinal_wrap(1+2+3+4+...) == ordinal_ratio(neg(quanta_1), quanta_12).
+    -- The main theorem: closes ordinal_wrap at == for the triangular ordinal.
+    -- Structural insight (Tyler Roost, 2026-04-13):
+    --   "multiplicativeness of 2" produces the quanta_4 == 2*2 factor;
+    --   "3 as necessary extension from ax-diff" is the residual 4-1 = 3
+    --   (ax-diff: the doubled form is MORE than ground; 3 measures that excess).
+    step 1: let S == 1+2+3+4+... (triangular ordinal at ordinal_limit).
+    step 2: let eta == 1-2+3-4+... (from alternating-triangular-wrap: eta == 1/4).
+    step 3: compute S - eta at each position n:
+            n odd:  S(n) - eta(n) == quanta_n - quanta_n == ground.
+            n even: S(n) - eta(n) == quanta_n - neg(quanta_n)
+                    == quanta_n + quanta_n == quanta_2 * quanta_n.
+    step 4: S - eta == sum of (quanta_2 * quanta_n) for n in even positions
+                    == quanta_2 * (quanta_2 + quanta_4 + quanta_6 + ...)
+                    == quanta_2 * quanta_2 * (quanta_1 + quanta_2 + quanta_3 + ...)
+                    == quanta_4 * S.
+            -- The quanta_4 == quanta_2 * quanta_2: multiplicativeness of 2.
+    step 5: S - eta == quanta_4 * S.
+            S + neg(quanta_4 * S) == eta.
+            (quanta_1 + neg(quanta_4)) * S == eta.
+            neg(quanta_3) * S == eta.
+            -- The neg(quanta_3): this is Tyler's "3 as necessary extension from ax-diff."
+            -- quanta_3 == quanta_4 - quanta_1 == (quanta_2 * quanta_2) - ground.
+            -- ax-diff guarantees: the doubled-doubled form IS MORE than ground.
+            -- That excess is exactly quanta_3. It cannot be zero (ax-diff: □(x) != □).
+    step 6: neg(quanta_3) * ordinal_wrap(S) == ordinal_ratio(quanta_1, quanta_4).
+            ordinal_wrap(S) == ordinal_ratio(quanta_1, quanta_4) / neg(quanta_3).
+            ordinal_wrap(S) == ordinal_ratio(neg(quanta_1), quanta_12).
+            -- quanta_12 == quanta_4 * quanta_3 == (quanta_2 * quanta_2) * (quanta_2 * quanta_2 - ground).
+    close: relation(==)
+    -- ordinal_wrap(triangular ordinal at ordinal_limit) == neg(quanta_1)/quanta_12 == -1/12.
+    -- This closes the FRONTIER stated in ordinal_wrap-definition.
+    -- All downstream == closures (kernel.hm, form.mm Layer 0) are now unblocked.
